@@ -1,0 +1,8 @@
+.login .dialog--input {
+    width: 200px;
+}
+
+.dialog-error--message {
+    margin: 10px;
+    color: red;
+}

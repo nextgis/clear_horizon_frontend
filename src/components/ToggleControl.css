@@ -1,0 +1,7 @@
+.toggle-control {
+  font-size: 1.2rem;
+}
+
+.toggle-control.active {
+  background-color: green !important ;
+}

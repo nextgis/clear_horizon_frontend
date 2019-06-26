@@ -1,0 +1,17 @@
+/* DIALOG */
+.dialog--form {
+
+}
+
+.dialog--input {
+    margin: 5px;
+}
+
+.dialog--button {
+    padding: 5px;
+}
+
+.ngw-map-container.leaflet-container {
+    background: #fff;
+  }
+

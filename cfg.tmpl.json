@@ -1,0 +1,13 @@
+{
+  "mapOptions": {
+    "target": "map",
+    "qmsId": 487,
+    "bounds": [45,46,47,49],
+    "baseUrl": "https://demo.nextgis.com",
+    "webmapId": 4199,
+    "auth": {
+      "login": "",
+      "password": ""
+    }
+  }
+}
