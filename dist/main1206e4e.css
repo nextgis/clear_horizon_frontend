@@ -1,0 +1,83 @@
+/* DIALOG */
+.dialog--form {
+
+}
+
+.dialog--input {
+    margin: 5px;
+}
+
+.dialog--button {
+    padding: 5px;
+}
+
+.ngw-map-container.leaflet-container {
+    background: #fff;
+  }
+
+.toggle-control {
+  font-size: 1.2rem;
+}
+
+.toggle-control.active {
+  background-color: green !important ;
+}
+.tree-container.hidden {
+  display: none;
+}
+
+.tree-container {
+  display: block;
+  padding: 10px 0;
+  height: 100%;
+  overflow: auto;
+}
+
+.tree-container__item {
+  padding-top: .3rem;
+}
+
+.tree-container__item input {
+  margin-right: 3px;
+}
+
+.tree-container__item-children {
+  padding: 0;
+  padding-top: 3px;
+  padding-left: 15px;
+}
+
+/* .tree-container__item-children > .tree-container__item {
+  padding: 
+} */.login .dialog--input {
+    width: 200px;
+}
+
+.dialog-error--message {
+    margin: 10px;
+    color: red;
+}.dialog-component {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.dialog-component::backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dialog-component__close {
+  margin-top: -2px;
+  float: right;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  filter: alpha(opacity=20);
+  opacity: .2;
+}
+

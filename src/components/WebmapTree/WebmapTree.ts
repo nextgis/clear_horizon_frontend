@@ -60,7 +60,9 @@ export class WebmapTree {
       if (this.ngwLayers.hasOwnProperty(n)) {
         const ngwLayer = this.ngwLayers[n];
         const tree = this._createTreeItem(ngwLayer.layer.layer);
-        container.appendChild(tree);
+        if (tree) {
+          container.appendChild(tree);
+        }
       }
     }
 
@@ -73,7 +75,9 @@ export class WebmapTree {
     layers.forEach((x) => {
       if (x.item) {
         const item = this._createTreeItem(x);
-        elem.appendChild(item);
+        if (item) {
+          elem.appendChild(item);
+        }
       }
     });
     return elem;
@@ -81,6 +85,9 @@ export class WebmapTree {
 
   private _createTreeItem(layer: WebMapLayerItem) {
     const item: TreeGroup | TreeLayer = layer.item;
+    if (!item) {
+      return false;
+    }
     const elem = document.createElement('div');
     elem.className = 'tree-container__item';
     if (item.display_name) {
