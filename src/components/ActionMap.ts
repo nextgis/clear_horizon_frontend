@@ -8,10 +8,10 @@ import 'leaflet/dist/leaflet.css';
 // import MapAdapter from '@nextgis/ol-map-adapter';
 // import 'ol/ol.css';
 
-import { AppOptions } from 'src/App';
+import { AppOptions, FireResource } from 'src/App';
 import { WebmapTreeControl } from './WebmapTree/WebmapTreeControl';
-import NgwConnector from '@nextgis/ngw-connector';
-import { Auth } from './Auth';
+import { Auth } from './Auth/Auth';
+import { Feature, Point, MultiPoint } from 'geojson';
 
 interface FunctionArg {
   argType: 'function';
@@ -24,34 +24,41 @@ interface WebMapRemote {
   args?: Array<any | FunctionArg>;
 }
 
+interface Firms {
+  acq_date: string;
+  acq_time: string; // '09:06';
+  bright_t31?: number;
+  brightness?: number;
+  confidence: string;
+  daynight: 'D';
+  frp: number;
+  latitude: number;
+  longitude: number;
+  satellite: 'N';
+  scan: number;
+  track: number;
+  version: string;
+}
+
 export class ActionMap {
 
   ngwMap: NgwMap<L.Map, L.Layer, any>;
 
-  connector: NgwConnector;
   tree?: WebmapTreeControl;
   treeControl?: L.Control & ToggleControl;
 
+  authControl?: L.Control & ToggleControl;
+
   constructor(private options: AppOptions) {
-    this.connector = new NgwConnector({baseUrl: options.mapOptions.baseUrl, auth: options.mapOptions.auth});
+    // ignore
   }
 
-  async create(options: NgwMapOptions) {
-    let connectionOk = false;
-    try {
-      connectionOk = !!await this.connector.connect();
-    } catch (er) {
-      // handle error
-    }
-    if (!connectionOk) {
-      const auth = new Auth();
-      const credentials = await auth.getAuth();
-      await this.connector.login(credentials);
-    }
-
+  async create(options: NgwMapOptions, fires?: FireResource[]) {
+    const auth = new Auth(options);
+    await auth.login();
     this.ngwMap = new NgwMap(new MapAdapter(), {
       controls: [],
-      connector: this.connector,
+      connector: auth.connector,
       ...options
     });
 
@@ -60,27 +67,50 @@ export class ActionMap {
     this.ngwMap.addControl('ZOOM', 'top-left');
     this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
 
+    this.authControl = await this.ngwMap.createButtonControl({
+      html: '<span>&#10162;</span>',
+      title: 'Выйти',
+      onClick: () => {
+        auth.logout();
+        window.location.reload();
+      }
+    });
+    this.ngwMap.addControl(this.authControl , 'top-right');
+
     const ngwLayers = await this.ngwMap.getNgwLayers();
+
+    if (fires) {
+      for (const x of fires) {
+        await this.ngwMap.addNgwLayer({
+          resourceId: x.resourceId,
+          adapterOptions: {
+            paint: {stroke: true, color: x.color, fillOpacity: 0.5},
+            selectable: true,
+            selectedPaint: {stroke: true, color: x.color, fillOpacity: 0.9},
+            selectOnHover: true,
+            popupOnSelect: true,
+            popupOptions: {
+              createPopupContent: (e) => {
+                if (e.feature) {
+                  const feature = e.feature as Feature<MultiPoint, Firms>;
+                  return this._createPopupContent(feature);
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
     await this._addTreeControl(ngwLayers);
 
     this._addEventsListeners();
   }
 
-  executeWebMapCommand(descriptor: WebMapRemote): any {
-    if (this.ngwMap && descriptor.type === 'webmap_remote') {
-      const cmd = descriptor.cmd;
-      const args = [].concat(descriptor.args).map((y) => {
-        if (y && y.argType && y.argType === 'function') {
-          // tslint:disable-next-line:function-constructor
-          return new Function('return ' + y.body)();
-        }
-        return y;
-      });
-      const exec = this.ngwMap[cmd];
-      if (exec) {
-        return exec.apply(this.ngwMap, args);
-      }
-    }
+  private _createPopupContent(feature: Feature<MultiPoint, Firms>): HTMLElement {
+    const popupElement = document.createElement('pre');
+    popupElement.innerHTML = JSON.stringify(feature.properties, null, 2);
+    return popupElement;
   }
 
   private async _addTreeControl(ngwLayers: NgwLayers) {

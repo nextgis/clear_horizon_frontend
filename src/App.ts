@@ -14,8 +14,14 @@ export interface ConnectionOptions {
   showUrl: string;
 }
 
+export interface FireResource {
+  resourceId: number;
+  color?: string;
+}
+
 export interface AppOptions {
   mapOptions?: NgwMapOptions;
+  fires?: FireResource[];
 }
 
 export class App {
@@ -27,7 +33,7 @@ export class App {
 
   async create(options?: AppOptions) {
     this.options = { ...this.options, ...options };
-    this.actionMap.create(this.options.mapOptions);
+    this.actionMap.create(this.options.mapOptions, this.options.fires);
   }
 
 }

@@ -1,6 +1,8 @@
 import './Auth.css';
 
+import NgwConnector from '@nextgis/ngw-connector';
 import Dialog from '@nextgis/dialog';
+import { NgwMapOptions } from '@nextgis/ngw-map';
 
 export interface Credentials {
   login: string;
@@ -9,16 +11,45 @@ export interface Credentials {
 
 export class Auth {
 
+  readonly connector: NgwConnector;
+  private readonly _storageKey = 'auth';
+  private readonly _storage = localStorage;
   private _errorMessage: string;
   private auth: Credentials;
 
-  constructor() { }
+  constructor(private options: NgwMapOptions) {
+    this.connector = new NgwConnector({baseUrl: options.baseUrl, auth: options.auth});
+    const auth = this._storage.getItem(this._storageKey);
+    if (auth) {
+      this.auth = JSON.parse(auth);
+    }
+  }
+
+  async login(credentials?: Credentials) {
+    this._errorMessage = '';
+    if (!credentials) {
+      credentials = await this.getAuth();
+    }
+    try {
+    await this.connector.login(credentials);
+    } catch (er) {
+      this._errorMessage = 'Не удаётся войти';
+      const auth = await this._showLoginDialog(credentials);
+      await this.login(auth);
+    }
+    if (this.connector.getUserInfo) {
+      this._storage.setItem(this._storageKey, JSON.stringify(credentials));
+    }
+  }
+
+  logout() {
+    this.connector.logout();
+    this._storage.setItem(this._storageKey, '');
+    this._errorMessage = '';
+  }
 
   async getAuth() {
-    if (this.auth) {
-      return this.auth;
-    }
-    const auth = await this._showLoginDialog();
+    const auth = await this._showLoginDialog(this.auth);
     return auth;
   }
 
