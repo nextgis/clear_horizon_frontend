@@ -16,6 +16,7 @@ export interface ConnectionOptions {
 
 export interface FireResource {
   resourceId: number;
+  id: string;
   color?: string;
 }
 

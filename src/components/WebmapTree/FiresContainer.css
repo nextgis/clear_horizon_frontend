@@ -1,0 +1,15 @@
+.fires-contentainer {
+  padding: 15px;
+}
+
+.fires-contentainer__layers .tree-container__item span {
+  padding-left: 3px;
+}
+
+.item-symbol {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #000;
+  border-radius: 50%;
+}

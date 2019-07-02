@@ -6,6 +6,7 @@ import { NgwLayers } from '@nextgis/ngw-map';
 
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
+import { FiresContainer } from './FiresContainer';
 
 
 const OPTIONS: WebmapTreeOptions = {
@@ -21,7 +22,6 @@ export class WebmapTree {
   private _target: HTMLElement;
 
   private ngwLayers!: NgwLayers;
-  private _panels: CollapsiblePanel[];
 
   constructor(options: WebmapTreeOptions) {
     this.options = { ...OPTIONS, ...options };
@@ -61,16 +61,22 @@ export class WebmapTree {
 
     const ngwPanel = new CollapsiblePanel({
       title: 'Базовые слои',
-      content: () => this._createNgwlayers(),
+      content: () => this._createNgwLayers(),
       open: false,
       parent: container
     });
-
+    if (this.options.fires) {
+      const firesPanel = new CollapsiblePanel({
+        title: 'Термоточки (FIRMS)',
+        content: () => this._createFiresContainer(),
+        parent: container
+      });
+    }
 
     return container;
   }
 
-  private _createNgwlayers() {
+  private _createNgwLayers() {
     const container = document.createElement('div');
     container.className = '';
     for (const n in this.ngwLayers) {
@@ -82,6 +88,19 @@ export class WebmapTree {
           container.appendChild(treeContainer);
         }
       }
+    }
+    return container;
+  }
+
+  private _createFiresContainer() {
+    const container = document.createElement('div');
+    const fires = this.options.fires;
+    if (fires) {
+      const firesContainer = new FiresContainer({
+        fires,
+        ngwMap: this.options.ngwMap
+      });
+      container.appendChild(firesContainer.getContainer());
     }
     return container;
   }

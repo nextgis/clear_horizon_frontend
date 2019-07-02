@@ -11,7 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import { AppOptions, FireResource } from 'src/App';
 import { WebmapTreeControl } from './WebmapTree/WebmapTreeControl';
 import { Auth } from './Auth/Auth';
-import { Feature, Point, MultiPoint } from 'geojson';
+import { Feature, MultiPoint } from 'geojson';
 
 interface FunctionArg {
   argType: 'function';
@@ -75,7 +75,7 @@ export class ActionMap {
         window.location.reload();
       }
     });
-    this.ngwMap.addControl(this.authControl , 'top-right');
+    this.ngwMap.addControl(this.authControl, 'top-right');
 
     const ngwLayers = await this.ngwMap.getNgwLayers();
 
@@ -83,10 +83,11 @@ export class ActionMap {
       for (const x of fires) {
         await this.ngwMap.addNgwLayer({
           resourceId: x.resourceId,
+          id: x.id,
           adapterOptions: {
-            paint: {stroke: true, color: x.color, fillOpacity: 0.5},
+            paint: { stroke: true, color: x.color, fillOpacity: 0.5 },
             selectable: true,
-            selectedPaint: {stroke: true, color: x.color, fillOpacity: 0.9},
+            selectedPaint: { stroke: true, color: x.color, fillOpacity: 0.9 },
             selectOnHover: true,
             popupOnSelect: true,
             popupOptions: {
@@ -102,7 +103,7 @@ export class ActionMap {
       }
     }
 
-    await this._addTreeControl(ngwLayers);
+    await this._addTreeControl(ngwLayers, fires);
 
     this._addEventsListeners();
   }
@@ -113,10 +114,14 @@ export class ActionMap {
     return popupElement;
   }
 
-  private async _addTreeControl(ngwLayers: NgwLayers) {
+  private async _addTreeControl(ngwLayers: NgwLayers, fires: FireResource[]) {
     await this.ngwMap.onLoad();
 
-    this.tree = new WebmapTreeControl(this, { ngwLayers });
+    this.tree = new WebmapTreeControl(this, {
+      ngwLayers,
+      ngwMap: this.ngwMap,
+      fires
+    });
     this.treeControl = await this.ngwMap.createToggleControl(this.tree);
 
     this.ngwMap.addControl(this.treeControl, 'top-left');
