@@ -4,7 +4,7 @@
 
 .tree-container {
   display: block;
-  padding: 10px 0;
+  /* padding: 10px 0; */
   height: 100%;
   overflow: auto;
 }
@@ -24,5 +24,5 @@
 }
 
 /* .tree-container__item-children > .tree-container__item {
-  padding: 
+  padding:
 } */

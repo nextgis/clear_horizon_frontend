@@ -1,10 +1,11 @@
 import './WebmapTree.css';
 
 import { WebmapTreeOptions } from './interfaces';
-import { WebMapLayerItem, TreeGroup, TreeLayer } from '@nextgis/ngw-kit';
+
 import { NgwLayers } from '@nextgis/ngw-map';
-import WebMap from '@nextgis/webmap';
-import { CheckProperty, CheckChangeEvent } from '@nextgis/item';
+
+import { CollapsiblePanel } from './CollapsiblePanel';
+import { WebmapTreeItem } from './WebmapTreeItem';
 
 
 const OPTIONS: WebmapTreeOptions = {
@@ -20,6 +21,7 @@ export class WebmapTree {
   private _target: HTMLElement;
 
   private ngwLayers!: NgwLayers;
+  private _panels: CollapsiblePanel[];
 
   constructor(options: WebmapTreeOptions) {
     this.options = { ...OPTIONS, ...options };
@@ -56,71 +58,32 @@ export class WebmapTree {
     container.className = 'tree-container';
 
     container.style.width = (this.options.width || 300) + 'px';
-    for (const n in this.ngwLayers) {
-      if (this.ngwLayers.hasOwnProperty(n)) {
-        const ngwLayer = this.ngwLayers[n];
-        const tree = this._createTreeItem(ngwLayer.layer.layer);
-        if (tree) {
-          container.appendChild(tree);
-        }
-      }
-    }
+
+    const ngwPanel = new CollapsiblePanel({
+      title: 'Базовые слои',
+      content: () => this._createNgwlayers(),
+      open: false,
+      parent: container
+    });
+
 
     return container;
   }
 
-  private _createTreeBranch(layers: WebMapLayerItem[]) {
-    const elem = document.createElement('div');
-    elem.className = 'tree-container__item-children';
-    layers.forEach((x) => {
-      if (x.item) {
-        const item = this._createTreeItem(x);
-        if (item) {
-          elem.appendChild(item);
+  private _createNgwlayers() {
+    const container = document.createElement('div');
+    container.className = '';
+    for (const n in this.ngwLayers) {
+      if (this.ngwLayers.hasOwnProperty(n)) {
+        const ngwLayer = this.ngwLayers[n];
+        const tree = new WebmapTreeItem(ngwLayer.layer.layer);
+        const treeContainer = tree.getContainer();
+        if (treeContainer) {
+          container.appendChild(treeContainer);
         }
       }
-    });
-    return elem;
-  }
-
-  private _createTreeItem(layer: WebMapLayerItem) {
-    const item: TreeGroup | TreeLayer = layer.item;
-    if (!item) {
-      return false;
     }
-    const elem = document.createElement('div');
-    elem.className = 'tree-container__item';
-    if (item.display_name) {
-      const input = document.createElement('input');
-      input.setAttribute('type', 'checkbox');
-      const value = item.item_type === 'layer' ? item.layer_enabled : true;
-      input.checked = value;
-
-      const visibility = layer.properties.property('visibility') as CheckProperty;
-      if (visibility) {
-        visibility.emitter.on('change', (ev: CheckChangeEvent) => {
-          input.checked = ev.value;
-        });
-        input.onclick = () => {
-          visibility.set(input.checked, {
-            propagation: WebMap.keys.pressed('ctrl')
-          });
-        };
-      }
-
-      const name = document.createElement('span');
-      name.innerHTML = item.display_name;
-
-      elem.appendChild(input);
-      elem.appendChild(name);
-    }
-
-    if (item.item_type === 'group' || item.item_type === 'root' && item.children.length) {
-      const children = layer.tree.getChildren() as WebMapLayerItem[];
-      const treeBranch = this._createTreeBranch(children.reverse());
-      elem.appendChild(treeBranch);
-    }
-    return elem;
+    return container;
   }
 
 }

@@ -1,0 +1,20 @@
+.panel-header {
+  padding: 0 4px;
+  background-color: rgba(0,0,0,.05);
+  border: 1px solid rgba(0,0,0,.4);
+  height: 45px;
+  line-height: 45px;
+}
+
+.panel-header__toggle {
+  width: 30px;
+  height: 30px;
+  float: right;
+  border: 1px solid rgba(0,0,0,.7);
+  margin: 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  line-height: 30px;
+
+}
