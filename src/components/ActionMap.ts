@@ -85,6 +85,9 @@ export class ActionMap {
           resourceId: x.resourceId,
           id: x.id,
           adapterOptions: {
+            propertiesFilter: [
+              ['timestamp', 'ge', new Date().getTime() - (this.options.timedelta * 3600000) ]
+            ],
             paint: { stroke: true, color: x.color, fillOpacity: 0.5 },
             selectable: true,
             selectedPaint: { stroke: true, color: x.color, fillOpacity: 0.9 },

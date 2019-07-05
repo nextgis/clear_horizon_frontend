@@ -23,6 +23,7 @@ export interface FireResource {
 export interface AppOptions {
   mapOptions?: NgwMapOptions;
   fires?: FireResource[];
+  timedelta?: 24;
 }
 
 export class App {

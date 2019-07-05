@@ -2,7 +2,7 @@ import './FiresContainer.css';
 
 import { FireResource } from 'src/App';
 import NgwMap from '@nextgis/ngw-map';
-import { ResourceAdapter } from '@nextgis/ngw-kit';
+import { ResourceAdapter, VectorResourceAdapter } from '@nextgis/ngw-kit';
 
 export interface FiresContainerOptions {
   ngwMap: NgwMap;
@@ -15,10 +15,10 @@ export class FiresContainer {
   private _container: HTMLElement;
 
   private _select = [
-    ['24h', '24 часа'],
-    ['48h', '48 часов'],
-    ['72h', '72 часа'],
-    ['168h', 'неделя']
+    ['24', '24 часа'],
+    ['48', '48 часов'],
+    ['72', '72 часа'],
+    ['168', 'неделя']
   ];
 
   constructor(private options: FiresContainerOptions) {
@@ -57,9 +57,9 @@ export class FiresContainer {
 
     input.checked = true;
 
-      // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
-      //   input.checked = ev.value;
-      // });
+    // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
+    //   input.checked = ev.value;
+    // });
     input.onclick = () => {
       this.ngwMap.toggleLayer(fire.id, input.checked);
     };
@@ -104,6 +104,15 @@ export class FiresContainer {
       option.text = x[1];
       selector.appendChild(option);
     });
+
+    selector.onchange = () => {
+      this.options.fires.forEach((x) => {
+        const layer = this.ngwMap.getLayer(x.id) as VectorResourceAdapter;
+        layer.propertiesFilter([
+          ['timestamp', 'ge', new Date().getTime() - (Number(selector.value) * 3600000)]
+        ]);
+      });
+    };
 
     label.appendChild(selector);
     elem.appendChild(label);
