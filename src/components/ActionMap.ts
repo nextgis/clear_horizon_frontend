@@ -86,11 +86,11 @@ export class ActionMap {
           id: x.id,
           adapterOptions: {
             propertiesFilter: [
-              ['timestamp', 'ge', new Date().getTime() - (this.options.timedelta * 3600000) ]
+              ['timestamp', 'ge', Math.floor(Date.now() / 1000) - (Number(this.options.timedelta) * 3600) ]
             ],
-            paint: { stroke: true, color: x.color, fillOpacity: 0.5 },
+            paint: { stroke: true, color: x.color, fillOpacity: 0.6, radius: 5 },
             selectable: true,
-            selectedPaint: { stroke: true, color: x.color, fillOpacity: 0.9 },
+            selectedPaint: { stroke: true, color: x.color, fillOpacity: 0.9, radius: 7 },
             selectOnHover: true,
             popupOnSelect: true,
             popupOptions: {
