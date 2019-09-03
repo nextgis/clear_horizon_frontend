@@ -25,3 +25,15 @@ git pull origin master
 ```
 
 In this case, the @nextgis libraries will be used from the submodule, not from the node_modules
+
+## Docker
+
+```bash
+docker build -t registry.nextgis.com/clear_horizon:0.0.0 .
+docker build -t registry.nextgis.com/clear_horizon:latest .
+docker run -it -p 8080:8080 --rm --name code-nextgis-1 registry.nextgis.com/clear_horizon:latest
+
+docker push registry.nextgis.com/clear_horizon:0.0.0
+docker push registry.nextgis.com/clear_horizon:latest
+```
+

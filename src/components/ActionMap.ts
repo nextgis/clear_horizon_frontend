@@ -12,7 +12,13 @@ import { AppOptions, FireResource } from 'src/App';
 import { WebmapTreeControl } from './WebmapTree/WebmapTreeControl';
 import { Auth } from './Auth/Auth';
 import { Feature, MultiPoint, Geometry } from 'geojson';
-import { FeatureLayersIdentify, CancelablePromise } from '@nextgis/ngw-connector';
+import {
+  FeatureLayersIdentify,
+  CancelablePromise,
+  ResourceItem,
+  FeatureItemAttachment
+} from '@nextgis/ngw-connector';
+import NgwKit from '@nextgis/ngw-kit';
 
 interface FunctionArg {
   argType: 'function';
@@ -48,6 +54,8 @@ export class ActionMap {
   treeControl?: L.Control & ToggleControl;
 
   authControl?: L.Control & ToggleControl;
+
+  private _resourceItems: { [resourceId: number]: ResourceItem } = {};
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};
 
@@ -118,9 +126,12 @@ export class ActionMap {
   private _createPopupContent<G extends Geometry = any, P = any>(
     feature: Feature<G, P>
   ): HTMLElement {
-    const popupElement = document.createElement('pre');
-    popupElement.innerHTML = JSON.stringify(feature.properties, null, 2);
-    popupElement.style.whiteSpace = 'pre-wrap';
+    const popupElement = document.createElement('div');
+    const pre = document.createElement('pre');
+    pre.className = 'properties';
+    pre.innerHTML = JSON.stringify(feature.properties, null, 2);
+    pre.style.whiteSpace = 'pre-wrap';
+    popupElement.appendChild(pre);
     return popupElement;
   }
 
@@ -144,28 +155,128 @@ export class ActionMap {
     this.ngwMap.removeLayer('highlight');
   }
 
-  private _highlighNgwLayer(e: FeatureLayersIdentify) {
-    this._clean();
-    this._promises.getFeaturePromise = this.ngwMap.getIdentifyGeoJson(e).then(geojson => {
-      delete this._promises.getFeaturePromise;
-      this.ngwMap.addLayer('GEOJSON', {
-        id: 'highlight',
-        data: geojson,
-        visibility: true,
-        paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
-        // selectable: true,
-        selectOnHover: true,
-        popup: true,
-        // popupOnSelect: true,
-        popupOptions: {
-          createPopupContent: e => {
-            if (e.feature) {
-              return this._createPopupContent(e.feature);
-            }
-          }
+  private async _getResourceItem(resourceId: number) {
+    if (!this._resourceItems[resourceId]) {
+      const item = await this.ngwMap.connector.get('resource.item', null, { id: resourceId });
+      this._resourceItems[resourceId] = item;
+    }
+    return this._resourceItems[resourceId];
+  }
+
+  private async _updateElementContent<G extends Geometry = any, P = any>(
+    element: HTMLElement,
+    resourceId: number,
+    feature: Feature<G, P>
+  ) {
+    const item = await this._getResourceItem(resourceId);
+    if (item.feature_layer) {
+      const newProperties = {};
+      item.feature_layer.fields.forEach(x => {
+        const property = feature.properties[x.keyname];
+        if (property) {
+          newProperties[x.display_name] = property;
         }
       });
+      const newContent = JSON.stringify(newProperties, null, 2);
+      const pre = element.getElementsByClassName('properties')[0];
+      if (pre) {
+        pre.innerHTML = newContent;
+      }
+    }
+  }
+
+  private _loadImage(
+    img: FeatureItemAttachment,
+    options: { id: number; fid: number; width?: number; height?: number }
+  ) {
+    return new Promise<string>(async (resolve, reject) => {
+      const { width, height } = options;
+      const url =
+        '/api/resource/' +
+        options.id +
+        '/feature/' +
+        options.fid +
+        `/attachment/${img.id}/image` +
+        (width && height ? `?size=${width}x${height}` : '');
+      const blob = await this.ngwMap.connector.makeQuery(url, {}, { responseType: 'blob' });
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
     });
+  }
+
+  private async _addPhotos(
+    element: HTMLElement,
+    attachment: FeatureItemAttachment[],
+    id: number,
+    fid: number
+  ) {
+    const attachmentElement = document.createElement('div');
+    attachmentElement.className = 'attachment';
+    for (const img of attachment) {
+      const src = await this._loadImage(img, {
+        width: 100,
+        height: 100,
+        id,
+        fid
+      });
+      const imgElem = document.createElement('img');
+      imgElem.src = src;
+      attachmentElement.appendChild(imgElem);
+    }
+    element.appendChild(attachmentElement);
+  }
+
+  private _highlighNgwLayer(e: FeatureLayersIdentify) {
+    this._clean();
+    const params = NgwKit.utils.getIdentifyGeoJsonParams(e);
+    if (params) {
+      const resourceId = params.resourceId;
+      this._promises.getFeaturePromise = this.ngwMap.connector
+        .get('feature_layer.feature.item', null, {
+          id: params.resourceId,
+          fid: params.featureId,
+          geom_format: 'geojson',
+          srs: 4326
+        })
+        .then(item => {
+          delete this._promises.getFeaturePromise;
+          const geojson = NgwKit.utils.createGeoJsonFeature(item);
+          this.ngwMap.addLayer('GEOJSON', {
+            id: 'highlight',
+            data: geojson,
+            visibility: true,
+            paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
+            // selectable: true,
+            selectOnHover: true,
+            popup: true,
+            // popupOnSelect: true,
+            popupOptions: {
+              createPopupContent: e => {
+                if (e.feature) {
+                  const element = this._createPopupContent(e.feature);
+                  this._updateElementContent(element, resourceId, e.feature);
+                  if (
+                    item.extensions &&
+                    item.extensions.attachment &&
+                    item.extensions.attachment.length
+                  ) {
+                    this._addPhotos(
+                      element,
+                      item.extensions.attachment,
+                      params.resourceId,
+                      params.featureId
+                    );
+                  }
+                  return element;
+                }
+              }
+            }
+          });
+        });
+    }
   }
 
   private _addEventsListeners() {
