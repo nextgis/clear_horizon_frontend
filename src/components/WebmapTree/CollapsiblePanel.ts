@@ -95,7 +95,8 @@ export class CollapsiblePanel {
   _createContent() {
     const content = document.createElement('div');
     content.className = 'panel-content';
-    const html = typeof this.options.content === 'function' ? this.options.content() : this.options.content;
+    const html =
+      typeof this.options.content === 'function' ? this.options.content() : this.options.content;
     content.appendChild(html);
     this._content = content;
     return content;

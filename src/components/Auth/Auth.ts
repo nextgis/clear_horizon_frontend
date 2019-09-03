@@ -77,7 +77,11 @@ export class Auth {
     });
   }
 
-  private _createDialogHtml(defAuth: Credentials = { login: '', password: '' }, resolve, reject): HTMLElement {
+  private _createDialogHtml(
+    defAuth: Credentials = { login: '', password: '' },
+    resolve,
+    reject
+  ): HTMLElement {
     const { login, password } = defAuth;
     const form = document.createElement('div');
     form.className = 'dialog--form login';
@@ -96,7 +100,9 @@ export class Auth {
     const loginElement = form.getElementsByClassName('name')[0] as HTMLInputElement;
     const passwordElement = form.getElementsByClassName('password')[0] as HTMLInputElement;
     if (this._errorMessage) {
-      const errorMessageElement = form.getElementsByClassName('dialog-error')[0] as HTMLButtonElement;
+      const errorMessageElement = form.getElementsByClassName(
+        'dialog-error'
+      )[0] as HTMLButtonElement;
       errorMessageElement.className = 'dialog-error';
       errorMessageElement.innerHTML = `<div class="dialog-error--message">${this._errorMessage}</div>`;
     }

@@ -100,7 +100,9 @@ export class FiresContainer {
     selector.onchange = () => {
       this.options.fires.forEach(x => {
         const layer = this.ngwMap.getLayer(x.id) as VectorResourceAdapter;
-        layer.propertiesFilter([['timestamp', 'ge', Math.floor(Date.now() / 1000) - Number(selector.value) * 3600]]);
+        layer.propertiesFilter([
+          ['timestamp', 'ge', Math.floor(Date.now() / 1000) - Number(selector.value) * 3600]
+        ]);
       });
     };
 
