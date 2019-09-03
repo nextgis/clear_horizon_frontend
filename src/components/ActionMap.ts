@@ -11,7 +11,8 @@ import 'leaflet/dist/leaflet.css';
 import { AppOptions, FireResource } from 'src/App';
 import { WebmapTreeControl } from './WebmapTree/WebmapTreeControl';
 import { Auth } from './Auth/Auth';
-import { Feature, MultiPoint } from 'geojson';
+import { Feature, MultiPoint, Geometry } from 'geojson';
+import { FeatureLayersIdentify, CancelablePromise } from '@nextgis/ngw-connector';
 
 interface FunctionArg {
   argType: 'function';
@@ -47,6 +48,8 @@ export class ActionMap {
   treeControl?: L.Control & ToggleControl;
 
   authControl?: L.Control & ToggleControl;
+
+  private _promises: { [name: string]: CancelablePromise<any> } = {};
 
   constructor(private options: AppOptions) {
     // ignore
@@ -85,7 +88,11 @@ export class ActionMap {
           id: x.id,
           adapterOptions: {
             propertiesFilter: [
-              ['timestamp', 'ge', Math.floor(Date.now() / 1000) - Number(this.options.timedelta) * 3600]
+              [
+                'timestamp',
+                'ge',
+                Math.floor(Date.now() / 1000) - Number(this.options.timedelta) * 3600
+              ]
             ],
             paint: { stroke: true, color: x.color, fillOpacity: 0.6, radius: 5 },
             selectable: true,
@@ -96,7 +103,7 @@ export class ActionMap {
               createPopupContent: e => {
                 if (e.feature) {
                   const feature = e.feature as Feature<MultiPoint, Firms>;
-                  return this._createPopupContent(feature);
+                  return this._createPopupContent<MultiPoint, Firms>(feature);
                 }
               }
             }
@@ -104,15 +111,16 @@ export class ActionMap {
         });
       }
     }
-
     await this._addTreeControl(ngwLayers, fires);
-
     this._addEventsListeners();
   }
 
-  private _createPopupContent(feature: Feature<MultiPoint, Firms>): HTMLElement {
+  private _createPopupContent<G extends Geometry = any, P = any>(
+    feature: Feature<G, P>
+  ): HTMLElement {
     const popupElement = document.createElement('pre');
     popupElement.innerHTML = JSON.stringify(feature.properties, null, 2);
+    popupElement.style.whiteSpace = 'pre-wrap';
     return popupElement;
   }
 
@@ -129,7 +137,40 @@ export class ActionMap {
     this.ngwMap.addControl(this.treeControl, 'top-left');
   }
 
+  private _clean() {
+    if (this._promises.getFeaturePromise && this._promises.getFeaturePromise.cancel) {
+      this._promises.getFeaturePromise.cancel();
+    }
+    this.ngwMap.removeLayer('highlight');
+  }
+
+  private _highlighNgwLayer(e: FeatureLayersIdentify) {
+    this._clean();
+    this._promises.getFeaturePromise = this.ngwMap.getIdentifyGeoJson(e).then(geojson => {
+      delete this._promises.getFeaturePromise;
+      this.ngwMap.addLayer('GEOJSON', {
+        id: 'highlight',
+        data: geojson,
+        visibility: true,
+        paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
+        // selectable: true,
+        selectOnHover: true,
+        popup: true,
+        // popupOnSelect: true,
+        popupOptions: {
+          createPopupContent: e => {
+            if (e.feature) {
+              return this._createPopupContent(e.feature);
+            }
+          }
+        }
+      });
+    });
+  }
+
   private _addEventsListeners() {
+    this.ngwMap.emitter.on('ngw:select', e => this._highlighNgwLayer(e));
+
     const togglers = [this.tree];
     const controls = [this.treeControl];
     togglers.forEach((x, i) => {

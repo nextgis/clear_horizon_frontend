@@ -1,7 +1,6 @@
 /* DIALOG */
-.dialog--form {
 
-}
+.dialog--form {}
 
 .dialog--input {
     margin: 5px;
@@ -13,5 +12,12 @@
 
 .ngw-map-container.leaflet-container {
     background: #fff;
-  }
+}
 
+.leaflet-pane.leaflet-popup-pane {
+    z-index: 10001;
+}
+
+.leaflet-pane.leaflet-tooltip-pane {
+    z-index: 10002;
+}
