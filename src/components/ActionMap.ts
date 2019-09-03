@@ -189,7 +189,7 @@ export class ActionMap {
     img: FeatureItemAttachment,
     options: { id: number; fid: number; width?: number; height?: number }
   ) {
-    return new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       const { width, height } = options;
       const url =
         '/api/resource/' +
@@ -198,12 +198,18 @@ export class ActionMap {
         options.fid +
         `/attachment/${img.id}/image` +
         (width && height ? `?size=${width}x${height}` : '');
-      const blob = await this.ngwMap.connector.makeQuery(url, {}, { responseType: 'blob' });
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = () => {
-        resolve(reader.result as string);
-      };
+      this.ngwMap.connector
+        .makeQuery(url, {}, { responseType: 'blob' })
+        .then(blob => {
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = () => {
+            resolve(reader.result as string);
+          };
+        })
+        .catch(er => {
+          reject(er);
+        });
     });
   }
 

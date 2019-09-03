@@ -36,4 +36,3 @@ docker run -it -p 8080:8080 --rm --name code-nextgis-1 registry.nextgis.com/clea
 docker push registry.nextgis.com/clear_horizon:0.0.0
 docker push registry.nextgis.com/clear_horizon:latest
 ```
-
