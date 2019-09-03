@@ -8,14 +8,12 @@ import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
 import { FiresContainer } from './FiresContainer';
 
-
 const OPTIONS: WebmapTreeOptions = {
   target: 'tree',
-  width: 300,
+  width: 300
 };
 
 export class WebmapTree {
-
   options: WebmapTreeOptions;
 
   private _container: HTMLElement;
@@ -59,14 +57,14 @@ export class WebmapTree {
 
     container.style.width = (this.options.width || 300) + 'px';
 
-    const ngwPanel = new CollapsiblePanel({
+    new CollapsiblePanel({
       title: 'Базовые слои',
       content: () => this._createNgwLayers(),
       open: false,
       parent: container
     });
     if (this.options.fires) {
-      const firesPanel = new CollapsiblePanel({
+      new CollapsiblePanel({
         title: 'Термоточки (FIRMS)',
         content: () => this._createFiresContainer(),
         parent: container
@@ -80,13 +78,11 @@ export class WebmapTree {
     const container = document.createElement('div');
     container.className = '';
     for (const n in this.ngwLayers) {
-      if (this.ngwLayers.hasOwnProperty(n)) {
-        const ngwLayer = this.ngwLayers[n];
-        const tree = new WebmapTreeItem(ngwLayer.layer.layer);
-        const treeContainer = tree.getContainer();
-        if (treeContainer) {
-          container.appendChild(treeContainer);
-        }
+      const ngwLayer = this.ngwLayers[n];
+      const tree = new WebmapTreeItem(ngwLayer.layer.layer);
+      const treeContainer = tree.getContainer();
+      if (treeContainer) {
+        container.appendChild(treeContainer);
       }
     }
     return container;
@@ -104,5 +100,4 @@ export class WebmapTree {
     }
     return container;
   }
-
 }

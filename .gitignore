@@ -226,4 +226,4 @@ bower_components
 /.cache
 
 
-cfg.json
+# cfg.json

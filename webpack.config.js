@@ -1,5 +1,5 @@
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 // let FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
@@ -12,7 +12,6 @@ try {
 }
 
 module.exports = (env, argv) => {
-
   const isProd = argv.mode === 'production';
 
   const config = {
@@ -21,14 +20,11 @@ module.exports = (env, argv) => {
     devtool: isProd ? 'none' : 'inline-source-map',
 
     entry: {
-      'main': [
-        '@babel/polyfill',
-        './src/main.ts'
-      ],
+      main: ['@babel/polyfill', './src/main.ts']
     },
 
     output: {
-      filename: '[name][hash:7].js',
+      filename: '[name][hash:7].js'
     },
 
     resolve: {
@@ -39,14 +35,13 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.ts$/,
           enforce: 'pre',
-          use: [
-            {
-              loader: 'tslint-loader',
-              options: { fix: true }
-            }
-          ]
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          loader: 'eslint-loader',
+          options: {
+            fix: true
+          }
         },
         {
           test: /\.tsx?$/,
@@ -56,9 +51,9 @@ module.exports = (env, argv) => {
               loader: 'ts-loader',
               options: {
                 // disable type checker - we will use it in fork plugin
-                transpileOnly: true,
+                transpileOnly: true
               }
-            },
+            }
           ]
         },
         {
@@ -66,7 +61,7 @@ module.exports = (env, argv) => {
           use: ExtractTextPlugin.extract({
             fallback: 'style-loader',
             use: [{ loader: 'css-loader', options: { sourceMap: true } }],
-            publicPath: './',
+            publicPath: './'
           })
         },
         {
@@ -76,23 +71,20 @@ module.exports = (env, argv) => {
             publicPath: './',
             use: [
               {
-                loader: 'css-loader', options: { sourceMap: true }// translates CSS into CommonJS modules
+                loader: 'css-loader'
               },
               {
                 loader: 'postcss-loader', // Run post css actions
                 options: {
                   sourceMap: true,
-                  plugins: function () { // post css plugins, can be exported to postcss.config.js
-                    return [
-                      require('precss'),
-                      require('autoprefixer'),
-                    ];
+                  plugins: function() {
+                    // post css plugins, can be exported to postcss.config.js
+                    return [require('precss'), require('autoprefixer')];
                   }
                 }
               },
               {
-                loader: 'sass-loader', // compiles Sass to CSS
-                options: { sourceMap: true }
+                loader: 'sass-loader'
               }
             ]
           })
@@ -108,10 +100,7 @@ module.exports = (env, argv) => {
         { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, use: ['file-loader?name=fonts/[name]-[hash:7].[ext]'] },
         {
           test: /\.(jpe?g|png|gif|svg)$/i,
-          use: [
-            'file-loader?name=images/[name].[ext]',
-            'image-webpack-loader?bypassOnDebug'
-          ]
+          use: ['file-loader?name=images/[name].[ext]', 'image-webpack-loader?bypassOnDebug']
         }
       ]
     },
@@ -119,7 +108,7 @@ module.exports = (env, argv) => {
     plugins: [
       new ForkTsCheckerWebpackPlugin({ vue: true }),
       new ExtractTextPlugin({ filename: '[name][hash:7].css', allChunks: true }),
-      new HtmlWebpackPlugin({ template: 'src/index.html' }),
+      new HtmlWebpackPlugin({ template: 'src/index.html' })
       // new FaviconsWebpackPlugin('./src/img/favicon.png')
     ],
 
@@ -139,12 +128,12 @@ module.exports = (env, argv) => {
 
               // npm package names are URL-safe, but some servers don't like @ symbols
               return `npm.${packageName.replace('@', '')}`;
-            },
-          },
-        },
-      },
-    },
-  }
+            }
+          }
+        }
+      }
+    }
+  };
 
   return config;
 };

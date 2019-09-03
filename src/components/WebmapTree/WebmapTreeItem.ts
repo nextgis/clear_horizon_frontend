@@ -1,9 +1,8 @@
 import WebMap from '@nextgis/webmap';
-import { CheckProperty, CheckChangeEvent } from '@nextgis/item';
+import { CheckProperty, ChangeEvent } from '@nextgis/item';
 import { WebMapLayerItem, TreeGroup, TreeLayer } from '@nextgis/ngw-kit';
 
 export class WebmapTreeItem {
-
   private _container?: HTMLElement;
 
   constructor(layer: WebMapLayerItem) {
@@ -20,7 +19,7 @@ export class WebmapTreeItem {
   private _createTreeBranch(layers: WebMapLayerItem[]) {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item-children';
-    layers.forEach((x) => {
+    layers.forEach(x => {
       if (x.item) {
         const item = this._createTreeItem(x);
         if (item) {
@@ -46,7 +45,7 @@ export class WebmapTreeItem {
 
       const visibility = layer.properties.property('visibility') as CheckProperty;
       if (visibility) {
-        visibility.emitter.on('change', (ev: CheckChangeEvent) => {
+        visibility.emitter.on('change', (ev: ChangeEvent) => {
           input.checked = ev.value;
         });
         input.onclick = () => {
@@ -63,7 +62,7 @@ export class WebmapTreeItem {
       elem.appendChild(name);
     }
 
-    if (item.item_type === 'group' || item.item_type === 'root' && item.children.length) {
+    if (item.item_type === 'group' || (item.item_type === 'root' && item.children.length)) {
       const children = layer.tree.getChildren() as WebMapLayerItem[];
       const treeBranch = this._createTreeBranch(children.reverse());
       elem.appendChild(treeBranch);

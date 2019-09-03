@@ -10,7 +10,6 @@ export interface CollapsiblePanelOptions {
 }
 
 export class CollapsiblePanel {
-
   private readonly _container = document.createElement('div');
   private _content: HTMLElement;
   private _toggle?: HTMLElement;
@@ -81,7 +80,9 @@ export class CollapsiblePanel {
     const toggle = document.createElement('div');
     toggle.className = 'panel-header__toggle';
 
-    toggle.onclick = () => { this.toggle(); };
+    toggle.onclick = () => {
+      this.toggle();
+    };
     this._toggle = toggle;
 
     header.appendChild(toggle);
@@ -94,10 +95,7 @@ export class CollapsiblePanel {
   _createContent() {
     const content = document.createElement('div');
     content.className = 'panel-content';
-    const html = (typeof this.options.content === 'function') ?
-      this.options.content()
-      :
-      this.options.content;
+    const html = typeof this.options.content === 'function' ? this.options.content() : this.options.content;
     content.appendChild(html);
     this._content = content;
     return content;

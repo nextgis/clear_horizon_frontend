@@ -10,15 +10,14 @@ export interface Credentials {
 }
 
 export class Auth {
-
   readonly connector: NgwConnector;
   private readonly _storageKey = 'auth';
   private readonly _storage = localStorage;
   private _errorMessage: string;
   private auth: Credentials;
 
-  constructor(private options: NgwMapOptions) {
-    this.connector = new NgwConnector({baseUrl: options.baseUrl, auth: options.auth});
+  constructor(options: NgwMapOptions) {
+    this.connector = new NgwConnector({ baseUrl: options.baseUrl, auth: options.auth });
     const auth = this._storage.getItem(this._storageKey);
     if (auth) {
       this.auth = JSON.parse(auth);
@@ -31,7 +30,15 @@ export class Auth {
       credentials = await this.getAuth();
     }
     try {
-    await this.connector.login(credentials);
+      await this.connector.login(credentials);
+      const user = this.connector.user;
+      if (user) {
+        if (user.keyname === 'guest') {
+          throw new Error();
+        }
+      } else {
+        throw new Error();
+      }
     } catch (er) {
       this._errorMessage = 'Не удаётся войти';
       const auth = await this._showLoginDialog(credentials);
@@ -102,21 +109,21 @@ export class Auth {
         password: passwordElement.value
       };
     };
-    const onInputChange = () => {
-      validate();
-    };
     const validate = () => {
       const auth = getAuthOpt();
       loginBtn.disabled = !(auth.login && auth.password);
     };
+    const onInputChange = () => {
+      validate();
+    };
     const addEventListener = () => {
-      [loginElement, passwordElement].forEach((x) => {
-        ['change', 'input'].forEach((y) => x.addEventListener(y, onInputChange));
+      [loginElement, passwordElement].forEach(x => {
+        ['change', 'input'].forEach(y => x.addEventListener(y, onInputChange));
       });
     };
     const removeEventListener = () => {
-      [loginElement, passwordElement].forEach((x) => {
-        ['change', 'input'].forEach((y) => x.removeEventListener(y, onInputChange));
+      [loginElement, passwordElement].forEach(x => {
+        ['change', 'input'].forEach(y => x.removeEventListener(y, onInputChange));
       });
     };
     loginBtn.onclick = () => {

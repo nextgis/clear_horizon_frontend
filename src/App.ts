@@ -3,7 +3,6 @@ import './App.css';
 import { NgwMapOptions } from '@nextgis/ngw-map';
 import { ActionMap } from './components/ActionMap';
 
-
 export interface AsuLayer {
   name: string;
 }
@@ -27,15 +26,12 @@ export interface AppOptions {
 }
 
 export class App {
-
   actionMap = new ActionMap(this.options);
 
-  constructor(public options?: AppOptions) {
-  }
+  constructor(public options?: AppOptions) {}
 
   async create(options?: AppOptions) {
     this.options = { ...this.options, ...options };
     this.actionMap.create(this.options.mapOptions, this.options.fires);
   }
-
 }

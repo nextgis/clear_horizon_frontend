@@ -1,22 +1,19 @@
 import '../ToggleControl.css';
 import { ActionMap } from '../ActionMap';
-import { ToggleControlOptions, MapClickEvent, VectorLayerAdapter } from '@nextgis/ngw-map';
+import { ToggleControlOptions } from '@nextgis/ngw-map';
 
 import { EventEmitter } from 'events';
 import { WebmapTreeOptions } from './interfaces';
 import { WebmapTree } from './WebmapTree';
 
-
-
 export class WebmapTreeControl implements ToggleControlOptions {
-
   html = '<span>&#9776;</span>';
   title = { off: 'Показать дерево слоёв', on: 'Скрыть дерево слоёв' };
 
   addClass = 'toggle-control webmap-tree-control';
   addClassOn = 'active';
 
-  status: boolean = false;
+  status = false;
 
   emitter = new EventEmitter();
 
@@ -57,5 +54,4 @@ export class WebmapTreeControl implements ToggleControlOptions {
     this.status = status;
     this.emitter.emit('status', this.status);
   }
-
 }

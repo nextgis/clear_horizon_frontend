@@ -41,7 +41,6 @@ interface Firms {
 }
 
 export class ActionMap {
-
   ngwMap: NgwMap<L.Map, L.Layer, any>;
 
   tree?: WebmapTreeControl;
@@ -86,7 +85,7 @@ export class ActionMap {
           id: x.id,
           adapterOptions: {
             propertiesFilter: [
-              ['timestamp', 'ge', Math.floor(Date.now() / 1000) - (Number(this.options.timedelta) * 3600) ]
+              ['timestamp', 'ge', Math.floor(Date.now() / 1000) - Number(this.options.timedelta) * 3600]
             ],
             paint: { stroke: true, color: x.color, fillOpacity: 0.6, radius: 5 },
             selectable: true,
@@ -94,7 +93,7 @@ export class ActionMap {
             selectOnHover: true,
             popupOnSelect: true,
             popupOptions: {
-              createPopupContent: (e) => {
+              createPopupContent: e => {
                 if (e.feature) {
                   const feature = e.feature as Feature<MultiPoint, Firms>;
                   return this._createPopupContent(feature);
@@ -148,4 +147,3 @@ export class ActionMap {
     });
   }
 }
-

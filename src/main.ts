@@ -8,7 +8,6 @@ try {
   console.warn('Config file is not funded, run with default settings');
 }
 
-
 const OPTIONS: AppOptions = {
   mapOptions: {
     target: 'map',
@@ -21,7 +20,3 @@ const options = NgwMap.utils.deepmerge(OPTIONS, config);
 const app = new App(options);
 
 app.create();
-
-
-
-
