@@ -1,3 +1,4 @@
+import 'bulma/bulma.sass';
 import './App.css';
 
 import { NgwMapOptions } from '@nextgis/ngw-map';

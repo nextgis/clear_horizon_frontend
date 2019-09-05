@@ -65,7 +65,7 @@ module.exports = (env, argv) => {
           })
         },
         {
-          test: /\.(scss)$/,
+          test: /\.(sass)$/,
           use: ExtractTextPlugin.extract({
             fallback: 'style-loader',
             publicPath: './',

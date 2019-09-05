@@ -15,15 +15,17 @@
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
-    "@nextgis/dialog": "^0.19.0",
+    "@nextgis/dialog": "^0.19.1",
     "@nextgis/eslint-config": "^0.19.0",
-    "@nextgis/leaflet-map-adapter": "^0.19.0",
-    "@nextgis/ngw-map": "^0.19.0"
+    "@nextgis/leaflet-map-adapter": "^0.19.1",
+    "@nextgis/ngw-map": "^0.19.1",
+    "bulma": "^0.7.5",
+    "bulma-carousel": "^4.0.4"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.7",
     "@types/leaflet": "^1.5.1",
-    "@types/node": "^12.7.3",
+    "@types/node": "^12.7.4",
     "@types/wellknown": "^0.5.0",
     "autoprefixer": "^9.6.1",
     "css-loader": "^3.2.0",
@@ -33,7 +35,7 @@
     "file-loader": "^4.2.0",
     "fork-ts-checker-webpack-plugin": "^1.5.0",
     "html-webpack-plugin": "^3.2.0",
-    "image-webpack-loader": "^5.0.0",
+    "image-webpack-loader": "^6.0.0",
     "node-sass": "^4.12.0",
     "postcss-loader": "^3.0.0",
     "precss": "^4.0.0",

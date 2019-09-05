@@ -44,7 +44,7 @@ export class Auth {
       const auth = await this._showLoginDialog(credentials);
       await this.login(auth);
     }
-    if (this.connector.getUserInfo) {
+    if (this.connector) {
       this._storage.setItem(this._storageKey, JSON.stringify(credentials));
     }
   }
@@ -87,14 +87,14 @@ export class Auth {
     form.className = 'dialog--form login';
     const formHtml = `
       <div><label><div>Имя пользователя:</div>
-        <input value="${login}" class="dialog--input name"></input>
+        <input value="${login}" class="input dialog--input name"></input>
       </label></div>
       <div><label><div>Пароль:</div>
-        <input value="${password}" type="password" class="dialog--input password"></input>
+        <input value="${password}" type="password" class="input dialog--input password"></input>
       </label></div>
       <div class="dialog-error"></div>
-      <button class="dialog--button accept">Войти</button>
-      <button class="dialog--button cancel">Отмена</button>
+      <button class="button dialog--button accept">Войти</button>
+      <button class="button dialog--button cancel">Отмена</button>
     `;
     form.innerHTML = formHtml;
     const loginElement = form.getElementsByClassName('name')[0] as HTMLInputElement;

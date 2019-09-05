@@ -1,0 +1,18 @@
+.columns .column {
+    padding: 5px!important;
+}
+
+.attachment {
+    overflow: hidden;
+    padding-top: 10px;
+}
+
+.sign-out--btn {
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+}
+
+.sign-out--btn svg {
+    height: 100%;
+}

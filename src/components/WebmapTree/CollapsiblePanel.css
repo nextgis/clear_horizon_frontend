@@ -7,14 +7,14 @@
 }
 
 .panel-header__toggle {
-  width: 30px;
-  height: 30px;
-  float: right;
-  border: 1px solid rgba(0,0,0,.7);
-  margin: 7px;
-  border-radius: 4px;
-  cursor: pointer;
-  text-align: center;
-  line-height: 30px;
+  /* width: 30px; */
+  /* height: 30px; */
+  /* float: right; */
+  /* border: 1px solid rgba(0,0,0,.7); */
+  margin: 9px;
+  /* border-radius: 4px; */
+  /* cursor: pointer; */
+  /* text-align: center; */
+  /* line-height: 30px; */
 
 }

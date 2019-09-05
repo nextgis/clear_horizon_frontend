@@ -1,9 +1,13 @@
+import 'leaflet/dist/leaflet.css';
+import 'bulma-carousel/dist/css/bulma-carousel.min.css';
+import './ActionMap.css';
+import bulmaCarousel from 'bulma-carousel';
+
 import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers } from '@nextgis/ngw-map';
 
 import { getIcon } from '@nextgis/icons';
 
 import MapAdapter from '@nextgis/leaflet-map-adapter';
-import 'leaflet/dist/leaflet.css';
 
 // import MapAdapter from '@nextgis/ol-map-adapter';
 // import 'ol/ol.css';
@@ -47,6 +51,19 @@ interface Firms {
   version: string;
 }
 
+interface CollectorDate {
+  year: number;
+  month: number;
+  day: number;
+}
+interface CollectorTime {
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+type CollectorProperty = string | number | CollectorDate | CollectorTime;
+
 export class ActionMap {
   ngwMap: NgwMap<L.Map, L.Layer, any>;
 
@@ -78,7 +95,7 @@ export class ActionMap {
     this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
 
     this.authControl = await this.ngwMap.createButtonControl({
-      html: '<span>&#10162;</span>',
+      html: '<div class="sign-out--btn"><i class="fas fa-sign-out-alt"></i></div>',
       title: 'Выйти',
       onClick: () => {
         auth.logout();
@@ -127,12 +144,38 @@ export class ActionMap {
     feature: Feature<G, P>
   ): HTMLElement {
     const popupElement = document.createElement('div');
-    const pre = document.createElement('pre');
+    const pre = document.createElement('div');
     pre.className = 'properties';
-    pre.innerHTML = JSON.stringify(feature.properties, null, 2);
-    pre.style.whiteSpace = 'pre-wrap';
+    const propertiesList = Object.keys(feature.properties).map(k => {
+      return {
+        key: k,
+        value: feature.properties[k]
+      };
+    });
+    pre.innerHTML = this._createPropertiesHtml(propertiesList);
+    // pre.style.whiteSpace = 'pre-wrap';
     popupElement.appendChild(pre);
     return popupElement;
+  }
+
+  private _createPropertiesHtml(properties: Array<{ key: string; value: CollectorProperty }>) {
+    let elem = '';
+    properties.forEach(({ key, value }) => {
+      if (typeof value === 'object' && value) {
+        if ('year' in value) {
+          value = [value.day, value.month, value.year].join('.');
+        } else if ('hour' in value) {
+          value = [value.hour, value.minute].join(':');
+        }
+      }
+      elem += `
+      <div class="columns">
+        <div class="column is-two-fifths">${key}</div>
+        <div class="column">${value}</div>
+      </div>
+      `;
+    });
+    return elem;
   }
 
   private async _addTreeControl(ngwLayers: NgwLayers, fires: FireResource[]) {
@@ -170,14 +213,14 @@ export class ActionMap {
   ) {
     const item = await this._getResourceItem(resourceId);
     if (item.feature_layer) {
-      const newProperties = {};
+      const newProperties = [];
       item.feature_layer.fields.forEach(x => {
         const property = feature.properties[x.keyname];
         if (property) {
-          newProperties[x.display_name] = property;
+          newProperties.push({ key: x.display_name, value: property });
         }
       });
-      const newContent = JSON.stringify(newProperties, null, 2);
+      const newContent = this._createPropertiesHtml(newProperties);
       const pre = element.getElementsByClassName('properties')[0];
       if (pre) {
         pre.innerHTML = newContent;
@@ -220,19 +263,26 @@ export class ActionMap {
     fid: number
   ) {
     const attachmentElement = document.createElement('div');
-    attachmentElement.className = 'attachment';
+
+    attachmentElement.className = 'carousel attachment';
     for (const img of attachment) {
+      const width = 300;
+      const height = 300;
+      const figure = document.createElement('figure');
+      figure.className = `image is-${width}x${height}`;
       const src = await this._loadImage(img, {
-        width: 100,
-        height: 100,
+        width,
+        height,
         id,
         fid
       });
       const imgElem = document.createElement('img');
       imgElem.src = src;
-      attachmentElement.appendChild(imgElem);
+      figure.appendChild(imgElem);
+      attachmentElement.appendChild(figure);
     }
     element.appendChild(attachmentElement);
+    const carousels = bulmaCarousel.attach(attachmentElement);
   }
 
   private _highlighNgwLayer(e: FeatureLayersIdentify) {

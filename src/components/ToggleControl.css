@@ -3,5 +3,5 @@
 }
 
 .toggle-control.active {
-  background-color: green !important ;
+  background-color: rgba(40, 171,40, 0.3) !important ;
 }

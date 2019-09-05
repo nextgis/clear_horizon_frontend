@@ -33,7 +33,7 @@ export class CollapsiblePanel {
     }
     this._container.appendChild(this._content);
     if (this._toggle) {
-      this._toggle.innerHTML = '&times;';
+      this._toggle.innerHTML = this._getToggleButtonHtml('fas fa-chevron-up');
     }
     this.status = true;
   }
@@ -43,7 +43,7 @@ export class CollapsiblePanel {
       this._content.parentNode.removeChild(this._content);
     }
     if (this._toggle) {
-      this._toggle.innerHTML = '>>';
+      this._toggle.innerHTML = this._getToggleButtonHtml('fas fa-chevron-down');
     }
     this.status = false;
   }
@@ -56,7 +56,17 @@ export class CollapsiblePanel {
     }
   }
 
-  _updateContainer() {
+  private _getToggleButtonHtml(icon?: string) {
+    return `
+    <a class="button is-small">
+    <span class="icon is-small">
+      <i class="${icon}"></i>
+    </span>
+    </a>
+    `;
+  }
+
+  private _updateContainer() {
     this._container.innerHTML = '';
     if (this.options.title) {
       const header = this._createHeader();
@@ -69,7 +79,7 @@ export class CollapsiblePanel {
     }
   }
 
-  _createHeader() {
+  private _createHeader() {
     const header = document.createElement('div');
     header.className = 'panel-header';
 
@@ -78,7 +88,7 @@ export class CollapsiblePanel {
     title.innerHTML = this.options.title;
 
     const toggle = document.createElement('div');
-    toggle.className = 'panel-header__toggle';
+    toggle.className = 'is-pulled-right panel-header__toggle';
 
     toggle.onclick = () => {
       this.toggle();
@@ -92,7 +102,7 @@ export class CollapsiblePanel {
     return header;
   }
 
-  _createContent() {
+  private _createContent() {
     const content = document.createElement('div');
     content.className = 'panel-content';
     const html =
