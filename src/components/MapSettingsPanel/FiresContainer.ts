@@ -87,7 +87,7 @@ export class FiresContainer {
     const elem = document.createElement('div');
     const label = document.createElement('label');
 
-    label.appendChild(document.createTextNode('Просмотр термоточек за: '));
+    label.appendChild(document.createTextNode('Просмотр термоточек: '));
     const selector = document.createElement('select');
 
     this._select.forEach(x => {
