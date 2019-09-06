@@ -1,27 +1,28 @@
-import './WebmapTree.css';
+import './MapSettingsPanel.css';
 
-import { WebmapTreeOptions } from './interfaces';
+import { MapSettingsPanelOptions } from './interfaces';
 
 import { NgwLayers } from '@nextgis/ngw-map';
 
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
 import { FiresContainer } from './FiresContainer';
+import { BaseMapsContainer } from './BaseMapsContainer';
 
-const OPTIONS: WebmapTreeOptions = {
+const OPTIONS: MapSettingsPanelOptions = {
   target: 'tree',
   width: 300
 };
 
-export class WebmapTree {
-  options: WebmapTreeOptions;
+export class MapSettingsPanel {
+  options: MapSettingsPanelOptions;
 
   private _container: HTMLElement;
   private _target: HTMLElement;
 
   private ngwLayers!: NgwLayers;
 
-  constructor(options: WebmapTreeOptions) {
+  constructor(options: MapSettingsPanelOptions) {
     this.options = { ...OPTIONS, ...options };
     if (typeof this.options.target === 'string') {
       const target = document.getElementById(this.options.target);
@@ -57,12 +58,6 @@ export class WebmapTree {
 
     container.style.width = (this.options.width || 300) + 'px';
 
-    new CollapsiblePanel({
-      title: 'Базовые слои',
-      content: () => this._createNgwLayers(),
-      open: false,
-      parent: container
-    });
     if (this.options.fires) {
       new CollapsiblePanel({
         title: 'Термоточки (FIRMS)',
@@ -70,6 +65,18 @@ export class WebmapTree {
         parent: container
       });
     }
+    new CollapsiblePanel({
+      title: 'Базовые слои',
+      content: () => this._createNgwLayers(),
+      open: false,
+      parent: container
+    });
+    new CollapsiblePanel({
+      title: 'Подложки',
+      content: () => this._createBasemapsContainer(),
+      open: false,
+      parent: container
+    });
 
     return container;
   }
@@ -97,6 +104,18 @@ export class WebmapTree {
         ngwMap: this.options.ngwMap
       });
       container.appendChild(firesContainer.getContainer());
+    }
+    return container;
+  }
+
+  private _createBasemapsContainer() {
+    const container = document.createElement('div');
+    const fires = this.options.fires;
+    if (fires) {
+      const baseMapsContainer = new BaseMapsContainer({
+        ngwMap: this.options.ngwMap
+      });
+      container.appendChild(baseMapsContainer.getContainer());
     }
     return container;
   }

@@ -14,13 +14,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/polyfill": "^7.4.4",
     "@nextgis/dialog": "^0.19.1",
     "@nextgis/eslint-config": "^0.19.0",
-    "@nextgis/leaflet-map-adapter": "^0.19.1",
+    "@nextgis/leaflet-map-adapter": "^0.19.0",
     "@nextgis/ngw-map": "^0.19.1",
     "bulma": "^0.7.5",
-    "bulma-carousel": "^4.0.4"
+    "bulma-carousel": "^4.0.4",
+    "core-js": "^3.2.1",
+    "regenerator-runtime": "^0.13.3"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.7",

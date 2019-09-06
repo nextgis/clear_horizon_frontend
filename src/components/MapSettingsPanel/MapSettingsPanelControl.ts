@@ -3,12 +3,12 @@ import { ActionMap } from '../ActionMap';
 import { ToggleControlOptions } from '@nextgis/ngw-map';
 
 import { EventEmitter } from 'events';
-import { WebmapTreeOptions } from './interfaces';
-import { WebmapTree } from './WebmapTree';
+import { MapSettingsPanelOptions } from './interfaces';
+import { MapSettingsPanel } from './MapSettingsPanel';
 
-export class WebmapTreeControl implements ToggleControlOptions {
+export class MapSettingsPanelControl implements ToggleControlOptions {
   html = '<span>&#9776;</span>';
-  title = { off: 'Показать дерево слоёв', on: 'Скрыть дерево слоёв' };
+  title = { off: 'Показать настройки карты', on: 'Скрыть настройки карты' };
 
   addClass = 'toggle-control webmap-tree-control';
   addClassOn = 'active';
@@ -17,10 +17,10 @@ export class WebmapTreeControl implements ToggleControlOptions {
 
   emitter = new EventEmitter();
 
-  tree: WebmapTree;
+  tree: MapSettingsPanel;
 
-  constructor(private actionMap: ActionMap, private options?: WebmapTreeOptions) {
-    this.tree = new WebmapTree(options);
+  constructor(private actionMap: ActionMap, options?: MapSettingsPanelOptions) {
+    this.tree = new MapSettingsPanel(options);
   }
 
   onClick(status: boolean) {

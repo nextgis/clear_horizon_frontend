@@ -1,3 +1,5 @@
+import 'core-js';
+import 'regenerator-runtime/runtime';
 import { App, AppOptions } from './App';
 import NgwMap from '@nextgis/ngw-map';
 
@@ -11,7 +13,6 @@ try {
 const OPTIONS: AppOptions = {
   mapOptions: {
     target: 'map',
-    qmsId: 487,
     bounds: [36.59, 43.385, 49.374, 50.214]
   },
   timedelta: 24

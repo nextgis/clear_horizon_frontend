@@ -12,8 +12,8 @@ import MapAdapter from '@nextgis/leaflet-map-adapter';
 // import MapAdapter from '@nextgis/ol-map-adapter';
 // import 'ol/ol.css';
 
-import { AppOptions, FireResource } from 'src/App';
-import { WebmapTreeControl } from './WebmapTree/WebmapTreeControl';
+import { AppOptions, FireResource, BaseLayer } from 'src/App';
+import { MapSettingsPanelControl } from './MapSettingsPanel/MapSettingsPanelControl';
 import { Auth } from './Auth/Auth';
 import { Feature, MultiPoint, Geometry } from 'geojson';
 import {
@@ -23,6 +23,7 @@ import {
   FeatureItemAttachment
 } from '@nextgis/ngw-connector';
 import NgwKit from '@nextgis/ngw-kit';
+import { QmsAdapterOptions } from '@nextgis/qms-kit';
 
 interface FunctionArg {
   argType: 'function';
@@ -67,7 +68,7 @@ type CollectorProperty = string | number | CollectorDate | CollectorTime;
 export class ActionMap {
   ngwMap: NgwMap<L.Map, L.Layer, any>;
 
-  tree?: WebmapTreeControl;
+  tree?: MapSettingsPanelControl;
   treeControl?: L.Control & ToggleControl;
 
   authControl?: L.Control & ToggleControl;
@@ -80,7 +81,7 @@ export class ActionMap {
     // ignore
   }
 
-  async create(options: NgwMapOptions, fires?: FireResource[]) {
+  async create(options: NgwMapOptions, fires?: FireResource[], basemaps?: BaseLayer[]) {
     const auth = new Auth(options);
     await auth.login();
     this.ngwMap = new NgwMap(new MapAdapter(), {
@@ -89,6 +90,13 @@ export class ActionMap {
       ...options
     });
 
+    if (basemaps) {
+      this.ngwMap.onLoad().then(() =>
+        basemaps.forEach((x, i) => {
+          this.ngwMap.addBaseLayer<any, QmsAdapterOptions>('QMS', { ...x, visibility: i === 0 });
+        })
+      );
+    }
     this.ngwMap.getPaintFunctions = { base: getIcon };
 
     this.ngwMap.addControl('ZOOM', 'top-left');
@@ -181,7 +189,7 @@ export class ActionMap {
   private async _addTreeControl(ngwLayers: NgwLayers, fires: FireResource[]) {
     await this.ngwMap.onLoad();
 
-    this.tree = new WebmapTreeControl(this, {
+    this.tree = new MapSettingsPanelControl(this, {
       ngwLayers,
       ngwMap: this.ngwMap,
       fires

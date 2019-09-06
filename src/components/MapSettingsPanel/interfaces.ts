@@ -1,7 +1,7 @@
 import NgwMap, { NgwLayers } from '@nextgis/ngw-map';
 import { FireResource } from 'src/App';
 
-export interface WebmapTreeOptions {
+export interface MapSettingsPanelOptions {
   target?: HTMLElement | string;
   width?: number;
   status?: boolean;

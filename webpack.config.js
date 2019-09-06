@@ -20,7 +20,7 @@ module.exports = (env, argv) => {
     devtool: isProd ? 'none' : 'inline-source-map',
 
     entry: {
-      main: ['@babel/polyfill', './src/main.ts']
+      main: ['./src/main.ts']
     },
 
     output: {

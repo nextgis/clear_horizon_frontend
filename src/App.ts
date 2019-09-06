@@ -20,9 +20,15 @@ export interface FireResource {
   color?: string;
 }
 
+export interface BaseLayer {
+  nameÍ: string;
+  qmsId: number;
+}
+
 export interface AppOptions {
   mapOptions?: NgwMapOptions;
   fires?: FireResource[];
+  basemaps?: BaseLayer[];
   timedelta?: 24;
 }
 
@@ -33,6 +39,6 @@ export class App {
 
   async create(options?: AppOptions) {
     this.options = { ...this.options, ...options };
-    this.actionMap.create(this.options.mapOptions, this.options.fires);
+    this.actionMap.create(this.options.mapOptions, this.options.fires, this.options.basemaps);
   }
 }

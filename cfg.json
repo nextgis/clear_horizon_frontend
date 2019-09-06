@@ -1,7 +1,6 @@
 {
   "mapOptions": {
     "target": "map",
-    "qmsId": 487,
     "bounds": [
       45,
       46,
@@ -17,6 +16,10 @@
       }
     ]
   },
+  "basemaps": [
+    {"qmsId": 487, "name": "Карта"},
+    {"qmsId": 1135, "name": "Спутник (гибрид)"}
+  ],
   "fires": [
     {
       "resourceId": 103,

@@ -1,0 +1,7 @@
+.basemap-container__item {
+    line-height: 2rem;
+}
+
+.basemap-container__item input {
+    margin-right: 3px;
+}

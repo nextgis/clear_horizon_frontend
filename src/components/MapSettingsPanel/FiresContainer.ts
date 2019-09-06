@@ -26,7 +26,7 @@ export class FiresContainer {
 
   _createContainer() {
     const container = document.createElement('div');
-    container.className = 'fires-contentainer';
+    container.className = 'fires-contentainer panel-content-padding ';
 
     const selector = this._createSelector();
     container.appendChild(selector);
