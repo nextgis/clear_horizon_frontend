@@ -16,7 +16,7 @@
   "dependencies": {
     "@nextgis/dialog": "^0.19.1",
     "@nextgis/eslint-config": "^0.19.0",
-    "@nextgis/leaflet-map-adapter": "^0.19.0",
+    "@nextgis/leaflet-map-adapter": "^0.19.1",
     "@nextgis/ngw-map": "^0.19.1",
     "bulma": "^0.7.5",
     "bulma-carousel": "^4.0.4",
@@ -32,7 +32,7 @@
     "css-loader": "^3.2.0",
     "eslint-loader": "^3.0.0",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "favicons-webpack-plugin": "1.0.1",
+    "favicons-webpack-plugin": "1.0.2",
     "file-loader": "^4.2.0",
     "fork-ts-checker-webpack-plugin": "^1.5.0",
     "html-webpack-plugin": "^3.2.0",
@@ -46,7 +46,7 @@
     "typescript": "^3.6.2",
     "url-loader": "^2.1.0",
     "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.7",
+    "webpack-cli": "^3.3.8",
     "webpack-dev-server": "^3.8.0"
   }
 }
