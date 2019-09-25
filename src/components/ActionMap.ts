@@ -24,6 +24,7 @@ import {
 } from '@nextgis/ngw-connector';
 import NgwKit from '@nextgis/ngw-kit';
 import { QmsAdapterOptions } from '@nextgis/qms-kit';
+import { prepareColumnValue } from '../Utils';
 
 interface FunctionArg {
   argType: 'function';
@@ -179,7 +180,7 @@ export class ActionMap {
       elem += `
       <div class="columns">
         <div class="column is-two-fifths">${key}</div>
-        <div class="column">${value}</div>
+        <div class="column">${prepareColumnValue(value)}</div>
       </div>
       `;
     });
@@ -223,9 +224,11 @@ export class ActionMap {
     if (item.feature_layer) {
       const newProperties = [];
       item.feature_layer.fields.forEach(x => {
-        const property = feature.properties[x.keyname];
-        if (property) {
-          newProperties.push({ key: x.display_name, value: property });
+        if (x.grid_visibility) {
+          const property = feature.properties[x.keyname];
+          if (property) {
+            newProperties.push({ key: x.display_name, value: property });
+          }
         }
       });
       const newContent = this._createPropertiesHtml(newProperties);
@@ -295,7 +298,8 @@ export class ActionMap {
 
   private _highlighNgwLayer(e: FeatureLayersIdentify) {
     this._clean();
-    const params = NgwKit.utils.getIdentifyGeoJsonParams(e);
+    const paramsList = NgwKit.utils.getIdentifyGeoJsonParams(e);
+    const params = paramsList[0];
     if (params) {
       const resourceId = params.resourceId;
       this._promises.getFeaturePromise = this.ngwMap.connector

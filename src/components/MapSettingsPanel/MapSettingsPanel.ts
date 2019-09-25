@@ -83,7 +83,7 @@ export class MapSettingsPanel {
 
   private _createNgwLayers() {
     const container = document.createElement('div');
-    container.className = '';
+    container.className = 'webmap-tree-container';
     for (const n in this.ngwLayers) {
       const ngwLayer = this.ngwLayers[n];
       const tree = new WebmapTreeItem(ngwLayer.layer.layer);
