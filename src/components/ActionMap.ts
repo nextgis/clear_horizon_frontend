@@ -16,26 +16,14 @@ import { AppOptions, FireResource, BaseLayer } from 'src/App';
 import { MapSettingsPanelControl } from './MapSettingsPanel/MapSettingsPanelControl';
 import { Auth } from './Auth/Auth';
 import { Feature, MultiPoint, Geometry } from 'geojson';
-import {
+import NgwConnector, {
   FeatureLayersIdentify,
   CancelablePromise,
-  ResourceItem,
-  FeatureItemAttachment
+  ResourceItem
 } from '@nextgis/ngw-connector';
 import NgwKit from '@nextgis/ngw-kit';
 import { QmsAdapterOptions } from '@nextgis/qms-kit';
-import { prepareColumnValue } from '../Utils';
-
-interface FunctionArg {
-  argType: 'function';
-  body: string;
-}
-
-interface WebMapRemote {
-  type: 'webmap_remote';
-  cmd: string;
-  args?: Array<any | FunctionArg>;
-}
+import { Popup } from './Popup';
 
 interface Firms {
   acq_date: string;
@@ -53,19 +41,6 @@ interface Firms {
   version: string;
 }
 
-interface CollectorDate {
-  year: number;
-  month: number;
-  day: number;
-}
-interface CollectorTime {
-  hour: number;
-  minute: number;
-  second: number;
-}
-
-type CollectorProperty = string | number | CollectorDate | CollectorTime;
-
 export class ActionMap {
   ngwMap: NgwMap<L.Map, L.Layer, any>;
 
@@ -73,22 +48,26 @@ export class ActionMap {
   treeControl?: L.Control & ToggleControl;
 
   authControl?: L.Control & ToggleControl;
-
-  private _resourceItems: { [resourceId: number]: ResourceItem } = {};
+  popup: Popup;
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};
 
   constructor(private options: AppOptions) {
-    // ignore
+    this.popup = new Popup(this.ngwMap);
   }
 
   async create(options: NgwMapOptions, fires?: FireResource[], basemaps?: BaseLayer[]) {
     const auth = new Auth(options);
-    await auth.login();
+    const opt = { ...options };
+    try {
+      await auth.login();
+      opt.connector = auth.connector;
+    } catch (er) {
+      // cancel login
+    }
     this.ngwMap = new NgwMap(new MapAdapter(), {
       controls: [],
-      connector: auth.connector,
-      ...options
+      ...opt
     });
 
     if (basemaps) {
@@ -103,9 +82,15 @@ export class ActionMap {
     this.ngwMap.addControl('ZOOM', 'top-left');
     this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
 
-    this.authControl = await this.ngwMap.createButtonControl({
-      html: '<div class="sign-out--btn"><i class="fas fa-sign-out-alt"></i></div>',
-      title: 'Выйти',
+    this.authControl = await this.ngwMap.createToggleControl({
+      html: {
+        on: '<div class="sign-out--btn"><i class="fas fa-sign-out-alt"></i></div>',
+        off: '<div class="sign-out--btn"><i class="fas fa-sign-in-alt"></i></div>'
+      },
+      title: { on: 'Выйти', off: 'Войти' },
+      getStatus: () => {
+        return !!(this.ngwMap.connector && this.ngwMap.connector.user);
+      },
       onClick: () => {
         auth.logout();
         window.location.reload();
@@ -137,7 +122,7 @@ export class ActionMap {
               createPopupContent: e => {
                 if (e.feature) {
                   const feature = e.feature as Feature<MultiPoint, Firms>;
-                  return this._createPopupContent<MultiPoint, Firms>(feature);
+                  return this.popup._createPopupContent<MultiPoint, Firms>(feature);
                 }
               }
             }
@@ -147,44 +132,6 @@ export class ActionMap {
     }
     await this._addTreeControl(ngwLayers, fires);
     this._addEventsListeners();
-  }
-
-  private _createPopupContent<G extends Geometry = any, P = any>(
-    feature: Feature<G, P>
-  ): HTMLElement {
-    const popupElement = document.createElement('div');
-    const pre = document.createElement('div');
-    pre.className = 'properties';
-    const propertiesList = Object.keys(feature.properties).map(k => {
-      return {
-        key: k,
-        value: feature.properties[k]
-      };
-    });
-    pre.innerHTML = this._createPropertiesHtml(propertiesList);
-    // pre.style.whiteSpace = 'pre-wrap';
-    popupElement.appendChild(pre);
-    return popupElement;
-  }
-
-  private _createPropertiesHtml(properties: Array<{ key: string; value: CollectorProperty }>) {
-    let elem = '';
-    properties.forEach(({ key, value }) => {
-      if (typeof value === 'object' && value) {
-        if ('year' in value) {
-          value = [value.day, value.month, value.year].join('.');
-        } else if ('hour' in value) {
-          value = [value.hour, value.minute].join(':');
-        }
-      }
-      elem += `
-      <div class="columns">
-        <div class="column is-two-fifths">${key}</div>
-        <div class="column">${prepareColumnValue(value)}</div>
-      </div>
-      `;
-    });
-    return elem;
   }
 
   private async _addTreeControl(ngwLayers: NgwLayers, fires: FireResource[]) {
@@ -205,95 +152,6 @@ export class ActionMap {
       this._promises.getFeaturePromise.cancel();
     }
     this.ngwMap.removeLayer('highlight');
-  }
-
-  private async _getResourceItem(resourceId: number) {
-    if (!this._resourceItems[resourceId]) {
-      const item = await this.ngwMap.connector.get('resource.item', null, { id: resourceId });
-      this._resourceItems[resourceId] = item;
-    }
-    return this._resourceItems[resourceId];
-  }
-
-  private async _updateElementContent<G extends Geometry = any, P = any>(
-    element: HTMLElement,
-    resourceId: number,
-    feature: Feature<G, P>
-  ) {
-    const item = await this._getResourceItem(resourceId);
-    if (item.feature_layer) {
-      const newProperties = [];
-      item.feature_layer.fields.forEach(x => {
-        if (x.grid_visibility) {
-          const property = feature.properties[x.keyname];
-          if (property) {
-            newProperties.push({ key: x.display_name, value: property });
-          }
-        }
-      });
-      const newContent = this._createPropertiesHtml(newProperties);
-      const pre = element.getElementsByClassName('properties')[0];
-      if (pre) {
-        pre.innerHTML = newContent;
-      }
-    }
-  }
-
-  private _loadImage(
-    img: FeatureItemAttachment,
-    options: { id: number; fid: number; width?: number; height?: number }
-  ) {
-    return new Promise<string>((resolve, reject) => {
-      const { width, height } = options;
-      const url =
-        '/api/resource/' +
-        options.id +
-        '/feature/' +
-        options.fid +
-        `/attachment/${img.id}/image` +
-        (width && height ? `?size=${width}x${height}` : '');
-      this.ngwMap.connector
-        .makeQuery(url, {}, { responseType: 'blob' })
-        .then(blob => {
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = () => {
-            resolve(reader.result as string);
-          };
-        })
-        .catch(er => {
-          reject(er);
-        });
-    });
-  }
-
-  private async _addPhotos(
-    element: HTMLElement,
-    attachment: FeatureItemAttachment[],
-    id: number,
-    fid: number
-  ) {
-    const attachmentElement = document.createElement('div');
-
-    attachmentElement.className = 'carousel attachment';
-    for (const img of attachment) {
-      const width = 300;
-      const height = 300;
-      const figure = document.createElement('figure');
-      figure.className = `image is-${width}x${height}`;
-      const src = await this._loadImage(img, {
-        width,
-        height,
-        id,
-        fid
-      });
-      const imgElem = document.createElement('img');
-      imgElem.src = src;
-      figure.appendChild(imgElem);
-      attachmentElement.appendChild(figure);
-    }
-    element.appendChild(attachmentElement);
-    const carousels = bulmaCarousel.attach(attachmentElement);
   }
 
   private _highlighNgwLayer(e: FeatureLayersIdentify) {
@@ -324,14 +182,14 @@ export class ActionMap {
             popupOptions: {
               createPopupContent: e => {
                 if (e.feature) {
-                  const element = this._createPopupContent(e.feature);
-                  this._updateElementContent(element, resourceId, e.feature);
+                  const element = this.popup._createPopupContent(e.feature);
+                  this.popup._updateElementContent(element, resourceId, e.feature);
                   if (
                     item.extensions &&
                     item.extensions.attachment &&
                     item.extensions.attachment.length
                   ) {
-                    this._addPhotos(
+                    this.popup._addPhotos(
                       element,
                       item.extensions.attachment,
                       params.resourceId,
