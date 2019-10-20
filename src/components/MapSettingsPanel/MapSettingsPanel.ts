@@ -8,6 +8,7 @@ import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
 import { FiresContainer } from './FiresContainer';
 import { BaseMapsContainer } from './BaseMapsContainer';
+import { BookmarksContainer } from './BookmarksContainer';
 
 const OPTIONS: MapSettingsPanelOptions = {
   target: 'tree',
@@ -77,6 +78,12 @@ export class MapSettingsPanel {
       open: false,
       parent: container
     });
+    new CollapsiblePanel({
+      title: 'Закладки',
+      content: () => this._createBookmarksContainer(),
+      open: false,
+      parent: container
+    });
 
     return container;
   }
@@ -91,6 +98,19 @@ export class MapSettingsPanel {
       if (treeContainer) {
         container.appendChild(treeContainer);
       }
+    }
+    return container;
+  }
+
+  private _createBookmarksContainer() {
+    const container = document.createElement('div');
+    const bookmarks = this.options.bookmarks;
+    if (bookmarks) {
+      const bookmarkContainer = new BookmarksContainer({
+        bookmarks,
+        ngwMap: this.options.ngwMap
+      });
+      container.appendChild(bookmarkContainer.getContainer());
     }
     return container;
   }

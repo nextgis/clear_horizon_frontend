@@ -20,6 +20,13 @@ export interface FireResource {
   color?: string;
 }
 
+export interface Bookmark {
+  id: string;
+  name: string;
+}
+
+export type Bookmarks = Bookmark[];
+
 export interface BaseLayer {
   nameÍ: string;
   qmsId: number;

@@ -28,9 +28,7 @@ export class CollapsiblePanel {
   }
 
   open() {
-    if (!this._content) {
-      this._createContent();
-    }
+    this._updateContent();
     this._container.appendChild(this._content);
     if (this._toggle) {
       this._toggle.innerHTML = this._getToggleButtonHtml('fas fa-chevron-up');
@@ -39,9 +37,7 @@ export class CollapsiblePanel {
   }
 
   close() {
-    if (this._content) {
-      this._content.parentNode.removeChild(this._content);
-    }
+    this._cleanContent();
     if (this._toggle) {
       this._toggle.innerHTML = this._getToggleButtonHtml('fas fa-chevron-down');
     }
@@ -72,6 +68,11 @@ export class CollapsiblePanel {
       const header = this._createHeader();
       this._container.appendChild(header);
     }
+    const content = document.createElement('div');
+    content.className = 'panel-content';
+    this._content = content;
+    this._container.appendChild(content);
+
     if (this.status) {
       this.open();
     } else {
@@ -81,34 +82,43 @@ export class CollapsiblePanel {
 
   private _createHeader() {
     const header = document.createElement('div');
-    header.className = 'panel-header';
+    header.className = 'level is-mobile panel-header';
+
+    const leftLevel = document.createElement('div');
+    leftLevel.className = 'level-left';
 
     const title = document.createElement('div');
-    title.className = 'panel-header__title';
+    title.className = 'level-item panel-header__title';
     title.innerHTML = this.options.title;
+    leftLevel.appendChild(title);
 
+    const rightLevel = document.createElement('div');
+    rightLevel.className = 'level-right';
     const toggle = document.createElement('div');
-    toggle.className = 'is-pulled-right panel-header__toggle';
+    toggle.className = 'level-item panel-header__toggle';
+    rightLevel.appendChild(toggle);
 
     toggle.onclick = () => {
       this.toggle();
     };
     this._toggle = toggle;
 
-    header.appendChild(toggle);
-
-    header.appendChild(title);
+    header.appendChild(leftLevel);
+    header.appendChild(rightLevel);
 
     return header;
   }
 
-  private _createContent() {
-    const content = document.createElement('div');
-    content.className = 'panel-content';
+  private _cleanContent() {
+    this._content.innerHTML = '';
+  }
+
+  private _updateContent() {
+    this._cleanContent();
     const html =
       typeof this.options.content === 'function' ? this.options.content() : this.options.content;
-    content.appendChild(html);
-    this._content = content;
-    return content;
+
+    this._content.appendChild(html);
+    return this._content;
   }
 }

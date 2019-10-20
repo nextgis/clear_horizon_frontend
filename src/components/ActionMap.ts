@@ -1,28 +1,20 @@
 import 'leaflet/dist/leaflet.css';
 import 'bulma-carousel/dist/css/bulma-carousel.min.css';
 import './ActionMap.css';
-import bulmaCarousel from 'bulma-carousel';
-
-import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers } from '@nextgis/ngw-map';
-
+import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers, LocationEvent } from '@nextgis/ngw-map';
+import NgwKit from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
-
 import MapAdapter from '@nextgis/leaflet-map-adapter';
+import { QmsAdapterOptions } from '@nextgis/qms-kit';
+import { Feature, MultiPoint } from 'geojson';
 
 // import MapAdapter from '@nextgis/ol-map-adapter';
 // import 'ol/ol.css';
 
-import { AppOptions, FireResource, BaseLayer } from 'src/App';
+import { AppOptions, FireResource, BaseLayer } from '../App';
 import { MapSettingsPanelControl } from './MapSettingsPanel/MapSettingsPanelControl';
 import { Auth } from './Auth/Auth';
-import { Feature, MultiPoint, Geometry } from 'geojson';
-import NgwConnector, {
-  FeatureLayersIdentify,
-  CancelablePromise,
-  ResourceItem
-} from '@nextgis/ngw-connector';
-import NgwKit from '@nextgis/ngw-kit';
-import { QmsAdapterOptions } from '@nextgis/qms-kit';
+import { FeatureLayersIdentify, CancelablePromise } from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
 
 interface Firms {
@@ -81,7 +73,41 @@ export class ActionMap {
 
     this.ngwMap.addControl('ZOOM', 'top-left');
     this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
+    await this._createAuthControl(auth);
+    this.ngwMap.addControl(this.authControl, 'top-right');
 
+    const ngwLayers = await this.ngwMap.getNgwLayers();
+
+    await this._addFires(fires);
+
+    this._addTreeControl(ngwLayers, fires);
+
+    this._locate();
+
+    this._addEventsListeners();
+  }
+
+  private _locate() {
+    const locationfound = (e: LocationEvent) => {
+      const lngLat = e.lngLat;
+      // const lngLat: [number, number] = [40, 46];
+      // TODO: get extent from webmap or frame layer;
+      const extent = this.ngwMap.getBounds();
+      if (extent) {
+        const [minLng, minLat, maxLng, maxLat] = extent;
+        const [lng, lat] = lngLat;
+        const isLngInBbox = minLng < lng && lng < maxLng;
+        const isLatInBbox = minLat < lat && lat < maxLat;
+        if (isLngInBbox && isLatInBbox) {
+          this.ngwMap.setCenter(lngLat);
+        }
+      }
+    };
+
+    this.ngwMap.locate({ setView: false }, { locationfound });
+  }
+
+  private async _createAuthControl(auth: Auth) {
     this.authControl = await this.ngwMap.createToggleControl({
       html: {
         on: '<div class="sign-out--btn"><i class="fas fa-sign-out-alt"></i></div>',
@@ -96,10 +122,9 @@ export class ActionMap {
         window.location.reload();
       }
     });
-    this.ngwMap.addControl(this.authControl, 'top-right');
+  }
 
-    const ngwLayers = await this.ngwMap.getNgwLayers();
-
+  private async _addFires(fires?: FireResource[]) {
     if (fires) {
       for (const x of fires) {
         await this.ngwMap.addNgwLayer({
@@ -130,8 +155,6 @@ export class ActionMap {
         });
       }
     }
-    await this._addTreeControl(ngwLayers, fires);
-    this._addEventsListeners();
   }
 
   private async _addTreeControl(ngwLayers: NgwLayers, fires: FireResource[]) {

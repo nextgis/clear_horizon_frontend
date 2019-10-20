@@ -1,9 +1,10 @@
 .panel-header {
   padding: 0 4px;
-  background-color: rgba(0,0,0,.05);
-  border-bottom: 1px solid rgba(0,0,0,.4);
+  background-color: rgba(0, 0, 0, .05);
+  border-bottom: 1px solid rgba(0, 0, 0, .4);
   height: 45px;
   line-height: 45px;
+  margin-bottom: 0!important;
 }
 
 .panel-header__toggle {
@@ -16,7 +17,6 @@
   /* cursor: pointer; */
   /* text-align: center; */
   /* line-height: 30px; */
-
 }
 
 .panel-content-padding {
