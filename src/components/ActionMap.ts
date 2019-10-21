@@ -1,6 +1,8 @@
 import 'leaflet/dist/leaflet.css';
 import 'bulma-carousel/dist/css/bulma-carousel.min.css';
 import './ActionMap.css';
+
+import PolylineMeasure from 'leaflet.polylinemeasure';
 import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers, LocationEvent } from '@nextgis/ngw-map';
 import NgwKit from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
@@ -95,6 +97,7 @@ export class ActionMap {
     await this._addFires(fires);
 
     this._addTreeControl({ ngwLayers, fires, bookmarks });
+    this.ngwMap.addControl(this._crateMeasureControl(), 'top-left');
 
     this._locate();
 
@@ -263,5 +266,35 @@ export class ActionMap {
         });
       }
     });
+  }
+
+  private _crateMeasureControl() {
+    const measureControl = new PolylineMeasure({
+      showBearings: true,
+      bearingTextIn: 'In',
+      bearingTextOut: 'Out',
+      tooltipTextFinish: 'Кликните чтобы <b>завершить изменрение</b><br>',
+      tooltipTextDelete: 'SHIFT + клик чтобы <b>удалить точку</b>',
+      tooltipTextMove: 'Клик + тянуть чтобы <b>передвинуть точку</b><br>',
+      tooltipTextResume: '<br>CTRL + клик чтобы <b>продолжить линию</b>',
+      tooltipTextAdd: 'CTRL + клик чтобы <b>добавить точку</b>',
+      measureControlTitleOn: 'Перейти в режим измерения',
+      measureControlTitleOff: 'Выйти из режима измерений',
+      measureControlLabel: '<i class="fas fa-ruler-combined measure-icon"></i>',
+      measureControlClasses: [],
+      unitControlLabel: {
+        metres: 'м',
+        kilometres: 'км'
+      }
+    });
+    // @ts-ignore
+    this.ngwMap.mapAdapter.map.on('polylinemeasure:toggle', (opt: { sttus: boolean }) => {
+      if (opt.sttus) {
+        this.ngwMap.disableSelection();
+      } else {
+        this.ngwMap.enableSelection();
+      }
+    });
+    return measureControl;
   }
 }

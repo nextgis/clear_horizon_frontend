@@ -16,3 +16,17 @@
 .sign-out--btn svg {
     height: 100%;
 }
+
+.measure-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.leaflet-pane.leaflet-overlay-pane {
+    z-index: 4000;
+}
+
+.leaflet-marker-icon.polyline-measure-tooltip {
+    font-weight: 700;
+    width: 100px!important;
+}

@@ -22,6 +22,7 @@
     "bulma": "^0.8.0",
     "bulma-carousel": "^4.0.4",
     "core-js": "^3.3.2",
+    "leaflet.polylinemeasure": "github:ppete2/Leaflet.PolylineMeasure#master",
     "regenerator-runtime": "^0.13.3"
   },
   "devDependencies": {
