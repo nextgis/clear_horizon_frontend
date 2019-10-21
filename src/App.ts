@@ -28,7 +28,7 @@ export interface Bookmark {
 export type Bookmarks = Bookmark[];
 
 export interface BaseLayer {
-  nameÍ: string;
+  name: string;
   qmsId: number;
 }
 

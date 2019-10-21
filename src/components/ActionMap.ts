@@ -14,7 +14,11 @@ import { Feature, MultiPoint } from 'geojson';
 import { AppOptions, FireResource, BaseLayer } from '../App';
 import { MapSettingsPanelControl } from './MapSettingsPanel/MapSettingsPanelControl';
 import { Auth } from './Auth/Auth';
-import { FeatureLayersIdentify, CancelablePromise } from '@nextgis/ngw-connector';
+import {
+  FeatureLayersIdentify,
+  CancelablePromise,
+  ResourceHierarchy
+} from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
 
 interface Firms {
@@ -59,9 +63,11 @@ export class ActionMap {
     }
     this.ngwMap = new NgwMap(new MapAdapter(), {
       controls: [],
+      minZoom: 4,
       ...opt
     });
-
+    this.ngwMap.setCursor('default');
+    this.popup.setNgwMap(this.ngwMap);
     if (basemaps) {
       this.ngwMap.onLoad().then(() =>
         basemaps.forEach((x, i) => {
@@ -77,10 +83,16 @@ export class ActionMap {
     this.ngwMap.addControl(this.authControl, 'top-right');
 
     const ngwLayers = await this.ngwMap.getNgwLayers();
-
+    const bookmarks: ResourceHierarchy[] = [];
+    Object.values(ngwLayers).forEach(x => {
+      const bookmark = x.layer.item && x.layer.item.webmap && x.layer.item.webmap.bookmark_resource;
+      if (bookmark) {
+        bookmarks.push(bookmark);
+      }
+    });
     await this._addFires(fires);
 
-    this._addTreeControl(ngwLayers, fires);
+    this._addTreeControl({ ngwLayers, fires, bookmarks });
 
     this._locate();
 
@@ -147,7 +159,7 @@ export class ActionMap {
               createPopupContent: e => {
                 if (e.feature) {
                   const feature = e.feature as Feature<MultiPoint, Firms>;
-                  return this.popup._createPopupContent<MultiPoint, Firms>(feature);
+                  return this.popup.createPopupContent<MultiPoint, Firms>(feature);
                 }
               }
             }
@@ -157,13 +169,16 @@ export class ActionMap {
     }
   }
 
-  private async _addTreeControl(ngwLayers: NgwLayers, fires: FireResource[]) {
+  private async _addTreeControl(opt: {
+    ngwLayers: NgwLayers;
+    fires: FireResource[];
+    bookmarks: ResourceHierarchy[];
+  }) {
     await this.ngwMap.onLoad();
 
     this.tree = new MapSettingsPanelControl(this, {
-      ngwLayers,
       ngwMap: this.ngwMap,
-      fires
+      ...opt
     });
     this.treeControl = await this.ngwMap.createToggleControl(this.tree);
 
@@ -205,8 +220,8 @@ export class ActionMap {
             popupOptions: {
               createPopupContent: e => {
                 if (e.feature) {
-                  const element = this.popup._createPopupContent(e.feature);
-                  this.popup._updateElementContent(element, resourceId, e.feature);
+                  const element = this.popup.createPopupContent(e.feature);
+                  this.popup.updateElementContent(element, resourceId, e.feature);
                   if (
                     item.extensions &&
                     item.extensions.attachment &&

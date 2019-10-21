@@ -33,7 +33,11 @@ export class Popup {
 
   constructor(private ngwMap: NgwMap) {}
 
-  _createPopupContent<G extends Geometry = any, P = any>(feature: Feature<G, P>): HTMLElement {
+  setNgwMap(ngwMap: NgwMap) {
+    this.ngwMap = ngwMap;
+  }
+
+  createPopupContent<G extends Geometry = any, P = any>(feature: Feature<G, P>): HTMLElement {
     const popupElement = document.createElement('div');
     const pre = document.createElement('div');
     pre.className = 'properties';
@@ -43,13 +47,13 @@ export class Popup {
         value: feature.properties[k]
       };
     });
-    pre.innerHTML = this._createPropertiesHtml(propertiesList);
+    pre.innerHTML = this.createPropertiesHtml(propertiesList);
     // pre.style.whiteSpace = 'pre-wrap';
     popupElement.appendChild(pre);
     return popupElement;
   }
 
-  _createPropertiesHtml(properties: Array<{ key: string; value: CollectorProperty }>) {
+  createPropertiesHtml(properties: Array<{ key: string; value: CollectorProperty }>) {
     let elem = '';
     properties.forEach(({ key, value }) => {
       if (typeof value === 'object' && value) {
@@ -69,7 +73,7 @@ export class Popup {
     return elem;
   }
 
-  async _updateElementContent<G extends Geometry = any, P = any>(
+  async updateElementContent<G extends Geometry = any, P = any>(
     element: HTMLElement,
     resourceId: number,
     feature: Feature<G, P>
@@ -85,7 +89,7 @@ export class Popup {
           }
         }
       });
-      const newContent = this._createPropertiesHtml(newProperties);
+      const newContent = this.createPropertiesHtml(newProperties);
       const pre = element.getElementsByClassName('properties')[0];
       if (pre) {
         pre.innerHTML = newContent;

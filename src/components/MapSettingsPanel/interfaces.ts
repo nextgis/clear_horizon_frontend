@@ -1,5 +1,6 @@
 import NgwMap, { NgwLayers } from '@nextgis/ngw-map';
-import { FireResource, Bookmarks } from 'src/App';
+import { FireResource } from 'src/App';
+import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
 export interface MapSettingsPanelOptions {
   target?: HTMLElement | string;
@@ -8,5 +9,5 @@ export interface MapSettingsPanelOptions {
   ngwMap?: NgwMap;
   ngwLayers?: NgwLayers;
   fires?: FireResource[];
-  bookmarks?: Bookmarks;
+  bookmarks?: ResourceHierarchy[];
 }

@@ -28,8 +28,10 @@ export class CollapsiblePanel {
   }
 
   open() {
-    this._updateContent();
-    this._container.appendChild(this._content);
+    if (!this._content.innerHTML) {
+      this._updateContent();
+    }
+    // this._container.appendChild(this._content);
     if (this._toggle) {
       this._toggle.innerHTML = this._getToggleButtonHtml('fas fa-chevron-up');
     }

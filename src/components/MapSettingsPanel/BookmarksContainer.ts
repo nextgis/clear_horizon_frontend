@@ -1,14 +1,18 @@
-import { Bookmarks, Bookmark } from 'src/App';
+import './BookmarksContainer.css';
+
+import { Bookmark } from 'src/App';
 import NgwMap from '@nextgis/ngw-map';
-import { ResourceAdapter } from '@nextgis/ngw-kit';
+import { ResourceHierarchy, FeatureItem } from '@nextgis/ngw-connector';
+import { GeoJSON, Map } from 'leaflet';
+import { Polygon } from 'geojson';
 
 export interface BookmarksContainerOptions {
   ngwMap: NgwMap;
-  bookmarks: Bookmarks;
+  bookmarks: ResourceHierarchy[];
 }
 
 export class BookmarksContainer {
-  private readonly ngwMap: NgwMap;
+  private readonly ngwMap: NgwMap<Map>;
   private _container: HTMLElement;
 
   constructor(private options: BookmarksContainerOptions) {
@@ -24,42 +28,35 @@ export class BookmarksContainer {
     const container = document.createElement('div');
     container.className = 'bookmarks-contentainer panel-content-padding ';
 
-    const bookmarks = document.createElement('div');
-    bookmarks.className = 'bookmarks-contentainer__layers';
+    const bookmarksContainer = document.createElement('div');
+    bookmarksContainer.className = 'bookmarks-contentainer__layers';
     this.options.bookmarks.forEach(b => {
-      this._createBookmarkItem(b, bookmarks);
+      this.ngwMap.connector.get('resource.item', null, { id: b.id }).then(resource => {
+        const labelField = resource.feature_layer.fields.find(x => x.label_field);
+        this.ngwMap.getNgwLayerItems({ resourceId: b.id }).then(items => {
+          items.forEach((x: FeatureItem<Bookmark, Polygon>) => {
+            const elem = this._createBookmarkItem(x, labelField.keyname);
+            container.appendChild(elem);
+          });
+        });
+      });
     });
-    container.appendChild(bookmarks);
+    container.appendChild(bookmarksContainer);
 
     return container;
   }
 
-  _createBookmarkItem(bookmark: Bookmark, container: HTMLElement) {
+  _createBookmarkItem(bookmark: FeatureItem<Bookmark, Polygon>, nameField = 'name') {
     const elem = document.createElement('div');
-    elem.className = 'tree-container__item';
-    const layer = this.ngwMap.getLayer(bookmark.id) as ResourceAdapter;
-    const item = layer.item;
-    const input = document.createElement('input');
-    input.setAttribute('type', 'checkbox');
-
-    input.checked = true;
-
-    // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
-    //   input.checked = ev.value;
-    // });
-    input.onclick = () => {
-      this.ngwMap.toggleLayer(bookmark.id, input.checked);
+    elem.className = 'tree-container__item bookmark';
+    const bookmarkBlock = document.createElement('div');
+    bookmarkBlock.innerHTML = bookmark.fields[nameField];
+    bookmarkBlock.onclick = () => {
+      const geoJson = new GeoJSON(bookmark.geom);
+      const lMap = this.ngwMap.mapAdapter.map;
+      lMap.fitBounds(geoJson.getBounds());
     };
-
-    const name = document.createElement('span');
-
-    const displayName = item.resource.display_name.split('__')[0];
-
-    name.innerHTML = displayName.replace('bookmarks', '').trim();
-
-    elem.appendChild(input);
-    elem.appendChild(name);
-
-    container.appendChild(elem);
+    elem.appendChild(bookmarkBlock);
+    return elem;
   }
 }
