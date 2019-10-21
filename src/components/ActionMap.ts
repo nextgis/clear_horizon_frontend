@@ -293,6 +293,7 @@ export class ActionMap {
         this.ngwMap.disableSelection();
       } else {
         this.ngwMap.enableSelection();
+        this.ngwMap.setCursor('default');
       }
     });
     return measureControl;
