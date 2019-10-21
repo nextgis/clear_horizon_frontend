@@ -17,8 +17,12 @@
     ]
   },
   "basemaps": [
-    {"qmsId": 487 },
-    {"qmsId": 1135 }
+    {
+      "qmsId": 487
+    },
+    {
+      "qmsId": 1135
+    }
   ],
   "fires": [
     {

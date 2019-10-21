@@ -5,6 +5,7 @@ import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers, LocationEvent } from '
 import NgwKit from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
+import UrlRuntimeParams from '@nextgis/url-runtime-params';
 import { QmsAdapterOptions } from '@nextgis/qms-kit';
 import { Feature, MultiPoint } from 'geojson';
 
@@ -64,6 +65,7 @@ export class ActionMap {
     this.ngwMap = new NgwMap(new MapAdapter(), {
       controls: [],
       minZoom: 4,
+      runtimeParams: [new UrlRuntimeParams()],
       ...opt
     });
     this.ngwMap.setCursor('default');

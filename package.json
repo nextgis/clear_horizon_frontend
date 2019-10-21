@@ -18,6 +18,7 @@
     "@nextgis/eslint-config": "^0.20.0",
     "@nextgis/leaflet-map-adapter": "^0.20.0",
     "@nextgis/ngw-map": "^0.20.0",
+    "@nextgis/url-runtime-params": "^0.20.0",
     "bulma": "^0.8.0",
     "bulma-carousel": "^4.0.4",
     "core-js": "^3.3.2",
