@@ -2,6 +2,7 @@ import 'leaflet/dist/leaflet.css';
 import 'bulma-carousel/dist/css/bulma-carousel.min.css';
 import './ActionMap.css';
 
+import ShareButtons from 'share-buttons/dist/share-buttons';
 import PolylineMeasure from 'leaflet.polylinemeasure';
 
 import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers, LocationEvent } from '@nextgis/ngw-map';
@@ -158,13 +159,54 @@ export class ActionMap {
   }
 
   private _createShareControl() {
+    const shareModal = document.getElementsByClassName('js-modal')[0];
+    const closeModalBtn = document.getElementsByClassName('js-modal-close')[0];
+    const shareModalContent = document.getElementsByClassName('js-share-modal-content')[0];
+    const showModal = () => {
+      const html = this._createShareModalContent();
+      shareModalContent.innerHTML = html;
+      ShareButtons.update();
+      shareModal.classList.add('is-active');
+    };
+    const closeModal = () => {
+      shareModalContent.innerHTML = '';
+      shareModal.classList.remove('is-active');
+    };
+    closeModalBtn.addEventListener('click', () => {
+      closeModal();
+    });
+
     const shareControl = this.ngwMap.createButtonControl({
       html: '<i class="fas fa-share-alt btn-control-icon "></i>',
       onClick() {
-        //
+        showModal();
       }
     });
     this.ngwMap.addControl(shareControl, 'bottom-right');
+  }
+
+  private _createShareModalContent() {
+    const social = [
+      { id: 'tw', name: 'Twitter', icon: 'fab fa-twitter' },
+      { id: 'vk', name: 'VK', icon: 'fab fa-vk' },
+      { id: 'fb', name: 'Facebook', icon: 'fab fa-facebook-square' }
+    ];
+
+    const html = `<div class="buttons share-btn js-share-btn" data-url="${
+      location.href
+    }" data-title="" data-desc="">
+      ${social
+        .map(
+          x => `<a class="button is-primary" data-id="${x.id}">
+                    <span class="icon">
+                        <i class="${x.icon}"></i>
+                    </span>
+                    <span>${x.name}</span>
+                </a>`
+        )
+        .join('')}
+    </div>`;
+    return html;
   }
 
   private async _addFires(fires?: FireResource[]) {

@@ -98,4 +98,16 @@ html {
 
 .polyline-measure-controlOnBgColor {
 	background-color: $primary !important;
-  }
+}
+
+.modal {
+	z-index: 5001;
+}
+
+.modal-content {
+	width: 350px;
+}
+
+.modal.is-active {
+	display: flex;
+}

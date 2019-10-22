@@ -24,7 +24,8 @@
     "core-js": "^3.3.3",
     "leaflet-sidebar": "github:rendrom/leaflet-sidebar",
     "leaflet.polylinemeasure": "github:ppete2/Leaflet.PolylineMeasure#master",
-    "regenerator-runtime": "^0.13.3"
+    "regenerator-runtime": "^0.13.3",
+    "share-buttons": "github:rendrom/share-buttons"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.7",
