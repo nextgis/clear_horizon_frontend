@@ -114,16 +114,17 @@ export class ActionMap {
       const lngLat = e.lngLat;
       // const lngLat: [number, number] = [40, 46];
       // TODO: get extent from webmap or frame layer;
-      const extent = this.ngwMap.getBounds();
-      if (extent) {
-        const [minLng, minLat, maxLng, maxLat] = extent;
-        const [lng, lat] = lngLat;
-        const isLngInBbox = minLng < lng && lng < maxLng;
-        const isLatInBbox = minLat < lat && lat < maxLat;
-        if (isLngInBbox && isLatInBbox) {
-          this.ngwMap.setCenter(lngLat);
-        }
-      }
+      // const extent = this.ngwMap.getBounds();
+      // if (extent) {
+      //   const [minLng, minLat, maxLng, maxLat] = extent;
+      //   const [lng, lat] = lngLat;
+      //   const isLngInBbox = minLng < lng && lng < maxLng;
+      //   const isLatInBbox = minLat < lat && lat < maxLat;
+      //   if (isLngInBbox && isLatInBbox) {
+      //     this.ngwMap.setCenter(lngLat);
+      //   }
+      // }
+      this.ngwMap.setCenter(lngLat);
     };
 
     this.ngwMap.locate({ setView: false }, { locationfound });
