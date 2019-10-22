@@ -1,8 +1,6 @@
-import 'bulma/bulma.sass';
-import './App.css';
-
 import { NgwMapOptions } from '@nextgis/ngw-map';
 import { ActionMap } from './components/ActionMap';
+import './bulma';
 
 export interface AsuLayer {
   name: string;

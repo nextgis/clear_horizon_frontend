@@ -1,3 +1,5 @@
+import './style/style.scss';
+
 import 'core-js';
 import 'regenerator-runtime/runtime';
 import { App, AppOptions } from './App';

@@ -10,8 +10,50 @@
 </head>
 
 <body>
+    <nav class="navbar is-transparent overlap-navbar" role="navigation" aria-label="main navigation">
+
+        <div class="navbar-brand">
+
+            <a role="button" class="navbar-burger burger left-burger js-sidebar" aria-label="menu" aria-expanded="false"
+                data-target="">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+
+            <a class="navbar-item navbar-brand has-text-weight-bold has-text-primary" href="/">
+                <span class="">CLEAR</span><span class="has-text-danger">HORIZON</span>
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
+                data-target="navbarMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarMenu" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item js-main">
+                    Главная
+                </a>
+                <a class="navbar-item js-about">
+                    О проекте
+                </a>
+                <a class="navbar-item js-contacts">
+                    Контакты
+                </a>
+            </div>
+
+            <div class="navbar-end">
+                <a class="navbar-item js-auth-btn">
+                    Войти
+                </a>
+            </div>
+        </div>
+    </nav>
     <div id="container">
-        <div id="geocoder"></div>
         <div id="tree"></div>
         <div id='map'></div>
         <div style="clear:both"></div>

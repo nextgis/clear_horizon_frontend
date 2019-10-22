@@ -3,6 +3,7 @@ import 'bulma-carousel/dist/css/bulma-carousel.min.css';
 import './ActionMap.css';
 
 import PolylineMeasure from 'leaflet.polylinemeasure';
+
 import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers, LocationEvent } from '@nextgis/ngw-map';
 import NgwKit from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
@@ -23,6 +24,7 @@ import {
   ResourceHierarchy
 } from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
+import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 
 interface Firms {
   acq_date: string;
@@ -43,7 +45,7 @@ interface Firms {
 export class ActionMap {
   ngwMap: NgwMap<L.Map, L.Layer, any>;
 
-  tree?: MapSettingsPanelControl;
+  tree?: MapSettingsPanel;
   treeControl?: L.Control & ToggleControl;
 
   authControl?: L.Control & ToggleControl;
@@ -84,7 +86,7 @@ export class ActionMap {
     this.ngwMap.addControl('ZOOM', 'top-left');
     this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
     await this._createAuthControl(auth);
-    this.ngwMap.addControl(this.authControl, 'top-right');
+    // this.ngwMap.addControl(this.authControl, 'top-right');
 
     const ngwLayers = await this.ngwMap.getNgwLayers();
     const bookmarks: ResourceHierarchy[] = [];
@@ -124,21 +126,35 @@ export class ActionMap {
     this.ngwMap.locate({ setView: false }, { locationfound });
   }
 
+  // private async _createAuthControl(auth: Auth) {
+  //   this.authControl = await this.ngwMap.createToggleControl({
+  //     html: {
+  //       on: '<div class="sign-out--btn"><i class="fas fa-sign-out-alt"></i></div>',
+  //       off: '<div class="sign-out--btn"><i class="fas fa-sign-in-alt"></i></div>'
+  //     },
+  //     title: { on: 'Выйти', off: 'Войти' },
+  //     getStatus: () => {
+  //       return !!(this.ngwMap.connector && this.ngwMap.connector.user);
+  //     },
+  //     onClick: () => {
+  //       auth.logout();
+  //       window.location.reload();
+  //     }
+  //   });
+  // }
+
   private async _createAuthControl(auth: Auth) {
-    this.authControl = await this.ngwMap.createToggleControl({
-      html: {
-        on: '<div class="sign-out--btn"><i class="fas fa-sign-out-alt"></i></div>',
-        off: '<div class="sign-out--btn"><i class="fas fa-sign-in-alt"></i></div>'
-      },
-      title: { on: 'Выйти', off: 'Войти' },
-      getStatus: () => {
-        return !!(this.ngwMap.connector && this.ngwMap.connector.user);
-      },
-      onClick: () => {
-        auth.logout();
-        window.location.reload();
-      }
-    });
+    const authBtn = document.getElementsByClassName('js-auth-btn')[0] as HTMLElement;
+    const getStatus = () => {
+      return !!(this.ngwMap.connector && this.ngwMap.connector.user);
+    };
+    const onClick = () => {
+      auth.logout();
+      window.location.reload();
+    };
+    authBtn.innerHTML = getStatus() ? 'Выйти' : 'Войти';
+    authBtn.style.display = 'block';
+    authBtn.addEventListener('click', onClick);
   }
 
   private async _addFires(fires?: FireResource[]) {
@@ -179,15 +195,21 @@ export class ActionMap {
     fires: FireResource[];
     bookmarks: ResourceHierarchy[];
   }) {
+    const sidebarToggleBtn = document.getElementsByClassName('js-sidebar')[0];
+
+    const isActive = () => sidebarToggleBtn.classList.contains('is-active');
+
     await this.ngwMap.onLoad();
 
-    this.tree = new MapSettingsPanelControl(this, {
-      ngwMap: this.ngwMap,
-      ...opt
-    });
-    this.treeControl = await this.ngwMap.createToggleControl(this.tree);
+    this.tree = new MapSettingsPanel(this, { ...opt, ngwMap: this.ngwMap });
 
-    this.ngwMap.addControl(this.treeControl, 'top-left');
+    sidebarToggleBtn.addEventListener('click', () => {
+      if (isActive()) {
+        this.tree.show();
+      } else {
+        this.tree.hide();
+      }
+    });
   }
 
   private _clean() {
@@ -251,7 +273,7 @@ export class ActionMap {
   private _addEventsListeners() {
     this.ngwMap.emitter.on('ngw:select', e => this._highlighNgwLayer(e));
 
-    const togglers = [this.tree];
+    const togglers = [];
     const controls = [this.treeControl];
     togglers.forEach((x, i) => {
       if (x) {

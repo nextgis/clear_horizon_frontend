@@ -1,5 +1,8 @@
 import './MapSettingsPanel.css';
 
+import Sidebar from 'leaflet-sidebar';
+import 'leaflet-sidebar/src/L.Control.Sidebar.css';
+
 import { MapSettingsPanelOptions } from './interfaces';
 
 import { NgwLayers } from '@nextgis/ngw-map';
@@ -9,21 +12,24 @@ import { WebmapTreeItem } from './WebmapTreeItem';
 import { FiresContainer } from './FiresContainer';
 import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
+import { ActionMap } from '../ActionMap';
 
 const OPTIONS: MapSettingsPanelOptions = {
-  target: 'tree',
-  width: 300
+  target: 'tree'
+  // width: 300
 };
 
 export class MapSettingsPanel {
   options: MapSettingsPanelOptions;
+
+  sidebar: Sidebar;
 
   private _container: HTMLElement;
   private _target: HTMLElement;
 
   private ngwLayers!: NgwLayers;
 
-  constructor(options: MapSettingsPanelOptions) {
+  constructor(private actionMap: ActionMap, options: MapSettingsPanelOptions) {
     this.options = { ...OPTIONS, ...options };
     if (typeof this.options.target === 'string') {
       const target = document.getElementById(this.options.target);
@@ -35,6 +41,12 @@ export class MapSettingsPanel {
     } else if (this.options.target instanceof HTMLElement) {
       this._target = this.options.target;
     }
+    this.sidebar = new Sidebar(this._target, {
+      closeButton: false,
+      position: 'left',
+      autoPan: false
+    });
+    this.sidebar.addTo(this.actionMap.ngwMap.mapAdapter.map);
 
     this.ngwLayers = this.options.ngwLayers;
 
@@ -47,9 +59,11 @@ export class MapSettingsPanel {
 
   show() {
     this._container.classList.remove('hidden');
+    this.sidebar.show();
   }
 
   hide() {
+    this.sidebar.hide();
     this._container.classList.add('hidden');
   }
 
@@ -57,7 +71,9 @@ export class MapSettingsPanel {
     const container = document.createElement('div');
     container.className = 'tree-container';
 
-    container.style.width = (this.options.width || 300) + 'px';
+    if (this.options.width !== undefined) {
+      container.style.width = this.options.width + 'px';
+    }
 
     if (this.options.fires) {
       new CollapsiblePanel({

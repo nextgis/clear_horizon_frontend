@@ -1,0 +1,15 @@
+@charset "utf-8";
+
+@import "./variables.scss";
+
+// Import only what you need from Bulma
+@import "node_modules/bulma/sass/utilities/_all.sass";
+@import "node_modules/bulma/sass/base/_all.sass";
+@import "node_modules/bulma/sass/elements/_all.sass";
+@import "node_modules/bulma/sass/form/_all.sass";
+@import "node_modules/bulma/sass/components/navbar.sass";
+@import "node_modules/bulma/sass/components/level.sass";
+@import "node_modules/bulma/sass/grid/columns.sass";
+// @import "../node_modules/bulma/sass/layout/section.sass";
+
+@import "./main.scss";

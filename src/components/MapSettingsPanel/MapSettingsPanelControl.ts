@@ -20,7 +20,7 @@ export class MapSettingsPanelControl implements ToggleControlOptions {
   tree: MapSettingsPanel;
 
   constructor(private actionMap: ActionMap, options?: MapSettingsPanelOptions) {
-    this.tree = new MapSettingsPanel(options);
+    this.tree = new MapSettingsPanel(actionMap, options);
   }
 
   onClick(status: boolean) {
