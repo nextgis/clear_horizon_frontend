@@ -84,6 +84,7 @@ export class ActionMap {
     this.ngwMap.getPaintFunctions = { base: getIcon };
 
     this.ngwMap.addControl('ZOOM', 'top-left');
+    this._createLocateControl();
     this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
     this._createShareControl();
     await this._createAuthControl(auth);
@@ -101,8 +102,6 @@ export class ActionMap {
 
     this._addTreeControl({ ngwLayers, fires, bookmarks });
     this.ngwMap.addControl(this._crateMeasureControl(), 'top-left');
-
-    this._locate();
 
     this._addEventsListeners();
   }
@@ -162,8 +161,11 @@ export class ActionMap {
     const shareModal = document.getElementsByClassName('js-modal')[0];
     const closeModalBtn = document.getElementsByClassName('js-modal-close')[0];
     const shareModalContent = document.getElementsByClassName('js-share-modal-content')[0];
+    const shareInput = document.getElementsByClassName('js-share-input')[0] as HTMLInputElement;
     const showModal = () => {
-      const html = this._createShareModalContent();
+      const href = location.href;
+      const html = this._createShareModalContent(href);
+      shareInput.value = href;
       shareModalContent.innerHTML = html;
       ShareButtons.update();
       shareModal.classList.add('is-active');
@@ -185,16 +187,24 @@ export class ActionMap {
     this.ngwMap.addControl(shareControl, 'bottom-right');
   }
 
-  private _createShareModalContent() {
+  private _createLocateControl() {
+    const onClick = () => this._locate();
+    const locateControl = this.ngwMap.createButtonControl({
+      html: '<i class="fas fa-location-arrow btn-control-icon "></i>',
+      title: 'Найти меня на карте',
+      onClick
+    });
+    this.ngwMap.addControl(locateControl, 'top-left');
+  }
+
+  private _createShareModalContent(url: string) {
     const social = [
       { id: 'tw', name: 'Twitter', icon: 'fab fa-twitter' },
       { id: 'vk', name: 'VK', icon: 'fab fa-vk' },
       { id: 'fb', name: 'Facebook', icon: 'fab fa-facebook-square' }
     ];
 
-    const html = `<div class="buttons share-btn js-share-btn" data-url="${
-      location.href
-    }" data-title="" data-desc="">
+    const html = `<div class="buttons share-btn js-share-btn" data-url="${url}" data-title="" data-desc="">
       ${social
         .map(
           x => `<a class="button is-primary" data-id="${x.id}">
