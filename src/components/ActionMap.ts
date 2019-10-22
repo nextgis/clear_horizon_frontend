@@ -25,6 +25,7 @@ import {
 } from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
+import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
 
 interface Firms {
   acq_date: string;
@@ -52,6 +53,8 @@ export class ActionMap {
   popup: Popup;
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};
+
+  private _stopToggleControlsCb: Array<{ name: string; stop: () => void }> = [];
 
   constructor(private options: AppOptions) {
     this.popup = new Popup(this.ngwMap);
@@ -99,7 +102,7 @@ export class ActionMap {
       }
     });
     await this._addFires(fires);
-
+    this._createGetCoordinateControl();
     this._addTreeControl({ ngwLayers, fires, bookmarks });
     this.ngwMap.addControl(this._crateMeasureControl(), 'top-left');
 
@@ -125,23 +128,6 @@ export class ActionMap {
 
     this.ngwMap.locate({ setView: false }, { locationfound });
   }
-
-  // private async _createAuthControl(auth: Auth) {
-  //   this.authControl = await this.ngwMap.createToggleControl({
-  //     html: {
-  //       on: '<div class="sign-out--btn"><i class="fas fa-sign-out-alt"></i></div>',
-  //       off: '<div class="sign-out--btn"><i class="fas fa-sign-in-alt"></i></div>'
-  //     },
-  //     title: { on: 'Выйти', off: 'Войти' },
-  //     getStatus: () => {
-  //       return !!(this.ngwMap.connector && this.ngwMap.connector.user);
-  //     },
-  //     onClick: () => {
-  //       auth.logout();
-  //       window.location.reload();
-  //     }
-  //   });
-  // }
 
   private async _createAuthControl(auth: Auth) {
     const authBtn = document.getElementsByClassName('js-auth-btn')[0] as HTMLElement;
@@ -187,10 +173,29 @@ export class ActionMap {
     this.ngwMap.addControl(shareControl, 'bottom-right');
   }
 
+  private async _createGetCoordinateControl() {
+    const control = new GetCoordinatePanelControl(this, {
+      toggle: status => {
+        if (status) {
+          this._stopToggleControlsFor('coordinate');
+          this.ngwMap.disableSelection();
+        } else {
+          this.ngwMap.enableSelection();
+        }
+      }
+    });
+    const toggleControl = await this.ngwMap.createToggleControl(control);
+    this.ngwMap.addControl(toggleControl, 'top-left');
+    this._stopToggleControlsCb.push({
+      name: 'coordinate',
+      stop: () => toggleControl.onClick(false)
+    });
+  }
+
   private _createLocateControl() {
     const onClick = () => this._locate();
     const locateControl = this.ngwMap.createButtonControl({
-      html: '<i class="fas fa-location-arrow btn-control-icon "></i>',
+      html: '<i class="fas fa-location-arrow btn-control-icon"></i>',
       title: 'Найти меня на карте',
       onClick
     });
@@ -268,6 +273,7 @@ export class ActionMap {
     const toggle = () => {
       if (isActive()) {
         this.tree.show();
+        this._stopToggleControlsFor('tree');
       } else {
         this.tree.hide();
       }
@@ -278,6 +284,7 @@ export class ActionMap {
     setTimeout(() => {
       toggle();
     }, 500);
+    this._stopToggleControlsCb.push({ name: 'tree', stop: () => this.tree.hide() });
   }
 
   private _clean() {
@@ -338,24 +345,16 @@ export class ActionMap {
     }
   }
 
-  private _addEventsListeners() {
-    this.ngwMap.emitter.on('ngw:select', e => this._highlighNgwLayer(e));
-
-    const togglers = [];
-    const controls = [this.treeControl];
-    togglers.forEach((x, i) => {
-      if (x) {
-        x.emitter.on('status', (status: boolean) => {
-          if (status) {
-            controls.forEach((y, j) => {
-              if (y && i !== j) {
-                y.onClick(false);
-              }
-            });
-          }
-        });
+  private _stopToggleControlsFor(excludeControlName?: string) {
+    this._stopToggleControlsCb.forEach(x => {
+      if (x.name !== excludeControlName) {
+        x.stop();
       }
     });
+  }
+
+  private _addEventsListeners() {
+    this.ngwMap.emitter.on('ngw:select', e => this._highlighNgwLayer(e));
   }
 
   private _crateMeasureControl() {
@@ -380,10 +379,19 @@ export class ActionMap {
     // @ts-ignore
     this.ngwMap.mapAdapter.map.on('polylinemeasure:toggle', (opt: { sttus: boolean }) => {
       if (opt.sttus) {
+        this._stopToggleControlsFor('measure');
         this.ngwMap.disableSelection();
       } else {
-        this.ngwMap.enableSelection();
         this.ngwMap.setCursor('default');
+        this.ngwMap.enableSelection();
+      }
+    });
+    this._stopToggleControlsCb.push({
+      name: 'measure',
+      stop: () => {
+        if (measureControl._measuring) {
+          measureControl._toggleMeasure();
+        }
       }
     });
     return measureControl;

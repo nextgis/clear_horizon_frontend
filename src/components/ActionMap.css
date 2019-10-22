@@ -27,6 +27,9 @@
 }
 
 .leaflet-marker-icon.polyline-measure-tooltip {
-    font-weight: 700;
-    width: 100px!important;
+    font-weight: 800;
+    width: 80px!important;
+    height: auto!important;
+    z-index: 4000!important;
+    color: black;
 }

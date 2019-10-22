@@ -64,7 +64,7 @@ export class Popup {
         }
       }
       elem += `
-      <div class="columns">
+      <div class="columns is-mobile">
         <div class="column is-two-fifths">${key}</div>
         <div class="column">${prepareColumnValue(value)}</div>
       </div>

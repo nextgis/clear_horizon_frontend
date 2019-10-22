@@ -64,6 +64,10 @@ html {
     z-index: 10002;
 }
 
+.leaflet-pane.leaflet-marker-pane {
+	z-index: 4030;
+}
+
 .leaflet-sidebar{
 	padding-top: $top;
 	padding-bottom: 0;
@@ -96,7 +100,8 @@ html {
 }
 
 
-.polyline-measure-controlOnBgColor {
+.polyline-measure-controlOnBgColor,
+.toggle-control.active {
 	background-color: $primary !important;
 }
 
@@ -111,3 +116,5 @@ html {
 .modal.is-active {
 	display: flex;
 }
+
+
