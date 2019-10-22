@@ -265,17 +265,22 @@ export class ActionMap {
     const sidebarToggleBtn = document.getElementsByClassName('js-sidebar')[0];
 
     const isActive = () => sidebarToggleBtn.classList.contains('is-active');
+    const activeBurger = () => sidebarToggleBtn.classList.add('is-active');
+    const disactiveBurger = () => sidebarToggleBtn.classList.remove('is-active');
 
     await this.ngwMap.onLoad();
 
     this.tree = new MapSettingsPanel(this, { ...opt, ngwMap: this.ngwMap });
 
-    const toggle = () => {
-      if (isActive()) {
-        this.tree.show();
+    const toggle = (status?: boolean) => {
+      status = status !== undefined ? status : isActive();
+      if (status) {
         this._stopToggleControlsFor('tree');
+        this.tree.show();
+        activeBurger();
       } else {
         this.tree.hide();
+        disactiveBurger();
       }
     };
     sidebarToggleBtn.addEventListener('click', () => {
@@ -284,7 +289,7 @@ export class ActionMap {
     setTimeout(() => {
       toggle();
     }, 500);
-    this._stopToggleControlsCb.push({ name: 'tree', stop: () => this.tree.hide() });
+    this._stopToggleControlsCb.push({ name: 'tree', stop: () => toggle(false) });
   }
 
   private _clean() {
