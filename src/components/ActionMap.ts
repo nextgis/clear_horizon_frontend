@@ -16,7 +16,6 @@ import { Feature, MultiPoint } from 'geojson';
 // import 'ol/ol.css';
 
 import { AppOptions, FireResource, BaseLayer } from '../App';
-import { MapSettingsPanelControl } from './MapSettingsPanel/MapSettingsPanelControl';
 import { Auth } from './Auth/Auth';
 import {
   FeatureLayersIdentify,
@@ -85,6 +84,7 @@ export class ActionMap {
 
     this.ngwMap.addControl('ZOOM', 'top-left');
     this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
+    this._createShareControl();
     await this._createAuthControl(auth);
     // this.ngwMap.addControl(this.authControl, 'top-right');
 
@@ -157,6 +157,16 @@ export class ActionMap {
     authBtn.addEventListener('click', onClick);
   }
 
+  private _createShareControl() {
+    const shareControl = this.ngwMap.createButtonControl({
+      html: '<i class="fas fa-share-alt btn-control-icon "></i>',
+      onClick() {
+        //
+      }
+    });
+    this.ngwMap.addControl(shareControl, 'bottom-right');
+  }
+
   private async _addFires(fires?: FireResource[]) {
     if (fires) {
       for (const x of fires) {
@@ -203,13 +213,19 @@ export class ActionMap {
 
     this.tree = new MapSettingsPanel(this, { ...opt, ngwMap: this.ngwMap });
 
-    sidebarToggleBtn.addEventListener('click', () => {
+    const toggle = () => {
       if (isActive()) {
         this.tree.show();
       } else {
         this.tree.hide();
       }
+    };
+    sidebarToggleBtn.addEventListener('click', () => {
+      toggle();
     });
+    setTimeout(() => {
+      toggle();
+    }, 500);
   }
 
   private _clean() {
@@ -302,7 +318,7 @@ export class ActionMap {
       tooltipTextAdd: 'CTRL + клик чтобы <b>добавить точку</b>',
       measureControlTitleOn: 'Перейти в режим измерения',
       measureControlTitleOff: 'Выйти из режима измерений',
-      measureControlLabel: '<i class="fas fa-ruler-combined measure-icon"></i>',
+      measureControlLabel: '<i class="fas fa-ruler-combined btn-control-icon"></i>',
       measureControlClasses: [],
       unitControlLabel: {
         metres: 'м',

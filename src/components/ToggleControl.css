@@ -1,7 +1,3 @@
 .toggle-control {
   font-size: 1.2rem;
 }
-
-.toggle-control.active, .polyline-measure-controlOnBgColor {
-  background-color: rgba(40, 171, 40, 0.3) !important;
-}

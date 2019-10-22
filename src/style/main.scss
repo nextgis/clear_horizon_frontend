@@ -1,7 +1,6 @@
 @import "./variables.scss";
 
-// $top: ($navbar-height * 1.2);
-$top: 56px;
+$top: $navbar-height;
 
 * {
     margin: 0;
@@ -95,3 +94,8 @@ html {
 	margin-left: 0;
 	margin-right: 0;
 }
+
+
+.polyline-measure-controlOnBgColor {
+	background-color: $primary !important;
+  }
