@@ -150,7 +150,7 @@ export class ActionMap {
     const shareModalContent = document.getElementsByClassName('js-share-modal-content')[0];
     const shareInput = document.getElementsByClassName('js-share-input')[0] as HTMLInputElement;
     const showModal = () => {
-      const href = location.href;
+      const href = decodeURIComponent(location.href);
       const html = this._createShareModalContent(href);
       shareInput.value = href;
       shareModalContent.innerHTML = html;
