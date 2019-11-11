@@ -13,7 +13,12 @@ export class FiresContainer {
   private readonly ngwMap: NgwMap;
   private _container: HTMLElement;
 
-  private _select = [['24', '24 часа'], ['48', '48 часов'], ['72', '72 часа'], ['168', 'неделя']];
+  private _select = [
+    ['24', '24 часа'],
+    ['48', '48 часов'],
+    ['72', '72 часа'],
+    ['168', 'неделя']
+  ];
 
   constructor(private options: FiresContainerOptions) {
     this.ngwMap = options.ngwMap;

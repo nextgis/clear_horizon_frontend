@@ -1,3 +1,4 @@
+import './GetCoordinateControl.css';
 import '../ToggleControl.css';
 import { ActionMap } from '../ActionMap';
 import {
@@ -6,6 +7,7 @@ import {
   VectorLayerAdapter,
   LayerDefinition
 } from '@nextgis/ngw-map';
+import { Clipboard } from '@nextgis/utils';
 
 import { EventEmitter } from 'events';
 import { Feature, Point } from 'geojson';
@@ -103,7 +105,18 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
 
   private _createPopupContent([lng, lat]: string[]) {
     const content = document.createElement('div');
-    content.innerHTML = `Широта: ${lat}; долгота: ${lng}`;
+    const latLngStr = `${lat}, ${lng}`;
+    content.innerHTML = `
+    <span>Широта/Долгота:</span>
+    <span class="lat-lng-coord"> ${latLngStr}</span>
+    <a href="#" class="copy-to-clipboard">
+    <i class="far fa-clipboard"></i>
+    </a>`;
+    const clipBoardLink = content.getElementsByClassName('copy-to-clipboard')[0] as HTMLLinkElement;
+    clipBoardLink.onclick = () => {
+      Clipboard.copy(latLngStr);
+    };
+
     return content;
   }
 }

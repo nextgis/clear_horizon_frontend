@@ -6,7 +6,7 @@ import ShareButtons from 'share-buttons/dist/share-buttons';
 import PolylineMeasure from 'leaflet.polylinemeasure';
 
 import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers, LocationEvent } from '@nextgis/ngw-map';
-import NgwKit from '@nextgis/ngw-kit';
+import NgwKit, { NgwIdentify } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
 import UrlRuntimeParams from '@nextgis/url-runtime-params';
@@ -18,11 +18,7 @@ import { Feature, MultiPoint } from 'geojson';
 
 import { AppOptions, FireResource, BaseLayer } from '../App';
 import { Auth } from './Auth/Auth';
-import {
-  FeatureLayersIdentify,
-  CancelablePromise,
-  ResourceHierarchy
-} from '@nextgis/ngw-connector';
+import { CancelablePromise, ResourceHierarchy } from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
@@ -300,7 +296,7 @@ export class ActionMap {
     this.ngwMap.removeLayer('highlight');
   }
 
-  private _highlighNgwLayer(e: FeatureLayersIdentify) {
+  private _highlighNgwLayer(e: NgwIdentify) {
     this._clean();
     const paramsList = NgwKit.utils.getIdentifyGeoJsonParams(e);
     const params = paramsList[0];
