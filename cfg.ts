@@ -2,7 +2,8 @@ export default {
   mapOptions: {
     target: 'map',
     bounds: [45, 46, 47, 49],
-    baseUrl: location.protocol + '//clear-horizon.nextgis.com',
+    // baseUrl: location.protocol + '//clear-horizon.nextgis.com',
+    baseUrl: 'https://clear-horizon.nextgis.com',
     resources: [
       {
         selectable: true,
