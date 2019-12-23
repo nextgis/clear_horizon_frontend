@@ -426,6 +426,7 @@ export class ActionMap {
     });
     // @ts-ignore
     this.ngwMap.mapAdapter.map.on(
+      // @ts-ignore
       'polylinemeasure:toggle',
       (opt: { sttus: boolean }) => {
         if (opt.sttus) {
