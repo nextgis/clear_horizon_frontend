@@ -5,7 +5,12 @@ import './ActionMap.css';
 import ShareButtons from 'share-buttons/dist/share-buttons';
 import PolylineMeasure from 'leaflet.polylinemeasure';
 
-import NgwMap, { NgwMapOptions, ToggleControl, NgwLayers, LocationEvent } from '@nextgis/ngw-map';
+import NgwMap, {
+  NgwMapOptions,
+  ToggleControl,
+  NgwLayers,
+  LocationEvent
+} from '@nextgis/ngw-map';
 import NgwKit, { NgwIdentify } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
@@ -56,7 +61,11 @@ export class ActionMap {
     this.popup = new Popup(this.ngwMap);
   }
 
-  async create(options: NgwMapOptions, fires?: FireResource[], basemaps?: BaseLayer[]) {
+  async create(
+    options: NgwMapOptions,
+    fires?: FireResource[],
+    basemaps?: BaseLayer[]
+  ) {
     const auth = new Auth(options);
     const opt = { ...options };
     try {
@@ -76,7 +85,10 @@ export class ActionMap {
     if (basemaps) {
       this.ngwMap.onLoad().then(() =>
         basemaps.forEach((x, i) => {
-          this.ngwMap.addBaseLayer<any, QmsAdapterOptions>('QMS', { ...x, visibility: i === 0 });
+          this.ngwMap.addBaseLayer<any, QmsAdapterOptions>('QMS', {
+            ...x,
+            visibility: i === 0
+          });
         })
       );
     }
@@ -92,7 +104,10 @@ export class ActionMap {
     const ngwLayers = await this.ngwMap.getNgwLayers();
     const bookmarks: ResourceHierarchy[] = [];
     Object.values(ngwLayers).forEach(x => {
-      const bookmark = x.layer.item && x.layer.item.webmap && x.layer.item.webmap.bookmark_resource;
+      const bookmark =
+        x.layer.item &&
+        x.layer.item.webmap &&
+        x.layer.item.webmap.bookmark_resource;
       if (bookmark) {
         bookmarks.push(bookmark);
       }
@@ -127,7 +142,9 @@ export class ActionMap {
   }
 
   private async _createAuthControl(auth: Auth) {
-    const authBtn = document.getElementsByClassName('js-auth-btn')[0] as HTMLElement;
+    const authBtn = document.getElementsByClassName(
+      'js-auth-btn'
+    )[0] as HTMLElement;
     const getStatus = () => {
       return !!(this.ngwMap.connector && this.ngwMap.connector.user);
     };
@@ -143,8 +160,12 @@ export class ActionMap {
   private _createShareControl() {
     const shareModal = document.getElementsByClassName('js-modal')[0];
     const closeModalBtn = document.getElementsByClassName('js-modal-close')[0];
-    const shareModalContent = document.getElementsByClassName('js-share-modal-content')[0];
-    const shareInput = document.getElementsByClassName('js-share-input')[0] as HTMLInputElement;
+    const shareModalContent = document.getElementsByClassName(
+      'js-share-modal-content'
+    )[0];
+    const shareInput = document.getElementsByClassName(
+      'js-share-input'
+    )[0] as HTMLInputElement;
     const showModal = () => {
       const href = location.href;
       const html = this._createShareModalContent(href);
@@ -232,19 +253,32 @@ export class ActionMap {
               [
                 'timestamp',
                 'ge',
-                Math.floor(Date.now() / 1000) - Number(this.options.timedelta) * 3600
+                Math.floor(Date.now() / 1000) -
+                  Number(this.options.timedelta) * 3600
               ]
             ],
-            paint: { stroke: true, color: x.color, fillOpacity: 0.6, radius: 5 },
+            paint: {
+              stroke: true,
+              color: x.color,
+              fillOpacity: 0.6,
+              radius: 5
+            },
             selectable: true,
-            selectedPaint: { stroke: true, color: x.color, fillOpacity: 0.9, radius: 7 },
+            selectedPaint: {
+              stroke: true,
+              color: x.color,
+              fillOpacity: 0.9,
+              radius: 7
+            },
             selectOnHover: true,
             popupOnSelect: true,
             popupOptions: {
               createPopupContent: e => {
                 if (e.feature) {
                   const feature = e.feature as Feature<MultiPoint, Firms>;
-                  return this.popup.createPopupContent<MultiPoint, Firms>(feature);
+                  return this.popup.createPopupContent<MultiPoint, Firms>(
+                    feature
+                  );
                 }
               }
             }
@@ -263,7 +297,8 @@ export class ActionMap {
 
     const isActive = () => sidebarToggleBtn.classList.contains('is-active');
     const activeBurger = () => sidebarToggleBtn.classList.add('is-active');
-    const disactiveBurger = () => sidebarToggleBtn.classList.remove('is-active');
+    const disactiveBurger = () =>
+      sidebarToggleBtn.classList.remove('is-active');
 
     await this.ngwMap.onLoad();
 
@@ -286,11 +321,17 @@ export class ActionMap {
     setTimeout(() => {
       toggle();
     }, 500);
-    this._stopToggleControlsCb.push({ name: 'tree', stop: () => toggle(false) });
+    this._stopToggleControlsCb.push({
+      name: 'tree',
+      stop: () => toggle(false)
+    });
   }
 
   private _clean() {
-    if (this._promises.getFeaturePromise && this._promises.getFeaturePromise.cancel) {
+    if (
+      this._promises.getFeaturePromise &&
+      this._promises.getFeaturePromise.cancel
+    ) {
       this._promises.getFeaturePromise.cancel();
     }
     this.ngwMap.removeLayer('highlight');
@@ -325,7 +366,11 @@ export class ActionMap {
               createPopupContent: e => {
                 if (e.feature) {
                   const element = this.popup.createPopupContent(e.feature);
-                  this.popup.updateElementContent(element, resourceId, e.feature);
+                  this.popup.updateElementContent(
+                    element,
+                    resourceId,
+                    e.feature
+                  );
                   if (
                     item.extensions &&
                     item.extensions.attachment &&
@@ -371,7 +416,8 @@ export class ActionMap {
       tooltipTextAdd: 'CTRL + клик чтобы <b>добавить точку</b>',
       measureControlTitleOn: 'Перейти в режим измерения',
       measureControlTitleOff: 'Выйти из режима измерений',
-      measureControlLabel: '<i class="fas fa-ruler-combined btn-control-icon"></i>',
+      measureControlLabel:
+        '<i class="fas fa-ruler-combined btn-control-icon"></i>',
       measureControlClasses: [],
       unitControlLabel: {
         metres: 'м',
@@ -379,15 +425,18 @@ export class ActionMap {
       }
     });
     // @ts-ignore
-    this.ngwMap.mapAdapter.map.on('polylinemeasure:toggle', (opt: { sttus: boolean }) => {
-      if (opt.sttus) {
-        this._stopToggleControlsFor('measure');
-        this.ngwMap.disableSelection();
-      } else {
-        this.ngwMap.setCursor('default');
-        this.ngwMap.enableSelection();
+    this.ngwMap.mapAdapter.map.on(
+      'polylinemeasure:toggle',
+      (opt: { sttus: boolean }) => {
+        if (opt.sttus) {
+          this._stopToggleControlsFor('measure');
+          this.ngwMap.disableSelection();
+        } else {
+          this.ngwMap.setCursor('default');
+          this.ngwMap.enableSelection();
+        }
       }
-    });
+    );
     this._stopToggleControlsCb.push({
       name: 'measure',
       stop: () => {

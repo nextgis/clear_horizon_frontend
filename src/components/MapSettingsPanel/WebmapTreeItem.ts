@@ -43,7 +43,9 @@ export class WebmapTreeItem {
       const value = item.item_type === 'layer' ? item.layer_enabled : true;
       input.checked = value;
 
-      const visibility = layer.properties.property('visibility') as CheckProperty;
+      const visibility = layer.properties.property(
+        'visibility'
+      ) as CheckProperty;
       if (visibility) {
         visibility.emitter.on('change', (ev: ChangeEvent) => {
           input.checked = ev.value;
@@ -62,7 +64,10 @@ export class WebmapTreeItem {
       elem.appendChild(name);
     }
 
-    if (item.item_type === 'group' || (item.item_type === 'root' && item.children.length)) {
+    if (
+      item.item_type === 'group' ||
+      (item.item_type === 'root' && item.children.length)
+    ) {
       const children = layer.tree.getChildren() as WebMapLayerItem[];
       const treeBranch = this._createTreeBranch(children.reverse());
       elem.appendChild(treeBranch);

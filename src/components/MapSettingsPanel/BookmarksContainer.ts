@@ -31,22 +31,29 @@ export class BookmarksContainer {
     const bookmarksContainer = document.createElement('div');
     bookmarksContainer.className = 'bookmarks-contentainer__layers';
     this.options.bookmarks.forEach(b => {
-      this.ngwMap.connector.get('resource.item', null, { id: b.id }).then(resource => {
-        const labelField = resource.feature_layer.fields.find(x => x.label_field);
-        this.ngwMap.getNgwLayerItems({ resourceId: b.id }).then(items => {
-          items.forEach((x: FeatureItem<Bookmark, Polygon>) => {
-            const elem = this._createBookmarkItem(x, labelField.keyname);
-            container.appendChild(elem);
+      this.ngwMap.connector
+        .get('resource.item', null, { id: b.id })
+        .then(resource => {
+          const labelField = resource.feature_layer.fields.find(
+            x => x.label_field
+          );
+          this.ngwMap.getNgwLayerItems({ resourceId: b.id }).then(items => {
+            items.forEach((x: FeatureItem<Bookmark, Polygon>) => {
+              const elem = this._createBookmarkItem(x, labelField.keyname);
+              container.appendChild(elem);
+            });
           });
         });
-      });
     });
     container.appendChild(bookmarksContainer);
 
     return container;
   }
 
-  _createBookmarkItem(bookmark: FeatureItem<Bookmark, Polygon>, nameField = 'name') {
+  _createBookmarkItem(
+    bookmark: FeatureItem<Bookmark, Polygon>,
+    nameField = 'name'
+  ) {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item bookmark';
     const bookmarkBlock = document.createElement('div');

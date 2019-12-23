@@ -37,7 +37,9 @@ export class Popup {
     this.ngwMap = ngwMap;
   }
 
-  createPopupContent<G extends Geometry = any, P = any>(feature: Feature<G, P>): HTMLElement {
+  createPopupContent<G extends Geometry = any, P = any>(
+    feature: Feature<G, P>
+  ): HTMLElement {
     const popupElement = document.createElement('div');
     const pre = document.createElement('div');
     pre.className = 'properties';
@@ -53,7 +55,9 @@ export class Popup {
     return popupElement;
   }
 
-  createPropertiesHtml(properties: Array<{ key: string; value: CollectorProperty }>) {
+  createPropertiesHtml(
+    properties: Array<{ key: string; value: CollectorProperty }>
+  ) {
     let elem = '';
     properties.forEach(({ key, value }) => {
       if (typeof value === 'object' && value) {
@@ -128,7 +132,9 @@ export class Popup {
 
   private async _getResourceItem(resourceId: number) {
     if (!this._resourceItems[resourceId]) {
-      const item = await this.ngwMap.connector.get('resource.item', null, { id: resourceId });
+      const item = await this.ngwMap.connector.get('resource.item', null, {
+        id: resourceId
+      });
       this._resourceItems[resourceId] = item;
     }
     return this._resourceItems[resourceId];

@@ -36,7 +36,9 @@ export class MapSettingsPanel {
       if (target) {
         this._target = target;
       } else {
-        throw new Error(`No element with ID #${this.options.target} in document for webmap tree`);
+        throw new Error(
+          `No element with ID #${this.options.target} in document for webmap tree`
+        );
       }
     } else if (this.options.target instanceof HTMLElement) {
       this._target = this.options.target;

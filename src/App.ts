@@ -44,6 +44,10 @@ export class App {
 
   async create(options?: AppOptions) {
     this.options = { ...this.options, ...options };
-    this.actionMap.create(this.options.mapOptions, this.options.fires, this.options.basemaps);
+    this.actionMap.create(
+      this.options.mapOptions,
+      this.options.fires,
+      this.options.basemaps
+    );
   }
 }

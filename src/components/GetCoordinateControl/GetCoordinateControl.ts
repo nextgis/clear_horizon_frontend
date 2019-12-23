@@ -34,7 +34,10 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
   private __onMapClick?: (e: MapClickEvent) => void;
   private _layer!: VectorLayerAdapter;
 
-  constructor(private actionMap: ActionMap, options?: GetCoordinatePanelControlOptions) {
+  constructor(
+    private actionMap: ActionMap,
+    options?: GetCoordinatePanelControlOptions
+  ) {
     this._toggle = options.toggle;
     this.actionMap.ngwMap
       .addLayer('GEOJSON', {
@@ -44,7 +47,9 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
         popup: true,
         popupOptions: {
           createPopupContent: (d: LayerDefinition<Feature<Point>>) => {
-            return this._createPopupContent(d.feature.geometry.coordinates.map(x => x.toFixed(5)));
+            return this._createPopupContent(
+              d.feature.geometry.coordinates.map(x => x.toFixed(5))
+            );
           }
         }
       })
@@ -112,7 +117,9 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
     <a href="#" class="copy-to-clipboard">
     <i class="far fa-clipboard"></i>
     </a>`;
-    const clipBoardLink = content.getElementsByClassName('copy-to-clipboard')[0] as HTMLLinkElement;
+    const clipBoardLink = content.getElementsByClassName(
+      'copy-to-clipboard'
+    )[0] as HTMLLinkElement;
     clipBoardLink.onclick = () => {
       Clipboard.copy(latLngStr);
     };

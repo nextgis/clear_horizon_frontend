@@ -118,7 +118,9 @@ export class CollapsiblePanel {
   private _updateContent() {
     this._cleanContent();
     const html =
-      typeof this.options.content === 'function' ? this.options.content() : this.options.content;
+      typeof this.options.content === 'function'
+        ? this.options.content()
+        : this.options.content;
 
     this._content.appendChild(html);
     return this._content;

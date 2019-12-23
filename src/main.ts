@@ -7,7 +7,7 @@ import NgwMap from '@nextgis/ngw-map';
 
 let config: AppOptions = {};
 try {
-  config = require('../cfg.json');
+  config = require('../cfg').default;
 } catch (er) {
   console.warn('Config file is not funded, run with default settings');
 }

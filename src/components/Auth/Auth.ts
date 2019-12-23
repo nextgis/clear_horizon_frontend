@@ -17,7 +17,10 @@ export class Auth {
   private auth: Credentials;
 
   constructor(options: NgwMapOptions) {
-    this.connector = new NgwConnector({ baseUrl: options.baseUrl, auth: options.auth });
+    this.connector = new NgwConnector({
+      baseUrl: options.baseUrl,
+      auth: options.auth
+    });
     const auth = this._storage.getItem(this._storageKey);
     if (auth) {
       this.auth = JSON.parse(auth);
@@ -97,8 +100,12 @@ export class Auth {
       <button class="button dialog--button cancel">Отмена</button>
     `;
     form.innerHTML = formHtml;
-    const loginElement = form.getElementsByClassName('name')[0] as HTMLInputElement;
-    const passwordElement = form.getElementsByClassName('password')[0] as HTMLInputElement;
+    const loginElement = form.getElementsByClassName(
+      'name'
+    )[0] as HTMLInputElement;
+    const passwordElement = form.getElementsByClassName(
+      'password'
+    )[0] as HTMLInputElement;
     if (this._errorMessage) {
       const errorMessageElement = form.getElementsByClassName(
         'dialog-error'
@@ -107,8 +114,12 @@ export class Auth {
       errorMessageElement.innerHTML = `<div class="dialog-error--message">${this._errorMessage}</div>`;
     }
 
-    const loginBtn = form.getElementsByClassName('accept')[0] as HTMLButtonElement;
-    const cancelBtn = form.getElementsByClassName('cancel')[0] as HTMLButtonElement;
+    const loginBtn = form.getElementsByClassName(
+      'accept'
+    )[0] as HTMLButtonElement;
+    const cancelBtn = form.getElementsByClassName(
+      'cancel'
+    )[0] as HTMLButtonElement;
     const getAuthOpt: () => Credentials = () => {
       return {
         login: loginElement.value,
@@ -129,7 +140,9 @@ export class Auth {
     };
     const removeEventListener = () => {
       [loginElement, passwordElement].forEach(x => {
-        ['change', 'input'].forEach(y => x.removeEventListener(y, onInputChange));
+        ['change', 'input'].forEach(y =>
+          x.removeEventListener(y, onInputChange)
+        );
       });
     };
     loginBtn.onclick = () => {

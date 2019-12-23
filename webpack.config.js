@@ -1,3 +1,4 @@
+const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -38,6 +39,7 @@ module.exports = (env, argv) => {
           enforce: 'pre',
           test: /\.tsx?$/,
           exclude: /node_modules/,
+          include: path.resolve(__dirname, 'src'),
           loader: 'eslint-loader',
           options: {
             fix: true
@@ -58,7 +60,10 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, { loader: 'css-loader', options: { sourceMap: true } }]
+          use: [
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader', options: { sourceMap: true } }
+          ]
         },
         {
           test: /\.scss$/,
@@ -94,14 +99,20 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(jpe?g|png|gif|svg)$/i,
-          use: ['file-loader?name=images/[name].[ext]', 'image-webpack-loader?bypassOnDebug']
+          use: [
+            'file-loader?name=images/[name].[ext]',
+            'image-webpack-loader?bypassOnDebug'
+          ]
         }
       ]
     },
 
     plugins: [
       new ForkTsCheckerWebpackPlugin({ vue: true }),
-      new MiniCssExtractPlugin({ filename: '[name][hash:7].css', allChunks: true }),
+      new MiniCssExtractPlugin({
+        filename: '[name][hash:7].css',
+        allChunks: true
+      }),
       new HtmlWebpackPlugin({ template: 'src/index.html' })
       // new FaviconsWebpackPlugin('./src/img/favicon.png')
     ],
