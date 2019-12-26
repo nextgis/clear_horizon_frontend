@@ -1,7 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 // let FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 let alias = {};
@@ -53,7 +52,7 @@ module.exports = (env, argv) => {
               loader: 'ts-loader',
               options: {
                 // disable type checker - we will use it in fork plugin
-                transpileOnly: true
+                transpileOnly: !isProd
               }
             }
           ]
@@ -108,7 +107,6 @@ module.exports = (env, argv) => {
     },
 
     plugins: [
-      new ForkTsCheckerWebpackPlugin({ vue: true }),
       new MiniCssExtractPlugin({
         filename: '[name][hash:7].css',
         allChunks: true
