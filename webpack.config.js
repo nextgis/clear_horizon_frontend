@@ -1,7 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// let FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 let alias = {};
 try {
