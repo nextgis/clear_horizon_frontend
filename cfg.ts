@@ -1,4 +1,6 @@
-export default {
+import { AppOptions } from './src/App';
+
+const options: AppOptions = {
   mapOptions: {
     target: 'map',
     bounds: [45, 46, 47, 49],
@@ -6,9 +8,9 @@ export default {
     baseUrl: 'https://clear-horizon.nextgis.com',
     resources: [
       {
-        selectable: true,
-        resourceId: '1',
-        fit: true
+        resourceId: 1,
+        fit: true,
+        adapterOptions: { selectable: true }
       }
     ]
   },
@@ -20,16 +22,23 @@ export default {
       qmsId: 487
     }
   ],
+  userFires: {
+    resource: 'userfirepoints',
+    id: 'USERFIRE',
+    adapterOptions: { paint: { color: '#dc143c' } }
+  },
   fires: [
     {
       resourceId: 103,
       id: 'MODIS',
-      color: 'red'
+      adapterOptions: { paint: { color: 'red' } }
     },
     {
       resourceId: 105,
       id: 'VIIRS',
-      color: 'orange'
+      adapterOptions: { paint: { color: 'orange' } }
     }
   ]
 };
+
+export default options;

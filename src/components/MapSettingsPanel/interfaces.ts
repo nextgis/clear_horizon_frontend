@@ -1,5 +1,4 @@
-import NgwMap, { NgwLayers } from '@nextgis/ngw-map';
-import { FireResource } from 'src/App';
+import NgwMap, { NgwLayers, NgwLayerOptions } from '@nextgis/ngw-map';
 import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
 export interface MapSettingsPanelOptions {
@@ -8,6 +7,7 @@ export interface MapSettingsPanelOptions {
   status?: boolean;
   ngwMap?: NgwMap;
   ngwLayers?: NgwLayers;
-  fires?: FireResource[];
+  userFires?: NgwLayerOptions<'GEOJSON'>;
+  fires?: NgwLayerOptions<'GEOJSON'>[];
   bookmarks?: ResourceHierarchy[];
 }

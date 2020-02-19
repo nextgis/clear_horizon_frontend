@@ -5,23 +5,24 @@ import './ActionMap.css';
 import ShareButtons from 'share-buttons/dist/share-buttons';
 import PolylineMeasure from 'leaflet.polylinemeasure';
 
+import { Feature, MultiPoint } from 'geojson';
 import NgwMap, {
-  NgwMapOptions,
   ToggleControl,
   NgwLayers,
-  LocationEvent
+  LocationEvent,
+  CirclePaint,
+  VectorAdapterOptions
 } from '@nextgis/ngw-map';
-import NgwKit, { NgwIdentify } from '@nextgis/ngw-kit';
+import NgwKit, { NgwIdentify, NgwLayerOptions } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
 import UrlRuntimeParams from '@nextgis/url-runtime-params';
 import { QmsAdapterOptions } from '@nextgis/qms-kit';
-import { Feature, MultiPoint } from 'geojson';
 
 // import MapAdapter from '@nextgis/ol-map-adapter';
 // import 'ol/ol.css';
 
-import { AppOptions, FireResource, BaseLayer } from '../App';
+import { AppOptions } from '../App';
 import { Auth } from './Auth/Auth';
 import { CancelablePromise, ResourceHierarchy } from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
@@ -61,16 +62,12 @@ export class ActionMap {
     this.popup = new Popup(this.ngwMap);
   }
 
-  async create(
-    options: NgwMapOptions,
-    fires?: FireResource[],
-    basemaps?: BaseLayer[]
-  ) {
-    const auth = new Auth(options);
-    const opt = { ...options };
+  async create(opt: AppOptions) {
+    const auth = new Auth(opt.mapOptions);
+    const mapOpt = { ...opt.mapOptions };
     try {
       await auth.login();
-      opt.connector = auth.connector;
+      mapOpt.connector = auth.connector;
     } catch (er) {
       // cancel login
     }
@@ -78,13 +75,13 @@ export class ActionMap {
       controls: [],
       minZoom: 4,
       runtimeParams: [new UrlRuntimeParams()],
-      ...opt
+      ...mapOpt
     });
     this.ngwMap.setCursor('default');
     this.popup.setNgwMap(this.ngwMap);
-    if (basemaps) {
+    if (opt.basemaps) {
       this.ngwMap.onLoad().then(() =>
-        basemaps.forEach((x, i) => {
+        opt.basemaps.forEach((x, i) => {
           this.ngwMap.addBaseLayer<any, QmsAdapterOptions>('QMS', {
             ...x,
             visibility: i === 0
@@ -112,9 +109,15 @@ export class ActionMap {
         bookmarks.push(bookmark);
       }
     });
-    await this._addFires(fires);
+    await this._addUserFires(opt.userFires);
+    await this._addFires(opt.fires);
     this._createGetCoordinateControl();
-    this._addTreeControl({ ngwLayers, fires, bookmarks });
+    this._addTreeControl({
+      ngwLayers,
+      fires: opt.fires,
+      userFires: opt.userFires,
+      bookmarks
+    });
     this.ngwMap.addControl(this._crateMeasureControl(), 'top-left');
 
     this._addEventsListeners();
@@ -242,14 +245,80 @@ export class ActionMap {
     return html;
   }
 
-  private async _addFires(fires?: FireResource[]) {
+  private async _addUserFires(
+    x?: NgwLayerOptions<'GEOJSON'>,
+    adapterOptions?: VectorAdapterOptions,
+    opt?: { noPhotos: boolean }
+  ) {
+    if (x) {
+      const paint = x.adapterOptions.paint as CirclePaint;
+      const layer = await this.ngwMap.addNgwLayer({
+        resource: x,
+        id: x.id,
+
+        adapterOptions: {
+          paint: {
+            ...paint,
+            stroke: true,
+            fillOpacity: 0.6,
+            radius: 5
+          },
+          selectable: true,
+          selectedPaint: {
+            ...paint,
+            stroke: true,
+            fillOpacity: 0.9,
+            radius: 7
+          },
+          // selectOnHover: true,
+          popupOnSelect: true,
+          popupOptions: {
+            createPopupContent: e => {
+              if (e.feature) {
+                const feature = e.feature as Feature<MultiPoint, Firms>;
+                const content = this.popup.createPopupContent<
+                  MultiPoint,
+                  Firms
+                >(feature, layer.resourceId);
+
+                const noPhotos = opt?.noPhotos || false;
+                if (!noPhotos) {
+                  const resourceId = layer.resourceId;
+                  const featureId = Number(feature.id);
+                  const connector = this.ngwMap.connector;
+                  if (resourceId && featureId) {
+                    NgwKit.utils
+                      .getNgwLayerItem({ featureId, resourceId, connector })
+                      .then(item => {
+                        if (item.extensions?.attachment?.length) {
+                          this.popup._addPhotos(
+                            content,
+                            item.extensions.attachment,
+                            resourceId,
+                            featureId
+                          );
+                        }
+                      });
+                  }
+                }
+
+                return content;
+              }
+            }
+          },
+          ...adapterOptions
+        }
+      });
+    }
+  }
+
+  private async _addFires(fires?: NgwLayerOptions<'GEOJSON'>[]) {
     if (fires) {
       for (const x of fires) {
-        const resourceId = x.resourceId;
-        await this.ngwMap.addNgwLayer({
-          resourceId: x.resourceId,
-          id: x.id,
-          adapterOptions: {
+        await this._addUserFires(
+          x,
+          {
+            selectOnHover: true,
             propertiesFilter: [
               [
                 'timestamp',
@@ -257,42 +326,18 @@ export class ActionMap {
                 Math.floor(Date.now() / 1000) -
                   Number(this.options.timedelta) * 3600
               ]
-            ],
-            paint: {
-              stroke: true,
-              color: x.color,
-              fillOpacity: 0.6,
-              radius: 5
-            },
-            selectable: true,
-            selectedPaint: {
-              stroke: true,
-              color: x.color,
-              fillOpacity: 0.9,
-              radius: 7
-            },
-            selectOnHover: true,
-            popupOnSelect: true,
-            popupOptions: {
-              createPopupContent: e => {
-                if (e.feature) {
-                  const feature = e.feature as Feature<MultiPoint, Firms>;
-                  return this.popup.createPopupContent<MultiPoint, Firms>(
-                    feature,
-                    resourceId
-                  );
-                }
-              }
-            }
-          }
-        });
+            ]
+          },
+          { noPhotos: true }
+        );
       }
     }
   }
 
   private async _addTreeControl(opt: {
     ngwLayers: NgwLayers;
-    fires: FireResource[];
+    fires: NgwLayerOptions<'GEOJSON'>[];
+    userFires: NgwLayerOptions<'GEOJSON'>;
     bookmarks: ResourceHierarchy[];
   }) {
     const sidebarToggleBtn = document.getElementsByClassName('js-sidebar')[0];

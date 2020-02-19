@@ -13,6 +13,7 @@ import { FiresContainer } from './FiresContainer';
 import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
 import { ActionMap } from '../ActionMap';
+import { UserFiresContainer } from './UserFiresContainer';
 
 const OPTIONS: MapSettingsPanelOptions = {
   target: 'tree'
@@ -77,6 +78,13 @@ export class MapSettingsPanel {
       container.style.width = this.options.width + 'px';
     }
 
+    if (this.options.userFires) {
+      new CollapsiblePanel({
+        title: 'Пожары',
+        content: () => this._createUserFiresContainer(),
+        parent: container
+      });
+    }
     if (this.options.fires) {
       new CollapsiblePanel({
         title: 'Термоточки (FIRMS)',
@@ -129,6 +137,19 @@ export class MapSettingsPanel {
         ngwMap: this.options.ngwMap
       });
       container.appendChild(bookmarkContainer.getContainer());
+    }
+    return container;
+  }
+
+  private _createUserFiresContainer() {
+    const container = document.createElement('div');
+    const fires = [this.options.userFires];
+    if (fires) {
+      const firesContainer = new UserFiresContainer({
+        fires,
+        ngwMap: this.options.ngwMap
+      });
+      container.appendChild(firesContainer.getContainer());
     }
     return container;
   }

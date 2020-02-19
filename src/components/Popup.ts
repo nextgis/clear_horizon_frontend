@@ -110,6 +110,7 @@ export class Popup {
         pre.innerHTML = newContent;
       }
     }
+    return item;
   }
 
   async _addPhotos(

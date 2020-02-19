@@ -1,4 +1,4 @@
-import { NgwMapOptions } from '@nextgis/ngw-map';
+import { NgwMapOptions, NgwLayerOptions } from '@nextgis/ngw-map';
 import { ActionMap } from './components/ActionMap';
 import './bulma';
 
@@ -12,11 +12,7 @@ export interface ConnectionOptions {
   showUrl: string;
 }
 
-export interface FireResource {
-  resourceId: number;
-  id: string;
-  color?: string;
-}
+export type FireResource = NgwLayerOptions<'GEOJSON'>;
 
 export interface Bookmark {
   id: string;
@@ -26,13 +22,14 @@ export interface Bookmark {
 export type Bookmarks = Bookmark[];
 
 export interface BaseLayer {
-  name: string;
+  name?: string;
   qmsId: number;
 }
 
 export interface AppOptions {
   mapOptions?: NgwMapOptions;
-  fires?: FireResource[];
+  fires?: NgwLayerOptions<'GEOJSON'>[];
+  userFires?: NgwLayerOptions<'GEOJSON'>;
   basemaps?: BaseLayer[];
   timedelta?: 24;
 }
@@ -44,10 +41,6 @@ export class App {
 
   async create(options?: AppOptions) {
     this.options = { ...this.options, ...options };
-    this.actionMap.create(
-      this.options.mapOptions,
-      this.options.fires,
-      this.options.basemaps
-    );
+    this.actionMap.create(this.options);
   }
 }
