@@ -38,20 +38,31 @@ export class Popup {
   }
 
   createPopupContent<G extends Geometry = any, P = any>(
-    feature: Feature<G, P>
+    feature: Feature<G, P>,
+    resourceId?: number
   ): HTMLElement {
     const popupElement = document.createElement('div');
-    const pre = document.createElement('div');
-    pre.className = 'properties';
+    const properties = document.createElement('div');
+    properties.className = 'properties';
     const propertiesList = Object.keys(feature.properties).map(k => {
       return {
         key: k,
         value: feature.properties[k]
       };
     });
-    pre.innerHTML = this.createPropertiesHtml(propertiesList);
-    // pre.style.whiteSpace = 'pre-wrap';
-    popupElement.appendChild(pre);
+    properties.innerHTML = this.createPropertiesHtml(propertiesList);
+
+    if (resourceId) {
+      const pre = document.createElement('div');
+      pre.appendChild(properties);
+      popupElement.innerHTML = 'Загрузка';
+      this.updateElementContent(pre, resourceId, feature).then(() => {
+        popupElement.innerHTML = '';
+        popupElement.appendChild(pre);
+      });
+    } else {
+      popupElement.appendChild(properties);
+    }
     return popupElement;
   }
 

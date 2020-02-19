@@ -245,6 +245,7 @@ export class ActionMap {
   private async _addFires(fires?: FireResource[]) {
     if (fires) {
       for (const x of fires) {
+        const resourceId = x.resourceId;
         await this.ngwMap.addNgwLayer({
           resourceId: x.resourceId,
           id: x.id,
@@ -277,7 +278,8 @@ export class ActionMap {
                 if (e.feature) {
                   const feature = e.feature as Feature<MultiPoint, Firms>;
                   return this.popup.createPopupContent<MultiPoint, Firms>(
-                    feature
+                    feature,
+                    resourceId
                   );
                 }
               }
@@ -365,11 +367,9 @@ export class ActionMap {
             popupOptions: {
               createPopupContent: e => {
                 if (e.feature) {
-                  const element = this.popup.createPopupContent(e.feature);
-                  this.popup.updateElementContent(
-                    element,
-                    resourceId,
-                    e.feature
+                  const element = this.popup.createPopupContent(
+                    e.feature,
+                    resourceId
                   );
                   if (
                     item.extensions &&
