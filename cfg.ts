@@ -25,7 +25,7 @@ const options: AppOptions = {
   userFires: {
     resource: 'userfirepoints',
     id: 'USERFIRE',
-    adapterOptions: { paint: { color: '#dc143c' } }
+    adapterOptions: { paint: { color: 'rgb(100,20,40)' } }
   },
   fires: [
     {
