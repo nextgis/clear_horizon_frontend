@@ -15,9 +15,9 @@ try {
 const OPTIONS: AppOptions = {
   mapOptions: {
     target: 'map',
-    bounds: [36.59, 43.385, 49.374, 50.214]
+    bounds: [36.59, 43.385, 49.374, 50.214],
   },
-  timedelta: 24
+  timedelta: 24,
 };
 const options = NgwMap.utils.deepmerge(OPTIONS, config);
 const app = new App(options);

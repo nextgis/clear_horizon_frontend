@@ -10,9 +10,9 @@ import NgwMap, {
   ToggleControl,
   NgwLayers,
   LocationEvent,
-  CirclePaint,
-  VectorAdapterOptions
+  VectorAdapterOptions,
 } from '@nextgis/ngw-map';
+import { CirclePaint } from '@nextgis/paint';
 import NgwKit, { NgwIdentify, NgwLayerOptions } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
@@ -75,7 +75,7 @@ export class ActionMap {
       controls: [],
       minZoom: 4,
       runtimeParams: [new UrlRuntimeParams()],
-      ...mapOpt
+      ...mapOpt,
     });
     this.ngwMap.setCursor('default');
     this.popup.setNgwMap(this.ngwMap);
@@ -84,7 +84,7 @@ export class ActionMap {
         opt.basemaps.forEach((x, i) => {
           this.ngwMap.addBaseLayer<any, QmsAdapterOptions>('QMS', {
             ...x,
-            visibility: i === 0
+            visibility: i === 0,
           });
         })
       );
@@ -100,7 +100,7 @@ export class ActionMap {
 
     const ngwLayers = await this.ngwMap.getNgwLayers();
     const bookmarks: ResourceHierarchy[] = [];
-    Object.values(ngwLayers).forEach(x => {
+    Object.values(ngwLayers).forEach((x) => {
       const bookmark =
         x.layer.item &&
         x.layer.item.webmap &&
@@ -116,7 +116,7 @@ export class ActionMap {
       ngwLayers,
       fires: opt.fires,
       userFires: opt.userFires,
-      bookmarks
+      bookmarks,
     });
     this.ngwMap.addControl(this._crateMeasureControl(), 'top-left');
 
@@ -189,27 +189,27 @@ export class ActionMap {
       html: '<i class="fas fa-share-alt btn-control-icon "></i>',
       onClick() {
         showModal();
-      }
+      },
     });
     this.ngwMap.addControl(shareControl, 'bottom-right');
   }
 
   private async _createGetCoordinateControl() {
     const control = new GetCoordinatePanelControl(this, {
-      toggle: status => {
+      toggle: (status) => {
         if (status) {
           this._stopToggleControlsFor('coordinate');
           this.ngwMap.disableSelection();
         } else {
           this.ngwMap.enableSelection();
         }
-      }
+      },
     });
     const toggleControl = await this.ngwMap.createToggleControl(control);
     this.ngwMap.addControl(toggleControl, 'top-left');
     this._stopToggleControlsCb.push({
       name: 'coordinate',
-      stop: () => toggleControl.onClick(false)
+      stop: () => toggleControl.onClick(false),
     });
   }
 
@@ -218,7 +218,7 @@ export class ActionMap {
     const locateControl = this.ngwMap.createButtonControl({
       html: '<i class="fas fa-location-arrow btn-control-icon"></i>',
       title: 'Найти меня на карте',
-      onClick
+      onClick,
     });
     this.ngwMap.addControl(locateControl, 'top-left');
   }
@@ -227,13 +227,13 @@ export class ActionMap {
     const social = [
       { id: 'tw', name: 'Twitter', icon: 'fab fa-twitter' },
       { id: 'vk', name: 'VK', icon: 'fab fa-vk' },
-      { id: 'fb', name: 'Facebook', icon: 'fab fa-facebook-square' }
+      { id: 'fb', name: 'Facebook', icon: 'fab fa-facebook-square' },
     ];
 
     const html = `<div class="buttons share-btn js-share-btn" data-url="${url}" data-title="" data-desc="">
       ${social
         .map(
-          x => `<a class="button is-primary" data-id="${x.id}">
+          (x) => `<a class="button is-primary" data-id="${x.id}">
                     <span class="icon">
                         <i class="${x.icon}"></i>
                     </span>
@@ -261,19 +261,19 @@ export class ActionMap {
             ...paint,
             stroke: true,
             fillOpacity: 0.6,
-            radius: 5
+            radius: 5,
           },
           selectable: true,
           selectedPaint: {
             ...paint,
             stroke: true,
             fillOpacity: 0.9,
-            radius: 7
+            radius: 7,
           },
           // selectOnHover: true,
           popupOnSelect: true,
           popupOptions: {
-            createPopupContent: e => {
+            createPopupContent: (e) => {
               if (e.feature) {
                 const feature = e.feature as Feature<MultiPoint, Firms>;
                 const content = this.popup.createPopupContent<
@@ -289,7 +289,7 @@ export class ActionMap {
                   if (resourceId && featureId) {
                     NgwKit.utils
                       .getNgwLayerItem({ featureId, resourceId, connector })
-                      .then(item => {
+                      .then((item) => {
                         if (item.extensions?.attachment?.length) {
                           this.popup._addPhotos(
                             content,
@@ -304,10 +304,10 @@ export class ActionMap {
 
                 return content;
               }
-            }
+            },
           },
-          ...adapterOptions
-        }
+          ...adapterOptions,
+        },
       });
     }
   }
@@ -324,9 +324,9 @@ export class ActionMap {
                 'timestamp',
                 'ge',
                 Math.floor(Date.now() / 1000) -
-                  Number(this.options.timedelta) * 3600
-              ]
-            ]
+                  Number(this.options.timedelta) * 3600,
+              ],
+            ],
           },
           { noPhotos: true }
         );
@@ -370,7 +370,7 @@ export class ActionMap {
     }, 500);
     this._stopToggleControlsCb.push({
       name: 'tree',
-      stop: () => toggle(false)
+      stop: () => toggle(false),
     });
   }
 
@@ -395,9 +395,9 @@ export class ActionMap {
           id: params.resourceId,
           fid: params.featureId,
           geom_format: 'geojson',
-          srs: 4326
+          srs: 4326,
         })
-        .then(item => {
+        .then((item) => {
           delete this._promises.getFeaturePromise;
           const geojson = NgwKit.utils.createGeoJsonFeature(item);
           this.ngwMap.addLayer('GEOJSON', {
@@ -410,7 +410,7 @@ export class ActionMap {
             popup: true,
             // popupOnSelect: true,
             popupOptions: {
-              createPopupContent: e => {
+              createPopupContent: (e) => {
                 if (e.feature) {
                   const element = this.popup.createPopupContent(
                     e.feature,
@@ -430,15 +430,15 @@ export class ActionMap {
                   }
                   return element;
                 }
-              }
-            }
+              },
+            },
           });
         });
     }
   }
 
   private _stopToggleControlsFor(excludeControlName?: string) {
-    this._stopToggleControlsCb.forEach(x => {
+    this._stopToggleControlsCb.forEach((x) => {
       if (x.name !== excludeControlName) {
         x.stop();
       }
@@ -446,7 +446,7 @@ export class ActionMap {
   }
 
   private _addEventsListeners() {
-    this.ngwMap.emitter.on('ngw:select', e => this._highlighNgwLayer(e));
+    this.ngwMap.emitter.on('ngw:select', (e) => this._highlighNgwLayer(e));
   }
 
   private _crateMeasureControl() {
@@ -466,8 +466,8 @@ export class ActionMap {
       measureControlClasses: [],
       unitControlLabel: {
         metres: 'м',
-        kilometres: 'км'
-      }
+        kilometres: 'км',
+      },
     });
     // @ts-ignore
     this.ngwMap.mapAdapter.map.on(
@@ -489,7 +489,7 @@ export class ActionMap {
         if (measureControl._measuring) {
           measureControl._toggleMeasure();
         }
-      }
+      },
     });
     return measureControl;
   }

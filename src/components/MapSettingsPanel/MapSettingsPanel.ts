@@ -16,7 +16,7 @@ import { ActionMap } from '../ActionMap';
 import { UserFiresContainer } from './UserFiresContainer';
 
 const OPTIONS: MapSettingsPanelOptions = {
-  target: 'tree'
+  target: 'tree',
   // width: 300
 };
 
@@ -47,7 +47,7 @@ export class MapSettingsPanel {
     this.sidebar = new Sidebar(this._target, {
       closeButton: false,
       position: 'left',
-      autoPan: false
+      autoPan: false,
     });
     this.sidebar.addTo(this.actionMap.ngwMap.mapAdapter.map);
 
@@ -82,33 +82,33 @@ export class MapSettingsPanel {
       new CollapsiblePanel({
         title: 'Пожары',
         content: () => this._createUserFiresContainer(),
-        parent: container
+        parent: container,
       });
     }
     if (this.options.fires) {
       new CollapsiblePanel({
         title: 'Термоточки (FIRMS)',
         content: () => this._createFiresContainer(),
-        parent: container
+        parent: container,
       });
     }
     new CollapsiblePanel({
       title: 'Базовые слои',
       content: () => this._createNgwLayers(),
       open: false,
-      parent: container
+      parent: container,
     });
     new CollapsiblePanel({
       title: 'Подложки',
       content: () => this._createBasemapsContainer(),
       open: false,
-      parent: container
+      parent: container,
     });
     new CollapsiblePanel({
       title: 'Закладки',
       content: () => this._createBookmarksContainer(),
       open: false,
-      parent: container
+      parent: container,
     });
 
     return container;
@@ -134,7 +134,7 @@ export class MapSettingsPanel {
     if (bookmarks) {
       const bookmarkContainer = new BookmarksContainer({
         bookmarks,
-        ngwMap: this.options.ngwMap
+        ngwMap: this.options.ngwMap,
       });
       container.appendChild(bookmarkContainer.getContainer());
     }
@@ -147,7 +147,7 @@ export class MapSettingsPanel {
     if (fires) {
       const firesContainer = new UserFiresContainer({
         fires,
-        ngwMap: this.options.ngwMap
+        ngwMap: this.options.ngwMap,
       });
       container.appendChild(firesContainer.getContainer());
     }
@@ -160,7 +160,7 @@ export class MapSettingsPanel {
     if (fires) {
       const firesContainer = new FiresContainer({
         fires,
-        ngwMap: this.options.ngwMap
+        ngwMap: this.options.ngwMap,
       });
       container.appendChild(firesContainer.getContainer());
     }
@@ -172,7 +172,7 @@ export class MapSettingsPanel {
     const fires = this.options.fires;
     if (fires) {
       const baseMapsContainer = new BaseMapsContainer({
-        ngwMap: this.options.ngwMap
+        ngwMap: this.options.ngwMap,
       });
       container.appendChild(baseMapsContainer.getContainer());
     }

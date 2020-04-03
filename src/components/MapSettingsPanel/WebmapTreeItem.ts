@@ -19,7 +19,7 @@ export class WebmapTreeItem {
   private _createTreeBranch(layers: WebMapLayerItem[]) {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item-children';
-    layers.forEach(x => {
+    layers.forEach((x) => {
       if (x.item) {
         const item = this._createTreeItem(x);
         if (item) {
@@ -52,7 +52,7 @@ export class WebmapTreeItem {
         });
         input.onclick = () => {
           visibility.set(input.checked, {
-            propagation: WebMap.keys.pressed('ctrl')
+            propagation: WebMap.keys.pressed('ctrl'),
           });
         };
       }

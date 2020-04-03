@@ -19,7 +19,7 @@ export class Auth {
   constructor(options: NgwMapOptions) {
     this.connector = new NgwConnector({
       baseUrl: options.baseUrl,
-      auth: options.auth
+      auth: options.auth,
     });
     const auth = this._storage.getItem(this._storageKey);
     if (auth) {
@@ -123,7 +123,7 @@ export class Auth {
     const getAuthOpt: () => Credentials = () => {
       return {
         login: loginElement.value,
-        password: passwordElement.value
+        password: passwordElement.value,
       };
     };
     const validate = () => {
@@ -134,13 +134,15 @@ export class Auth {
       validate();
     };
     const addEventListener = () => {
-      [loginElement, passwordElement].forEach(x => {
-        ['change', 'input'].forEach(y => x.addEventListener(y, onInputChange));
+      [loginElement, passwordElement].forEach((x) => {
+        ['change', 'input'].forEach((y) =>
+          x.addEventListener(y, onInputChange)
+        );
       });
     };
     const removeEventListener = () => {
-      [loginElement, passwordElement].forEach(x => {
-        ['change', 'input'].forEach(y =>
+      [loginElement, passwordElement].forEach((x) => {
+        ['change', 'input'].forEach((y) =>
           x.removeEventListener(y, onInputChange)
         );
       });

@@ -44,10 +44,10 @@ export class Popup {
     const popupElement = document.createElement('div');
     const properties = document.createElement('div');
     properties.className = 'properties';
-    const propertiesList = Object.keys(feature.properties).map(k => {
+    const propertiesList = Object.keys(feature.properties).map((k) => {
       return {
         key: k,
-        value: feature.properties[k]
+        value: feature.properties[k],
       };
     });
     properties.innerHTML = this.createPropertiesHtml(propertiesList);
@@ -96,7 +96,7 @@ export class Popup {
     const item = await this._getResourceItem(resourceId);
     if (item.feature_layer) {
       const newProperties = [];
-      item.feature_layer.fields.forEach(x => {
+      item.feature_layer.fields.forEach((x) => {
         if (x.grid_visibility) {
           const property = feature.properties[x.keyname];
           if (property) {
@@ -131,7 +131,7 @@ export class Popup {
         width,
         height,
         id,
-        fid
+        fid,
       });
       const imgElem = document.createElement('img');
       imgElem.src = src;
@@ -145,7 +145,7 @@ export class Popup {
   private async _getResourceItem(resourceId: number) {
     if (!this._resourceItems[resourceId]) {
       const item = await this.ngwMap.connector.get('resource.item', null, {
-        id: resourceId
+        id: resourceId,
       });
       this._resourceItems[resourceId] = item;
     }
@@ -167,14 +167,14 @@ export class Popup {
         (width && height ? `?size=${width}x${height}` : '');
       this.ngwMap.connector
         .makeQuery(url, {}, { responseType: 'blob' })
-        .then(blob => {
+        .then((blob) => {
           const reader = new FileReader();
           reader.readAsDataURL(blob);
           reader.onloadend = () => {
             resolve(reader.result as string);
           };
         })
-        .catch(er => {
+        .catch((er) => {
           reject(er);
         });
     });

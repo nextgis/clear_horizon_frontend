@@ -1,7 +1,8 @@
 import './FiresContainer.css';
 
 import { FireResource } from 'src/App';
-import NgwMap, { CirclePaint } from '@nextgis/ngw-map';
+import NgwMap from '@nextgis/ngw-map';
+import { CirclePaint } from '@nextgis/paint';
 import { ResourceAdapter, NgwLayerOptions } from '@nextgis/ngw-kit';
 
 export interface FiresContainerOptions {
@@ -28,7 +29,7 @@ export class UserFiresContainer {
 
     const fires = document.createElement('div');
     fires.className = 'fires-contentainer__layers';
-    this.options.fires.forEach(f => {
+    this.options.fires.forEach((f) => {
       this._createFireItem(f, fires);
     });
     container.appendChild(fires);
@@ -72,9 +73,11 @@ export class UserFiresContainer {
     const symbol = document.createElement('span');
     symbol.className = 'item-symbol';
     const color = (fire.adapterOptions?.paint as CirclePaint).color;
-    symbol.style.color = color;
-    symbol.style.borderColor = color;
-    symbol.style.backgroundColor = color;
+    if (typeof color === 'string') {
+      symbol.style.color = color;
+      symbol.style.borderColor = color;
+      symbol.style.backgroundColor = color;
+    }
     return symbol;
   }
 }

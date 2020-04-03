@@ -30,14 +30,14 @@ export class BookmarksContainer {
 
     const bookmarksContainer = document.createElement('div');
     bookmarksContainer.className = 'bookmarks-contentainer__layers';
-    this.options.bookmarks.forEach(b => {
+    this.options.bookmarks.forEach((b) => {
       this.ngwMap.connector
         .get('resource.item', null, { id: b.id })
-        .then(resource => {
+        .then((resource) => {
           const labelField = resource.feature_layer.fields.find(
-            x => x.label_field
+            (x) => x.label_field
           );
-          this.ngwMap.getNgwLayerItems({ resourceId: b.id }).then(items => {
+          this.ngwMap.getNgwLayerItems({ resourceId: b.id }).then((items) => {
             items.forEach((x: FeatureItem<Bookmark, Polygon>) => {
               const elem = this._createBookmarkItem(x, labelField.keyname);
               container.appendChild(elem);

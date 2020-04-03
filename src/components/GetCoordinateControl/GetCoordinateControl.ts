@@ -5,7 +5,7 @@ import {
   ToggleControlOptions,
   MapClickEvent,
   VectorLayerAdapter,
-  LayerDefinition
+  LayerDefinition,
 } from '@nextgis/ngw-map';
 import { Clipboard } from '@nextgis/utils';
 
@@ -20,7 +20,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
   html = '<i class="fas fa-map-pin btn-control-icon "></i>';
   title = {
     off: 'Полученить координаты с карты',
-    on: 'Выключить режим получения координат с карты'
+    on: 'Выключить режим получения координат с карты',
   };
 
   addClass = 'toggle-control webmap-tree-control';
@@ -48,12 +48,12 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
         popupOptions: {
           createPopupContent: (d: LayerDefinition<Feature<Point>>) => {
             return this._createPopupContent(
-              d.feature.geometry.coordinates.map(x => x.toFixed(5))
+              d.feature.geometry.coordinates.map((x) => x.toFixed(5))
             );
-          }
-        }
+          },
+        },
       })
-      .then(layer => {
+      .then((layer) => {
         if (layer) {
           this._layer = layer;
         }
@@ -88,7 +88,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
     const feature: Feature<Point> = {
       type: 'Feature',
       properties: {},
-      geometry: { type: 'Point', coordinates: [e.latLng.lng, e.latLng.lat] }
+      geometry: { type: 'Point', coordinates: [e.latLng.lng, e.latLng.lat] },
     };
     this.actionMap.ngwMap.setLayerData(this._layer, feature);
   }

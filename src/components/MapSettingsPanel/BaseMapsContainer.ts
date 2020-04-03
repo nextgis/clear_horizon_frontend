@@ -14,7 +14,7 @@ export class BaseMapsContainer {
   constructor(private options: BaseMapsContainerOptions) {
     this.ngwMap = options.ngwMap;
     this._container = this._createContainer();
-    this.ngwMap.emitter.on('layer:add', e => {
+    this.ngwMap.emitter.on('layer:add', (e) => {
       if (this.ngwMap.isBaseLayer(e)) {
         this._updateBaseMapContainer();
       }
@@ -41,7 +41,7 @@ export class BaseMapsContainer {
     this._baseMapsContainer.innerHTML = '';
     // first checkbox to remove any basemap
     this._createBaseMapItem();
-    this.ngwMap.getBaseLayers().forEach(x => {
+    this.ngwMap.getBaseLayers().forEach((x) => {
       const layer = this.ngwMap.getLayer(x);
       if (layer) {
         this._createBaseMapItem(layer);

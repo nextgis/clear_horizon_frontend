@@ -7,7 +7,7 @@ const SELECT = [
   ['24', '24 часа'],
   ['48', '48 часов'],
   ['72', '72 часа'],
-  ['168', 'неделя']
+  ['168', 'неделя'],
 ];
 
 export class FiresContainer extends UserFiresContainer {
@@ -27,7 +27,7 @@ export class FiresContainer extends UserFiresContainer {
     label.appendChild(document.createTextNode('Просмотр термоточек: '));
     const selector = document.createElement('select');
 
-    SELECT.forEach(x => {
+    SELECT.forEach((x) => {
       const option = document.createElement('option');
       option.value = x[0];
       option.text = x[1];
@@ -35,14 +35,14 @@ export class FiresContainer extends UserFiresContainer {
     });
 
     selector.onchange = () => {
-      this.options.fires.forEach(x => {
+      this.options.fires.forEach((x) => {
         const layer = this.ngwMap.getLayer(x.id) as VectorResourceAdapter;
         layer.propertiesFilter([
           [
             'timestamp',
             'ge',
-            Math.floor(Date.now() / 1000) - Number(selector.value) * 3600
-          ]
+            Math.floor(Date.now() / 1000) - Number(selector.value) * 3600,
+          ],
         ]);
       });
     };
