@@ -1,9 +1,9 @@
-export function fixUrlStr(url: string) {
+export function fixUrlStr(url: string): string {
   // remove double slash
   return url.replace(/([^:]\/)\/+/g, '$1');
 }
 
-export function objToUrlStr(obj: { [param: string]: any }) {
+export function objToUrlStr(obj: { [param: string]: any }): string {
   let str = '';
   for (const key in obj) {
     if (str !== '') {
@@ -27,7 +27,7 @@ function isValidUrl(str: string): boolean {
   return !!pattern.test(str);
 }
 
-export function prepareColumnValue(value: unknown) {
+export function prepareColumnValue(value: unknown): unknown | string {
   if (typeof value === 'string') {
     if (isValidUrl(value)) {
       return `<a href="${value}" target="_blank">${value}</a>`;

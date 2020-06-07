@@ -60,12 +60,12 @@ export class MapSettingsPanel {
     this._target.appendChild(this._container);
   }
 
-  show() {
+  show(): void {
     this._container.classList.remove('hidden');
     this.sidebar.show();
   }
 
-  hide() {
+  hide(): void {
     this.sidebar.hide();
     this._container.classList.add('hidden');
   }

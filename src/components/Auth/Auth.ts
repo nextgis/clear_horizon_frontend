@@ -27,7 +27,7 @@ export class Auth {
     }
   }
 
-  async login(credentials?: Credentials) {
+  async login(credentials?: Credentials): Promise<void> {
     this._errorMessage = '';
     if (!credentials) {
       credentials = await this.getAuth();
@@ -52,13 +52,13 @@ export class Auth {
     }
   }
 
-  logout() {
+  logout(): void {
     this.connector.logout();
     this._storage.setItem(this._storageKey, '');
     this._errorMessage = '';
   }
 
-  async getAuth() {
+  async getAuth(): Promise<Credentials> {
     const auth = await this._showLoginDialog(this.auth);
     return auth;
   }

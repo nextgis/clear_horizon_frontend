@@ -11,7 +11,7 @@ const SELECT = [
 ];
 
 export class FiresContainer extends UserFiresContainer {
-  _createContainer() {
+  _createContainer(): HTMLElement {
     const container = super._createContainer();
 
     const selector = this._createSelector();

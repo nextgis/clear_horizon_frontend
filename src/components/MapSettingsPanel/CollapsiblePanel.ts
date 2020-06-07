@@ -23,11 +23,11 @@ export class CollapsiblePanel {
     }
   }
 
-  getContainer() {
+  getContainer(): HTMLElement {
     return this._container;
   }
 
-  open() {
+  open(): void {
     if (!this._content.innerHTML) {
       this._updateContent();
     }
@@ -38,7 +38,7 @@ export class CollapsiblePanel {
     this.status = true;
   }
 
-  close() {
+  close(): void {
     this._cleanContent();
     if (this._toggle) {
       this._toggle.innerHTML = this._getToggleButtonHtml('fas fa-chevron-down');
@@ -46,7 +46,7 @@ export class CollapsiblePanel {
     this.status = false;
   }
 
-  toggle() {
+  toggle(): void {
     if (this.status) {
       this.close();
     } else {

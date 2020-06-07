@@ -60,18 +60,18 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
       });
   }
 
-  onClick(status: boolean) {
+  onClick(status: boolean): void {
     this.toggleControl(status);
   }
 
-  show() {
+  show(): void {
     this.actionMap.ngwMap.setCursor('crosshair');
     this._removeClickListener();
     this.__onMapClick = (e: MapClickEvent) => this._onMapClick(e);
     this.actionMap.ngwMap.emitter.on('click', this.__onMapClick);
   }
 
-  hide() {
+  hide(): void {
     this.actionMap.ngwMap.setCursor('default');
     this._removeClickListener();
     this.actionMap.ngwMap.clearLayerData(this._layer);

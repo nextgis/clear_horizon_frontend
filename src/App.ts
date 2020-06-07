@@ -39,7 +39,7 @@ export class App {
 
   constructor(public options?: AppOptions) {}
 
-  async create(options?: AppOptions) {
+  async create(options?: AppOptions): Promise<void> {
     this.options = { ...this.options, ...options };
     this.actionMap.create(this.options);
   }

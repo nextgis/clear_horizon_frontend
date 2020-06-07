@@ -33,7 +33,7 @@ export class Popup {
 
   constructor(private ngwMap: NgwMap) {}
 
-  setNgwMap(ngwMap: NgwMap) {
+  setNgwMap(ngwMap: NgwMap): void {
     this.ngwMap = ngwMap;
   }
 
@@ -68,7 +68,7 @@ export class Popup {
 
   createPropertiesHtml(
     properties: Array<{ key: string; value: CollectorProperty }>
-  ) {
+  ): string {
     let elem = '';
     properties.forEach(({ key, value }) => {
       if (typeof value === 'object' && value) {
@@ -92,7 +92,7 @@ export class Popup {
     element: HTMLElement,
     resourceId: number,
     feature: Feature<G, P>
-  ) {
+  ): Promise<ResourceItem> {
     const item = await this._getResourceItem(resourceId);
     if (item.feature_layer) {
       const newProperties = [];
@@ -118,7 +118,7 @@ export class Popup {
     attachment: FeatureItemAttachment[],
     id: number,
     fid: number
-  ) {
+  ): Promise<void> {
     const attachmentElement = document.createElement('div');
 
     attachmentElement.className = 'carousel attachment';

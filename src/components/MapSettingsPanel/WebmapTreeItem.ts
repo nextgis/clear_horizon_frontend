@@ -12,7 +12,7 @@ export class WebmapTreeItem {
     }
   }
 
-  getContainer() {
+  getContainer(): HTMLElement {
     return this._container;
   }
 

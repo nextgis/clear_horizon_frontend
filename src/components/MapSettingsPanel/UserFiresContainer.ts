@@ -19,11 +19,11 @@ export class UserFiresContainer {
     this._container = this._createContainer();
   }
 
-  getContainer() {
+  getContainer(): HTMLElement {
     return this._container;
   }
 
-  _createContainer() {
+  _createContainer(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'fires-contentainer panel-content-padding ';
 
@@ -37,39 +37,41 @@ export class UserFiresContainer {
     return container;
   }
 
-  _createFireItem(fire: FireResource, container: HTMLElement) {
+  _createFireItem(fire: FireResource, container: HTMLElement): void {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item';
     const layer = this.ngwMap.getLayer(fire.id) as ResourceAdapter;
-    const item = layer.item;
-    const input = document.createElement('input');
-    input.setAttribute('type', 'checkbox');
+    if (layer && layer.item) {
+      const item = layer.item;
+      const input = document.createElement('input');
+      input.setAttribute('type', 'checkbox');
 
-    input.checked = true;
+      input.checked = true;
 
-    // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
-    //   input.checked = ev.value;
-    // });
-    input.onclick = () => {
-      this.ngwMap.toggleLayer(fire.id, input.checked);
-    };
+      // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
+      //   input.checked = ev.value;
+      // });
+      input.onclick = () => {
+        this.ngwMap.toggleLayer(fire.id, input.checked);
+      };
 
-    const name = document.createElement('span');
+      const name = document.createElement('span');
 
-    const displayName = item.resource.display_name.split('__')[0];
+      const displayName = item.resource.display_name.split('__')[0];
 
-    name.innerHTML = displayName.replace('fires', '').trim();
+      name.innerHTML = displayName.replace('fires', '').trim();
 
-    const symbol = this._createSymbol(fire);
+      const symbol = this._createSymbol(fire);
 
-    elem.appendChild(input);
-    elem.appendChild(symbol);
-    elem.appendChild(name);
+      elem.appendChild(input);
+      elem.appendChild(symbol);
+      elem.appendChild(name);
 
-    container.appendChild(elem);
+      container.appendChild(elem);
+    }
   }
 
-  _createSymbol(fire: FireResource) {
+  _createSymbol(fire: FireResource): HTMLElement {
     const symbol = document.createElement('span');
     symbol.className = 'item-symbol';
     const color = (fire.adapterOptions?.paint as CirclePaint).color;

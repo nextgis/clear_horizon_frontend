@@ -20,11 +20,11 @@ export class BookmarksContainer {
     this._container = this._createContainer();
   }
 
-  getContainer() {
+  getContainer(): HTMLElement {
     return this._container;
   }
 
-  _createContainer() {
+  _createContainer(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'bookmarks-contentainer panel-content-padding ';
 
@@ -53,7 +53,7 @@ export class BookmarksContainer {
   _createBookmarkItem(
     bookmark: FeatureItem<Bookmark, Polygon>,
     nameField = 'name'
-  ) {
+  ): HTMLElement {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item bookmark';
     const bookmarkBlock = document.createElement('div');

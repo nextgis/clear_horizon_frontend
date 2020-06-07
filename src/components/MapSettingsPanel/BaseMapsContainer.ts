@@ -21,7 +21,7 @@ export class BaseMapsContainer {
     });
   }
 
-  getContainer() {
+  getContainer(): HTMLElement {
     return this._container;
   }
 

@@ -56,13 +56,16 @@ export class ActionMap {
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};
 
-  private _stopToggleControlsCb: Array<{ name: string; stop: () => void }> = [];
+  private _stopToggleControlsCb: Array<{
+    name: string;
+    stop: () => void;
+  }> = [];
 
   constructor(private options: AppOptions) {
     this.popup = new Popup(this.ngwMap);
   }
 
-  async create(opt: AppOptions) {
+  async create(opt: AppOptions): Promise<void> {
     const auth = new Auth(opt.mapOptions);
     const mapOpt = { ...opt.mapOptions };
     try {
@@ -288,7 +291,11 @@ export class ActionMap {
                   const connector = this.ngwMap.connector;
                   if (resourceId && featureId) {
                     NgwKit.utils
-                      .getNgwLayerItem({ featureId, resourceId, connector })
+                      .getNgwLayerItem({
+                        featureId,
+                        resourceId,
+                        connector,
+                      })
                       .then((item) => {
                         if (item.extensions?.attachment?.length) {
                           this.popup._addPhotos(
@@ -349,7 +356,10 @@ export class ActionMap {
 
     await this.ngwMap.onLoad();
 
-    this.tree = new MapSettingsPanel(this, { ...opt, ngwMap: this.ngwMap });
+    this.tree = new MapSettingsPanel(this, {
+      ...opt,
+      ngwMap: this.ngwMap,
+    });
 
     const toggle = (status?: boolean) => {
       status = status !== undefined ? status : isActive();
