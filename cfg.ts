@@ -8,37 +8,37 @@ const options: AppOptions = {
     baseUrl: 'https://clear-horizon.nextgis.com',
     resources: [
       {
-        resourceId: 1,
+        resource: 1,
         fit: true,
-        adapterOptions: { selectable: true }
-      }
-    ]
+        adapterOptions: { selectable: true },
+      },
+    ],
   },
   basemaps: [
     {
-      qmsId: 1135
+      qmsId: 1135,
     },
     {
-      qmsId: 487
-    }
+      qmsId: 487,
+    },
   ],
   userFires: {
     resource: 'userfirepoints',
     id: 'USERFIRE',
-    adapterOptions: { paint: { color: 'rgb(100,20,40)' } }
+    adapterOptions: { paint: { color: 'rgb(100,20,40)' } },
   },
   fires: [
     {
-      resourceId: 103,
+      resource: 103,
       id: 'MODIS',
-      adapterOptions: { paint: { color: 'red' } }
+      adapterOptions: { paint: { color: 'red' } },
     },
     {
-      resourceId: 105,
+      resource: 105,
       id: 'VIIRS',
-      adapterOptions: { paint: { color: 'orange' } }
-    }
-  ]
+      adapterOptions: { paint: { color: 'orange' } },
+    },
+  ],
 };
 
 export default options;
