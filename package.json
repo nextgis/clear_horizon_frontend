@@ -1,6 +1,6 @@
 {
   "name": "clear_horizon",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "",
   "main": "dist/index.html",
   "scripts": {
@@ -19,7 +19,7 @@
     "@nextgis/leaflet-map-adapter": "^0.32.0",
     "@nextgis/ngw-map": "^0.32.0",
     "@nextgis/url-runtime-params": "^0.32.0",
-    "bulma": "^0.8.2",
+    "bulma": "^0.9.0",
     "bulma-carousel": "^4.0.4",
     "core-js": "^3.6.5",
     "leaflet-sidebar": "github:rendrom/leaflet-sidebar",
@@ -29,23 +29,23 @@
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.7",
-    "@types/leaflet": "^1.5.12",
-    "@types/node": "^14.0.11",
+    "@types/leaflet": "^1.5.16",
+    "@types/node": "^14.0.23",
     "@types/wellknown": "^0.5.1",
-    "css-loader": "^3.5.3",
+    "css-loader": "^3.6.0",
     "eslint-loader": "^4.0.2",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "image-webpack-loader": "^6.0.0",
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.14.1",
-    "sass-loader": "^8.0.2",
+    "sass-loader": "^9.0.2",
     "style-loader": "^1.2.1",
-    "ts-loader": "^7.0.5",
-    "typescript": "^3.9.5",
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.7",
     "url-loader": "^4.1.0",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
+    "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
   }
 }

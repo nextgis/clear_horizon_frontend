@@ -1,7 +1,7 @@
 import './FiresContainer.css';
 
 import { FireResource } from 'src/App';
-import NgwMap from '@nextgis/ngw-map';
+import { NgwMap } from '@nextgis/ngw-map';
 import { CirclePaint } from '@nextgis/paint';
 import { ResourceAdapter, NgwLayerOptions } from '@nextgis/ngw-kit';
 

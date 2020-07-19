@@ -1,5 +1,5 @@
 {
   "extends": [
-    "./nextgisweb_frontend/packages/eslint-config/index.js"
+    "./nextgis_frontend/packages/eslint-config/index.js"
   ]
 }

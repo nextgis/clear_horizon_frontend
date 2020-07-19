@@ -24,13 +24,15 @@
     "baseUrl": ".",
     "paths": {
       "@nextgis/*": [
-        "./nextgisweb_frontend/packages/*/src/"
+        "./nextgis_frontend/packages/*/src/"
       ]
     }
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.json"
+    "src/**/*.json",
+    // "nextgis_frontend/packages/*/src/",
+    "nextgis_frontend/packages/global.d.ts"
   ],
   "exclude": [
     "node_modules"

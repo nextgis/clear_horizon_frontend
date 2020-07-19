@@ -1,7 +1,7 @@
 import './BookmarksContainer.css';
 
 import { Bookmark } from 'src/App';
-import NgwMap from '@nextgis/ngw-map';
+import { NgwMap } from '@nextgis/ngw-map';
 import { ResourceHierarchy, FeatureItem } from '@nextgis/ngw-connector';
 import { GeoJSON, Map } from 'leaflet';
 import { Polygon } from 'geojson';

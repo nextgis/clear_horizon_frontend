@@ -1,4 +1,4 @@
-import NgwMap, { NgwLayers, NgwLayerOptions } from '@nextgis/ngw-map';
+import { NgwMap, NgwLayers, NgwLayerOptions } from '@nextgis/ngw-map';
 import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
 export interface MapSettingsPanelOptions {

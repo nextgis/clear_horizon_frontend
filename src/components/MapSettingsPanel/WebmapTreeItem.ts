@@ -1,4 +1,4 @@
-import WebMap from '@nextgis/webmap';
+import { WebMap } from '@nextgis/webmap';
 import { CheckProperty, ChangeEvent } from '@nextgis/item';
 import { WebMapLayerItem, TreeGroup, TreeLayer } from '@nextgis/ngw-kit';
 

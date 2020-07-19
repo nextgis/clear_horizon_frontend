@@ -1,5 +1,5 @@
 import bulmaCarousel from 'bulma-carousel';
-import NgwMap from '@nextgis/ngw-map';
+import { NgwMap } from '@nextgis/ngw-map';
 import { Feature, Geometry } from 'geojson';
 import { FeatureItemAttachment, ResourceItem } from '@nextgis/ngw-connector';
 import { prepareColumnValue } from '../Utils';

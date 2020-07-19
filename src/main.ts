@@ -2,8 +2,8 @@ import './style/style.scss';
 
 import 'core-js';
 import 'regenerator-runtime/runtime';
+import { deepmerge } from '@nextgis/utils';
 import { App, AppOptions } from './App';
-import NgwMap from '@nextgis/ngw-map';
 
 let config: AppOptions = {};
 try {
@@ -19,7 +19,7 @@ const OPTIONS: AppOptions = {
   },
   timedelta: 24,
 };
-const options = NgwMap.utils.deepmerge(OPTIONS, config);
+const options = deepmerge(OPTIONS, config);
 const app = new App(options);
 
 app.create();

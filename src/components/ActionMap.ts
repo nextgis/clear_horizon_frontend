@@ -6,25 +6,33 @@ import ShareButtons from 'share-buttons/dist/share-buttons';
 import PolylineMeasure from 'leaflet.polylinemeasure';
 
 import { Feature, MultiPoint } from 'geojson';
-import NgwMap, {
+import {
+  NgwMap,
   ToggleControl,
   NgwLayers,
   LocationEvent,
   VectorAdapterOptions,
 } from '@nextgis/ngw-map';
 import { CirclePaint } from '@nextgis/paint';
-import NgwKit, { NgwIdentify, NgwLayerOptions } from '@nextgis/ngw-kit';
+import {
+  NgwIdentify,
+  NgwLayerOptions,
+  getNgwLayerItem,
+  createGeoJsonFeature,
+  getIdentifyItems,
+} from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
 import UrlRuntimeParams from '@nextgis/url-runtime-params';
 import { QmsAdapterOptions } from '@nextgis/qms-kit';
+import CancelablePromise from '@nextgis/cancelable-promise';
+import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
 // import MapAdapter from '@nextgis/ol-map-adapter';
 // import 'ol/ol.css';
 
 import { AppOptions } from '../App';
 import { Auth } from './Auth/Auth';
-import { CancelablePromise, ResourceHierarchy } from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
@@ -66,14 +74,15 @@ export class ActionMap {
   }
 
   async create(opt: AppOptions): Promise<void> {
-    const auth = new Auth(opt.mapOptions);
+    // const auth = new Auth(opt.mapOptions);
     const mapOpt = { ...opt.mapOptions };
-    try {
-      await auth.login();
-      mapOpt.connector = auth.connector;
-    } catch (er) {
-      // cancel login
-    }
+    // try {
+    //   await auth.login();
+    //   mapOpt.connector = auth.connector;
+    // } catch (er) {
+    //   // cancel login
+    // }
+
     this.ngwMap = new NgwMap(new MapAdapter(), {
       controls: [],
       minZoom: 4,
@@ -96,9 +105,13 @@ export class ActionMap {
 
     this.ngwMap.addControl('ZOOM', 'top-left');
     this._createLocateControl();
-    this.ngwMap.addControl('ATTRIBUTION', 'bottom-right');
+    this.ngwMap.addControl('ATTRIBUTION', 'bottom-right', {
+      customAttribution: [
+        '<a href="https://nextgis.com" target="_blank">©NextGIS</a>',
+      ],
+    });
     this._createShareControl();
-    await this._createAuthControl(auth);
+    // await this._createAuthControl(auth);
     // this.ngwMap.addControl(this.authControl, 'top-right');
 
     const ngwLayers = await this.ngwMap.getNgwLayers();
@@ -290,22 +303,20 @@ export class ActionMap {
                   const featureId = Number(feature.id);
                   const connector = this.ngwMap.connector;
                   if (resourceId && featureId) {
-                    NgwKit.utils
-                      .getNgwLayerItem({
-                        featureId,
-                        resourceId,
-                        connector,
-                      })
-                      .then((item) => {
-                        if (item.extensions?.attachment?.length) {
-                          this.popup._addPhotos(
-                            content,
-                            item.extensions.attachment,
-                            resourceId,
-                            featureId
-                          );
-                        }
-                      });
+                    getNgwLayerItem({
+                      featureId,
+                      resourceId,
+                      connector,
+                    }).then((item) => {
+                      if (item.extensions?.attachment?.length) {
+                        this.popup._addPhotos(
+                          content,
+                          item.extensions.attachment,
+                          resourceId,
+                          featureId
+                        );
+                      }
+                    });
                   }
                 }
 
@@ -396,7 +407,7 @@ export class ActionMap {
 
   private _highlighNgwLayer(e: NgwIdentify) {
     this._clean();
-    const paramsList = NgwKit.utils.getIdentifyGeoJsonParams(e);
+    const paramsList = getIdentifyItems(e);
     const params = paramsList[0];
     if (params) {
       const resourceId = params.resourceId;
@@ -409,7 +420,7 @@ export class ActionMap {
         })
         .then((item) => {
           delete this._promises.getFeaturePromise;
-          const geojson = NgwKit.utils.createGeoJsonFeature(item);
+          const geojson = createGeoJsonFeature(item);
           this.ngwMap.addLayer('GEOJSON', {
             id: 'highlight',
             data: geojson,
