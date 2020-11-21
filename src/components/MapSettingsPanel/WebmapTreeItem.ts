@@ -1,11 +1,11 @@
 import { WebMap } from '@nextgis/webmap';
 import { CheckProperty, ChangeEvent } from '@nextgis/item';
-import { WebMapLayerItem, TreeGroup, TreeLayer } from '@nextgis/ngw-kit';
+import { NgwWebmapItem, TreeGroup, TreeLayer } from '@nextgis/ngw-kit';
 
 export class WebmapTreeItem {
   private _container?: HTMLElement;
 
-  constructor(layer: WebMapLayerItem) {
+  constructor(layer: NgwWebmapItem) {
     const container = this._createTreeItem(layer);
     if (container) {
       this._container = container;
@@ -16,7 +16,7 @@ export class WebmapTreeItem {
     return this._container;
   }
 
-  private _createTreeBranch(layers: WebMapLayerItem[]) {
+  private _createTreeBranch(layers: NgwWebmapItem[]) {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item-children';
     layers.forEach((x) => {
@@ -30,7 +30,7 @@ export class WebmapTreeItem {
     return elem;
   }
 
-  private _createTreeItem(layer: WebMapLayerItem) {
+  private _createTreeItem(layer: NgwWebmapItem) {
     const item: TreeGroup | TreeLayer = layer.item;
     if (!item) {
       return false;
@@ -68,7 +68,7 @@ export class WebmapTreeItem {
       item.item_type === 'group' ||
       (item.item_type === 'root' && item.children.length)
     ) {
-      const children = layer.tree.getChildren() as WebMapLayerItem[];
+      const children = layer.tree.getChildren() as NgwWebmapItem[];
       const treeBranch = this._createTreeBranch(children.reverse());
       elem.appendChild(treeBranch);
     }

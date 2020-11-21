@@ -7,7 +7,7 @@ import { GeoJSON, Map } from 'leaflet';
 import { Polygon } from 'geojson';
 
 export interface BookmarksContainerOptions {
-  ngwMap: NgwMap;
+  ngwMap: NgwMap<Map>;
   bookmarks: ResourceHierarchy[];
 }
 

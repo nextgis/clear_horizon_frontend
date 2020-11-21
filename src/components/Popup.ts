@@ -17,17 +17,6 @@ interface CollectorTime {
 
 type CollectorProperty = string | number | CollectorDate | CollectorTime;
 
-interface FunctionArg {
-  argType: 'function';
-  body: string;
-}
-
-interface WebMapRemote {
-  type: 'webmap_remote';
-  cmd: string;
-  args?: Array<any | FunctionArg>;
-}
-
 export class Popup {
   private _resourceItems: { [resourceId: number]: ResourceItem } = {};
 

@@ -83,7 +83,8 @@ export class ActionMap {
     //   // cancel login
     // }
 
-    this.ngwMap = new NgwMap(new MapAdapter(), {
+    this.ngwMap = new NgwMap({
+      mapAdapter: new MapAdapter(),
       controls: [],
       minZoom: 4,
       runtimeParams: [new UrlRuntimeParams()],

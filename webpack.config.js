@@ -2,10 +2,11 @@ const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 let alias = {};
 try {
-  const { getAliases } = require('./nextgis_frontend/build/aliases');
+  const { getAliases } = require('./@nextgis/scripts/aliases');
   alias = getAliases();
 } catch (er) {
   // ignore
@@ -35,16 +36,6 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          enforce: 'pre',
-          test: /\.tsx?$/,
-          exclude: /node_modules/,
-          include: path.resolve(__dirname, 'src'),
-          loader: 'eslint-loader',
-          options: {
-            fix: true,
-          },
-        },
-        {
           test: /\.tsx?$/,
           exclude: /node_modules/,
           use: [
@@ -52,32 +43,24 @@ module.exports = (env, argv) => {
               loader: 'ts-loader',
               options: {
                 // disable type checker - we will use it in fork plugin
-                transpileOnly: !isProd,
+                // transpileOnly: !isProd,
               },
             },
           ],
         },
-        {
-          test: /\.css$/,
+ {
+          test: /\.css$/i,
           use: [
-            MiniCssExtractPlugin.loader,
-            { loader: 'css-loader', options: { sourceMap: true } },
+            isProd ? MiniCssExtractPlugin.loader : 'style-loader',
+            'css-loader',
           ],
         },
         {
-          test: /\.scss$/,
+          test: /\.s[ac]ss$/i,
           use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader',
-            },
-            {
-              loader: 'sass-loader',
-              options: {
-                sourceMap: true,
-                // options...
-              },
-            },
+            isProd ? MiniCssExtractPlugin.loader : 'style-loader',
+            'css-loader',
+            'sass-loader',
           ],
         },
         {
@@ -109,11 +92,17 @@ module.exports = (env, argv) => {
     plugins: [
       new MiniCssExtractPlugin({
         filename: '[name][hash:7].css',
-        allChunks: true,
+      }),
+      new ESLintPlugin({
+        fix: true,
+        files: ['src/'],
+        extensions: ['ts'],
       }),
       new HtmlWebpackPlugin({ template: 'src/index.html' }),
       new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
         __BROWSER__: true,
+        __DEV__: !isProd,
       }),
       // new FaviconsWebpackPlugin('./src/img/favicon.png')
     ],
