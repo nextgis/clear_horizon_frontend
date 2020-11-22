@@ -1,13 +1,13 @@
-import './style/style.scss';
-
 import 'core-js';
 import 'regenerator-runtime/runtime';
 import { deepmerge } from '@nextgis/utils';
 import { App, AppOptions } from './App';
 
+import './style/style.scss';
+
 let config: AppOptions = {};
 try {
-  config = require('../cfg').default;
+  config = require('../config').default;
 } catch (er) {
   console.warn('Config file is not funded, run with default settings');
 }

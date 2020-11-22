@@ -17,8 +17,7 @@ import { CirclePaint } from '@nextgis/paint';
 import {
   NgwIdentify,
   NgwLayerOptions,
-  getNgwLayerItem,
-  createGeoJsonFeature,
+  fetchNgwLayerItem,
   getIdentifyItems,
 } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
@@ -304,7 +303,7 @@ export class ActionMap {
                   const featureId = Number(feature.id);
                   const connector = this.ngwMap.connector;
                   if (resourceId && featureId) {
-                    getNgwLayerItem({
+                    fetchNgwLayerItem({
                       featureId,
                       resourceId,
                       connector,
@@ -412,16 +411,8 @@ export class ActionMap {
     const params = paramsList[0];
     if (params) {
       const resourceId = params.resourceId;
-      this._promises.getFeaturePromise = this.ngwMap.connector
-        .get('feature_layer.feature.item', null, {
-          id: params.resourceId,
-          fid: params.featureId,
-          geom_format: 'geojson',
-          srs: 4326,
-        })
-        .then((item) => {
-          delete this._promises.getFeaturePromise;
-          const geojson = createGeoJsonFeature(item);
+      this.ngwMap.fetchIdentifyItem(e).then((item) => {
+        item.toGeojson().then((geojson) => {
           this.ngwMap.addLayer('GEOJSON', {
             id: 'highlight',
             data: geojson,
@@ -456,6 +447,7 @@ export class ActionMap {
             },
           });
         });
+      });
     }
   }
 
@@ -468,6 +460,9 @@ export class ActionMap {
   }
 
   private _addEventsListeners() {
+    this.ngwMap.emitter.on('click', () => {
+      this.ngwMap.cancelPromise('identify', 'select');
+    });
     this.ngwMap.emitter.on('ngw:select', (e) => this._highlighNgwLayer(e));
   }
 
