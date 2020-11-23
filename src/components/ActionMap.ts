@@ -5,7 +5,6 @@ import './ActionMap.css';
 import ShareButtons from 'share-buttons/dist/share-buttons';
 import PolylineMeasure from 'leaflet.polylinemeasure';
 
-import { Feature, MultiPoint } from 'geojson';
 import {
   NgwMap,
   ToggleControl,
@@ -17,7 +16,6 @@ import { CirclePaint } from '@nextgis/paint';
 import {
   NgwIdentify,
   NgwLayerOptions,
-  fetchNgwLayerItem,
   getIdentifyItems,
 } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
@@ -35,22 +33,6 @@ import { Auth } from './Auth/Auth';
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
-
-interface Firms {
-  acq_date: string;
-  acq_time: string; // '09:06';
-  bright_t31?: number;
-  brightness?: number;
-  confidence: string;
-  daynight: 'D';
-  frp: number;
-  latitude: number;
-  longitude: number;
-  satellite: 'N';
-  scan: number;
-  track: number;
-  version: string;
-}
 
 export class ActionMap {
   ngwMap: NgwMap<L.Map, L.Layer, any>;
@@ -263,12 +245,11 @@ export class ActionMap {
 
   private async _addUserFires(
     x?: NgwLayerOptions<'GEOJSON'>,
-    adapterOptions?: VectorAdapterOptions,
-    opt?: { noPhotos: boolean }
+    adapterOptions?: VectorAdapterOptions
   ) {
     if (x) {
       const paint = x.adapterOptions.paint as CirclePaint;
-      const layer = await this.ngwMap.addNgwLayer({
+      this.ngwMap.addNgwLayer({
         resource: x,
         id: x.id,
 
@@ -286,44 +267,6 @@ export class ActionMap {
             fillOpacity: 0.9,
             radius: 7,
           },
-          // selectOnHover: true,
-          popupOnSelect: true,
-          popupOptions: {
-            createPopupContent: (e) => {
-              if (e.feature) {
-                const feature = e.feature as Feature<MultiPoint, Firms>;
-                const content = this.popup.createPopupContent<
-                  MultiPoint,
-                  Firms
-                >(feature, layer.resourceId);
-
-                const noPhotos = opt?.noPhotos || false;
-                if (!noPhotos) {
-                  const resourceId = layer.resourceId;
-                  const featureId = Number(feature.id);
-                  const connector = this.ngwMap.connector;
-                  if (resourceId && featureId) {
-                    fetchNgwLayerItem({
-                      featureId,
-                      resourceId,
-                      connector,
-                    }).then((item) => {
-                      if (item.extensions?.attachment?.length) {
-                        this.popup._addPhotos(
-                          content,
-                          item.extensions.attachment,
-                          resourceId,
-                          featureId
-                        );
-                      }
-                    });
-                  }
-                }
-
-                return content;
-              }
-            },
-          },
           ...adapterOptions,
         },
       });
@@ -333,21 +276,16 @@ export class ActionMap {
   private async _addFires(fires?: NgwLayerOptions<'GEOJSON'>[]) {
     if (fires) {
       for (const x of fires) {
-        await this._addUserFires(
-          x,
-          {
-            selectOnHover: true,
-            propertiesFilter: [
-              [
-                'timestamp',
-                'ge',
-                Math.floor(Date.now() / 1000) -
-                  Number(this.options.timedelta) * 3600,
-              ],
+        await this._addUserFires(x, {
+          propertiesFilter: [
+            [
+              'timestamp',
+              'ge',
+              Math.floor(Date.now() / 1000) -
+                Number(this.options.timedelta) * 3600,
             ],
-          },
-          { noPhotos: true }
-        );
+          ],
+        });
       }
     }
   }
@@ -411,43 +349,46 @@ export class ActionMap {
     const params = paramsList[0];
     if (params) {
       const resourceId = params.resourceId;
-      this.ngwMap.fetchIdentifyItem(e).then((item) => {
-        item.toGeojson().then((geojson) => {
-          this.ngwMap.addLayer('GEOJSON', {
-            id: 'highlight',
-            data: geojson,
-            visibility: true,
-            paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
-            // selectable: true,
-            selectOnHover: true,
-            popup: true,
-            // popupOnSelect: true,
-            popupOptions: {
-              createPopupContent: (e) => {
-                if (e.feature) {
-                  const element = this.popup.createPopupContent(
-                    e.feature,
-                    resourceId
-                  );
-                  if (
-                    item.extensions &&
-                    item.extensions.attachment &&
-                    item.extensions.attachment.length
-                  ) {
-                    this.popup._addPhotos(
-                      element,
-                      item.extensions.attachment,
-                      params.resourceId,
-                      params.featureId
+      this.ngwMap
+        .fetchIdentifyItem(e, {
+          extensions: ['attachment'],
+        })
+        .then((item) => {
+          item.toGeojson().then((geojson) => {
+            this.ngwMap.addLayer('GEOJSON', {
+              id: 'highlight',
+              data: geojson,
+              visibility: true,
+              paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
+              // selectable: true,
+              selectOnHover: true,
+              popup: true,
+              // popupOnSelect: true,
+              popupOptions: {
+                createPopupContent: (e) => {
+                  if (e.feature) {
+                    const element = this.popup.createPopupContent(
+                      e.feature,
+                      resourceId
                     );
+                    if (
+                      item.extensions.attachment &&
+                      item.extensions.attachment.length
+                    ) {
+                      this.popup._addPhotos(
+                        element,
+                        item.extensions.attachment,
+                        params.resourceId,
+                        params.featureId
+                      );
+                    }
+                    return element;
                   }
-                  return element;
-                }
+                },
               },
-            },
+            });
           });
         });
-      });
     }
   }
 
