@@ -2,6 +2,7 @@ import 'leaflet/dist/leaflet.css';
 import 'bulma-carousel/dist/css/bulma-carousel.min.css';
 import './ActionMap.css';
 
+import { Control, Map, Layer } from 'leaflet';
 import ShareButtons from 'share-buttons/dist/share-buttons';
 import PolylineMeasure from 'leaflet.polylinemeasure';
 
@@ -35,12 +36,12 @@ import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
 
 export class ActionMap {
-  ngwMap: NgwMap<L.Map, L.Layer, any>;
+  ngwMap: NgwMap<Map, Layer, any>;
 
   tree?: MapSettingsPanel;
-  treeControl?: L.Control & ToggleControl;
+  treeControl?: Control & ToggleControl;
 
-  authControl?: L.Control & ToggleControl;
+  authControl?: Control & ToggleControl;
   popup: Popup;
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};

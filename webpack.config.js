@@ -18,7 +18,7 @@ module.exports = (env, argv) => {
   const config = {
     mode: 'development',
 
-    devtool: isProd ? 'none' : 'inline-source-map',
+    devtool: isProd ? 'source-map' : 'inline-source-map',
 
     entry: {
       main: ['./src/main.ts'],
@@ -48,7 +48,7 @@ module.exports = (env, argv) => {
             },
           ],
         },
- {
+        {
           test: /\.css$/i,
           use: [
             isProd ? MiniCssExtractPlugin.loader : 'style-loader',
@@ -64,27 +64,12 @@ module.exports = (env, argv) => {
           ],
         },
         {
-          test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
-          use: [
-            'url-loader?limit=10000&mimetype=application/font-woff&name=fonts/[name]-[hash:7].[ext]',
-          ],
+          test: /\.(png|svg|jpg|jpeg|gif)$/i,
+          type: 'asset/resource',
         },
         {
-          test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-          use: [
-            'url-loader?limit=10000&mimetype=application/octet-stream&name=fonts/[name]-[hash:7].[ext]',
-          ],
-        },
-        {
-          test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-          use: ['file-loader?name=fonts/[name]-[hash:7].[ext]'],
-        },
-        {
-          test: /\.(jpe?g|png|gif|svg)$/i,
-          use: [
-            'file-loader?name=images/[name].[ext]',
-            'image-webpack-loader?bypassOnDebug',
-          ],
+          test: /\.(woff|woff2|eot|ttf|otf)$/i,
+          type: 'asset/resource',
         },
       ],
     },
