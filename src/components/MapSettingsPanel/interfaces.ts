@@ -1,7 +1,8 @@
-import {Map} from 'leaflet';
+import type { Map } from 'leaflet';
 
-import { NgwMap, NgwLayers, NgwLayerOptions } from '@nextgis/ngw-map';
-import { ResourceHierarchy } from '@nextgis/ngw-connector';
+import type { NgwMap, NgwLayers } from '@nextgis/ngw-map';
+import type { ResourceHierarchy } from '@nextgis/ngw-connector';
+import type { NgwLayerOptions } from '@nextgis/ngw-kit';
 
 export interface MapSettingsPanelOptions {
   target?: HTMLElement | string;

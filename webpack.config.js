@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -25,6 +24,7 @@ module.exports = (env, argv) => {
     },
 
     output: {
+      publicPath: '',
       filename: '[name][hash:7].js',
     },
 
@@ -91,6 +91,8 @@ module.exports = (env, argv) => {
       }),
       // new FaviconsWebpackPlugin('./src/img/favicon.png')
     ],
+
+    target: ['web', 'es5'],
 
     optimization: {
       runtimeChunk: 'single',

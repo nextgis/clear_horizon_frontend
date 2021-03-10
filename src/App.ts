@@ -1,7 +1,8 @@
-import { NgwMapOptions, NgwLayerOptions } from '@nextgis/ngw-map';
 import { ActionMap } from './components/ActionMap';
 import './bulma';
 
+import type { NgwMapOptions } from '@nextgis/ngw-map';
+import type { NgwLayerOptions } from '@nextgis/ngw-kit';
 export interface AsuLayer {
   name: string;
 }
