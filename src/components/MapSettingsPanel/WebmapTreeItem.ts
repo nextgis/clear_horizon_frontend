@@ -44,7 +44,7 @@ export class WebmapTreeItem {
       input.checked = value;
 
       const visibility = layer.properties.property(
-        'visibility'
+        'visibility',
       ) as CheckProperty;
       if (visibility) {
         visibility.emitter.on('change', (ev: ChangeEvent) => {

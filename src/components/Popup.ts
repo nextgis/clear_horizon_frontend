@@ -28,7 +28,7 @@ export class Popup {
 
   createPopupContent<G extends Geometry = any, P = any>(
     feature: Feature<G, P>,
-    resourceId?: number
+    resourceId?: number,
   ): HTMLElement {
     const popupElement = document.createElement('div');
     const properties = document.createElement('div');
@@ -56,7 +56,7 @@ export class Popup {
   }
 
   createPropertiesHtml(
-    properties: Array<{ key: string; value: CollectorProperty }>
+    properties: Array<{ key: string; value: CollectorProperty }>,
   ): string {
     let elem = '';
     properties.forEach(({ key, value }) => {
@@ -80,7 +80,7 @@ export class Popup {
   async updateElementContent<G extends Geometry = any, P = any>(
     element: HTMLElement,
     resourceId: number,
-    feature: Feature<G, P>
+    feature: Feature<G, P>,
   ): Promise<ResourceItem> {
     const item = await this._getResourceItem(resourceId);
     if (item.feature_layer) {
@@ -106,7 +106,7 @@ export class Popup {
     element: HTMLElement,
     attachment: FeatureItemAttachment[],
     id: number,
-    fid: number
+    fid: number,
   ): Promise<void> {
     const attachmentElement = document.createElement('div');
 
@@ -143,7 +143,7 @@ export class Popup {
 
   private _loadImage(
     img: FeatureItemAttachment,
-    options: { id: number; fid: number; width?: number; height?: number }
+    options: { id: number; fid: number; width?: number; height?: number },
   ) {
     return new Promise<string>((resolve, reject) => {
       const { width, height } = options;

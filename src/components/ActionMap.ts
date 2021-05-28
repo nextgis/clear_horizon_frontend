@@ -81,7 +81,7 @@ export class ActionMap {
             ...x,
             visibility: i === 0,
           });
-        })
+        }),
       );
     }
     this.ngwMap.getPaintFunctions = { base: getIcon };
@@ -145,7 +145,7 @@ export class ActionMap {
 
   private async _createAuthControl(auth: Auth) {
     const authBtn = document.getElementsByClassName(
-      'js-auth-btn'
+      'js-auth-btn',
     )[0] as HTMLElement;
     const getStatus = () => {
       return !!(this.ngwMap.connector && this.ngwMap.connector.user);
@@ -163,10 +163,10 @@ export class ActionMap {
     const shareModal = document.getElementsByClassName('js-modal')[0];
     const closeModalBtn = document.getElementsByClassName('js-modal-close')[0];
     const shareModalContent = document.getElementsByClassName(
-      'js-share-modal-content'
+      'js-share-modal-content',
     )[0];
     const shareInput = document.getElementsByClassName(
-      'js-share-input'
+      'js-share-input',
     )[0] as HTMLInputElement;
     const showModal = () => {
       const href = location.href;
@@ -237,7 +237,7 @@ export class ActionMap {
                         <i class="${x.icon}"></i>
                     </span>
                     <span>${x.name}</span>
-                </a>`
+                </a>`,
         )
         .join('')}
     </div>`;
@@ -246,7 +246,7 @@ export class ActionMap {
 
   private async _addUserFires(
     x?: NgwLayerOptions<'GEOJSON'>,
-    adapterOptions?: VectorAdapterOptions
+    adapterOptions?: VectorAdapterOptions,
   ) {
     if (x) {
       const paint = x.adapterOptions.paint as CirclePaint;
@@ -370,7 +370,7 @@ export class ActionMap {
                   if (e.feature) {
                     const element = this.popup.createPopupContent(
                       e.feature,
-                      resourceId
+                      resourceId,
                     );
                     if (
                       item.extensions.attachment &&
@@ -380,7 +380,7 @@ export class ActionMap {
                         element,
                         item.extensions.attachment,
                         params.resourceId,
-                        params.featureId
+                        params.featureId,
                       );
                     }
                     return element;
@@ -440,7 +440,7 @@ export class ActionMap {
           this.ngwMap.setCursor('default');
           this.ngwMap.enableSelection();
         }
-      }
+      },
     );
     this._stopToggleControlsCb.push({
       name: 'measure',

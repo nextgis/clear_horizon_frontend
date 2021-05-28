@@ -36,7 +36,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
 
   constructor(
     private actionMap: ActionMap,
-    options?: GetCoordinatePanelControlOptions
+    options?: GetCoordinatePanelControlOptions,
   ) {
     this._toggle = options.toggle;
     this.actionMap.ngwMap
@@ -48,7 +48,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
         popupOptions: {
           createPopupContent: (d: LayerDefinition<Feature<Point>>) => {
             return this._createPopupContent(
-              d.feature.geometry.coordinates.map((x) => x.toFixed(5))
+              d.feature.geometry.coordinates.map((x) => x.toFixed(5)),
             );
           },
         },
@@ -118,7 +118,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
     <i class="far fa-clipboard"></i>
     </a>`;
     const clipBoardLink = content.getElementsByClassName(
-      'copy-to-clipboard'
+      'copy-to-clipboard',
     )[0] as HTMLLinkElement;
     clipBoardLink.onclick = () => {
       Clipboard.copy(latLngStr);

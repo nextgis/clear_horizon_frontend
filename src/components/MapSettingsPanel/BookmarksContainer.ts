@@ -35,7 +35,7 @@ export class BookmarksContainer {
         .get('resource.item', null, { id: b.id })
         .then((resource) => {
           const labelField = resource.feature_layer.fields.find(
-            (x) => x.label_field
+            (x) => x.label_field,
           );
           this.ngwMap.getNgwLayerItems({ resourceId: b.id }).then((items) => {
             items.forEach((x: FeatureItem<Bookmark, Polygon>) => {
@@ -52,7 +52,7 @@ export class BookmarksContainer {
 
   _createBookmarkItem(
     bookmark: FeatureItem<Bookmark, Polygon>,
-    nameField = 'name'
+    nameField = 'name',
   ): HTMLElement {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item bookmark';
