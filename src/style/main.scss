@@ -118,3 +118,7 @@ html {
 }
 
 
+// fix measure label
+.leaflet-measure-lable .content {
+    margin-bottom: 0!important;
+}

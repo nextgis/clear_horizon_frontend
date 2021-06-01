@@ -4,7 +4,6 @@ import './ActionMap.css';
 
 import { Control, Map, Layer } from 'leaflet';
 import ShareButtons from 'share-buttons/dist/share-buttons';
-import PolylineMeasure from 'leaflet.polylinemeasure';
 
 import {
   NgwMap,
@@ -26,14 +25,13 @@ import { QmsAdapterOptions } from '@nextgis/qms-kit';
 import CancelablePromise from '@nextgis/cancelable-promise';
 import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
-// import MapAdapter from '@nextgis/ol-map-adapter';
-// import 'ol/ol.css';
-
 import { AppOptions } from '../App';
 import { Auth } from './Auth/Auth';
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
+import { createMeasureControl } from './createMeasureControl';
+import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
 
 export class ActionMap {
   ngwMap: NgwMap<Map, Layer, any>;
@@ -45,11 +43,6 @@ export class ActionMap {
   popup: Popup;
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};
-
-  private _stopToggleControlsCb: Array<{
-    name: string;
-    stop: () => void;
-  }> = [];
 
   constructor(private options: AppOptions) {
     this.popup = new Popup(this.ngwMap);
@@ -93,6 +86,7 @@ export class ActionMap {
         '<a href="https://nextgis.com" target="_blank">©NextGIS</a>',
       ],
     });
+    createMeasureControl(this.ngwMap);
     this._createShareControl();
     // await this._createAuthControl(auth);
     // this.ngwMap.addControl(this.authControl, 'top-right');
@@ -117,7 +111,7 @@ export class ActionMap {
       userFires: opt.userFires,
       bookmarks,
     });
-    this.ngwMap.addControl(this._crateMeasureControl(), 'top-left');
+    // this.ngwMap.addControl(crateLineMeasureControl(), 'top-left');
 
     this._addEventsListeners();
   }
@@ -197,7 +191,7 @@ export class ActionMap {
     const control = new GetCoordinatePanelControl(this, {
       toggle: (status) => {
         if (status) {
-          this._stopToggleControlsFor('coordinate');
+          stopToggleControlsFor('coordinate');
           this.ngwMap.disableSelection();
         } else {
           this.ngwMap.enableSelection();
@@ -206,10 +200,7 @@ export class ActionMap {
     });
     const toggleControl = await this.ngwMap.createToggleControl(control);
     this.ngwMap.addControl(toggleControl, 'top-left');
-    this._stopToggleControlsCb.push({
-      name: 'coordinate',
-      stop: () => toggleControl.onClick(false),
-    });
+    addStopToggleControl('coordinate', () => toggleControl.onClick(false));
   }
 
   private _createLocateControl() {
@@ -314,7 +305,7 @@ export class ActionMap {
     const toggle = (status?: boolean) => {
       status = status !== undefined ? status : isActive();
       if (status) {
-        this._stopToggleControlsFor('tree');
+        stopToggleControlsFor('tree');
         this.tree.show();
         activeBurger();
       } else {
@@ -328,10 +319,7 @@ export class ActionMap {
     setTimeout(() => {
       toggle();
     }, 500);
-    this._stopToggleControlsCb.push({
-      name: 'tree',
-      stop: () => toggle(false),
-    });
+    addStopToggleControl('tree', () => toggle(false));
   }
 
   private _clean() {
@@ -393,63 +381,10 @@ export class ActionMap {
     }
   }
 
-  private _stopToggleControlsFor(excludeControlName?: string) {
-    this._stopToggleControlsCb.forEach((x) => {
-      if (x.name !== excludeControlName) {
-        x.stop();
-      }
-    });
-  }
-
   private _addEventsListeners() {
     this.ngwMap.emitter.on('click', () => {
-      this.ngwMap.cancelPromise('identify', 'select');
+      this.ngwMap.cancelPromises('identify', 'select');
     });
     this.ngwMap.emitter.on('ngw:select', (e) => this._highlighNgwLayer(e));
-  }
-
-  private _crateMeasureControl() {
-    const measureControl = new PolylineMeasure({
-      showBearings: true,
-      bearingTextIn: 'In',
-      bearingTextOut: 'Out',
-      tooltipTextFinish: 'Кликните чтобы <b>завершить изменрение</b><br>',
-      tooltipTextDelete: 'SHIFT + клик чтобы <b>удалить точку</b>',
-      tooltipTextMove: 'Клик + тянуть чтобы <b>передвинуть точку</b><br>',
-      tooltipTextResume: '<br>CTRL + клик чтобы <b>продолжить линию</b>',
-      tooltipTextAdd: 'CTRL + клик чтобы <b>добавить точку</b>',
-      measureControlTitleOn: 'Перейти в режим измерения',
-      measureControlTitleOff: 'Выйти из режима измерений',
-      measureControlLabel:
-        '<i class="fas fa-ruler-combined btn-control-icon"></i>',
-      measureControlClasses: [],
-      unitControlLabel: {
-        metres: 'м',
-        kilometres: 'км',
-      },
-    });
-    // @ts-ignore
-    this.ngwMap.mapAdapter.map.on(
-      // @ts-ignore
-      'polylinemeasure:toggle',
-      (opt: { sttus: boolean }) => {
-        if (opt.sttus) {
-          this._stopToggleControlsFor('measure');
-          this.ngwMap.disableSelection();
-        } else {
-          this.ngwMap.setCursor('default');
-          this.ngwMap.enableSelection();
-        }
-      },
-    );
-    this._stopToggleControlsCb.push({
-      name: 'measure',
-      stop: () => {
-        if (measureControl._measuring) {
-          measureControl._toggleMeasure();
-        }
-      },
-    });
-    return measureControl;
   }
 }
