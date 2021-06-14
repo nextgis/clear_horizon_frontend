@@ -34,15 +34,24 @@ export class BookmarksContainer {
       this.ngwMap.connector
         .get('resource.item', null, { id: b.id })
         .then((resource) => {
-          const labelField = resource.feature_layer.fields.find(
-            (x) => x.label_field,
-          );
-          this.ngwMap.getNgwLayerItems({ resourceId: b.id }).then((items) => {
-            items.forEach((x: FeatureItem<Bookmark, Polygon>) => {
-              const elem = this._createBookmarkItem(x, labelField.keyname);
-              container.appendChild(elem);
-            });
-          });
+          if (resource.feature_layer) {
+            const labelField = resource.feature_layer.fields.find(
+              (x) => x.label_field,
+            );
+            if (labelField) {
+              this.ngwMap
+                .fetchNgwLayerItems<Bookmark, Polygon>({ resourceId: b.id })
+                .then((items) => {
+                  items.forEach((x) => {
+                    const elem = this._createBookmarkItem(
+                      x,
+                      labelField.keyname as keyof Bookmark,
+                    );
+                    container.appendChild(elem);
+                  });
+                });
+            }
+          }
         });
     });
     container.appendChild(bookmarksContainer);
@@ -50,18 +59,19 @@ export class BookmarksContainer {
     return container;
   }
 
-  _createBookmarkItem(
-    bookmark: FeatureItem<Bookmark, Polygon>,
-    nameField = 'name',
+  _createBookmarkItem<B extends Bookmark = Bookmark>(
+    bookmark: FeatureItem<B, Polygon>,
+    nameField: keyof B = 'name',
   ): HTMLElement {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item bookmark';
     const bookmarkBlock = document.createElement('div');
-    bookmarkBlock.innerHTML = bookmark.fields[nameField];
+    const nameValue = bookmark.fields[nameField];
+    bookmarkBlock.innerHTML = String(nameValue);
     bookmarkBlock.onclick = () => {
       const geoJson = new GeoJSON(bookmark.geom);
       const lMap = this.ngwMap.mapAdapter.map;
-      lMap.fitBounds(geoJson.getBounds());
+      lMap && lMap.fitBounds(geoJson.getBounds());
     };
     elem.appendChild(bookmarkBlock);
     return elem;

@@ -9,7 +9,7 @@ export interface BaseMapsContainerOptions {
 export class BaseMapsContainer {
   private readonly ngwMap: NgwMap;
   private _container: HTMLElement;
-  private _baseMapsContainer: HTMLElement;
+  private _baseMapsContainer?: HTMLElement;
 
   constructor(private options: BaseMapsContainerOptions) {
     this.ngwMap = options.ngwMap;
@@ -38,7 +38,9 @@ export class BaseMapsContainer {
   }
 
   private _updateBaseMapContainer() {
-    this._baseMapsContainer.innerHTML = '';
+    if (this._baseMapsContainer) {
+      this._baseMapsContainer.innerHTML = '';
+    }
     // first checkbox to remove any basemap
     this._createBaseMapItem();
     this.ngwMap.getBaseLayers().forEach((x) => {
@@ -59,16 +61,19 @@ export class BaseMapsContainer {
     input.setAttribute('type', 'radio');
     input.setAttribute('name', 'basemap');
 
-    input.checked = this.ngwMap.isLayerVisible(baseMap);
+    input.checked = !!baseMap && this.ngwMap.isLayerVisible(baseMap);
 
     // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
     //   input.checked = ev.value;
     // });
     input.onclick = () => {
-      if (baseMap) {
+      if (baseMap && baseMap.id) {
         this.ngwMap.toggleLayer(baseMap.id, input.checked);
       } else {
-        this.ngwMap.hideLayer(this.ngwMap.getActiveBaseLayer());
+        const activeBaseLayer = this.ngwMap.getActiveBaseLayer();
+        if (activeBaseLayer) {
+          this.ngwMap.hideLayer(activeBaseLayer);
+        }
       }
     };
     const layerName = baseMap && (baseMap.name || baseMap.options.name);
@@ -80,7 +85,8 @@ export class BaseMapsContainer {
     elem.appendChild(name);
 
     control.appendChild(elem);
-
-    this._baseMapsContainer.appendChild(control);
+    if (this._baseMapsContainer) {
+      this._baseMapsContainer.appendChild(control);
+    }
   }
 }

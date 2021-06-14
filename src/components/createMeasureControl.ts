@@ -1,4 +1,4 @@
-import { Measure } from '../assets/Leaflet.Measure-master/src/leaflet.measure';
+import { Measure } from '../assets/Leaflet.Measure-master/src';
 import '../assets/Leaflet.Measure-master/src/leaflet.measure.css';
 import { NgwMap } from '@nextgis/ngw-map';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';

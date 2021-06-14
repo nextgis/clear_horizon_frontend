@@ -1,9 +1,11 @@
 import './FiresContainer.css';
 
-import { FireResource } from 'src/App';
-import { NgwMap } from '@nextgis/ngw-map';
-import { CirclePaint } from '@nextgis/paint';
-import { ResourceAdapter, NgwLayerOptions } from '@nextgis/ngw-kit';
+import { defined } from '@nextgis/utils';
+
+import type { FireResource } from 'src/App';
+import type { LayerAdapter, NgwMap } from '@nextgis/ngw-map';
+import type { CirclePaint } from '@nextgis/paint';
+import type { ResourceAdapter, NgwLayerOptions } from '@nextgis/ngw-kit';
 
 export interface FiresContainerOptions {
   ngwMap: NgwMap;
@@ -40,34 +42,47 @@ export class UserFiresContainer {
   _createFireItem(fire: FireResource, container: HTMLElement): void {
     const elem = document.createElement('div');
     elem.className = 'tree-container__item';
-    const layer = this.ngwMap.getLayer(fire.id) as ResourceAdapter;
-    if (layer && layer.item) {
-      const item = layer.item;
-      const input = document.createElement('input');
-      input.setAttribute('type', 'checkbox');
+    const id = fire.id;
+    if (!defined(id)) return;
 
-      input.checked = true;
+    const createItem = (layer_: ResourceAdapter): void => {
+      const item = layer_.item;
 
-      // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
-      //   input.checked = ev.value;
-      // });
-      input.onclick = () => {
-        this.ngwMap.toggleLayer(fire.id, input.checked);
+      if (item) {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'checkbox');
+
+        input.checked = true;
+
+        // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
+        //   input.checked = ev.value;
+        // });
+        input.onclick = () => {
+          this.ngwMap.toggleLayer(id, input.checked);
+        };
+
+        const name = document.createElement('span');
+        const displayName = item.resource.display_name.split('__')[0];
+        name.innerHTML = displayName.replace('fires', '').trim();
+        const symbol = this._createSymbol(fire);
+        elem.appendChild(input);
+        elem.appendChild(symbol);
+        elem.appendChild(name);
+        container.appendChild(elem);
+      }
+    };
+
+    const layer = this.ngwMap.getLayer(id) as ResourceAdapter;
+    if (layer) {
+      createItem(layer);
+    } else {
+      const onLayerAdd = (e: LayerAdapter) => {
+        if (e.id === id) {
+          createItem(e as ResourceAdapter);
+          this.ngwMap.emitter.off('layer:add', onLayerAdd);
+        }
       };
-
-      const name = document.createElement('span');
-
-      const displayName = item.resource.display_name.split('__')[0];
-
-      name.innerHTML = displayName.replace('fires', '').trim();
-
-      const symbol = this._createSymbol(fire);
-
-      elem.appendChild(input);
-      elem.appendChild(symbol);
-      elem.appendChild(name);
-
-      container.appendChild(elem);
+      this.ngwMap.emitter.on('layer:add', onLayerAdd);
     }
   }
 

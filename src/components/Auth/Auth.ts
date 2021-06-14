@@ -13,8 +13,8 @@ export class Auth {
   readonly connector: NgwConnector;
   private readonly _storageKey = 'auth';
   private readonly _storage = localStorage;
-  private _errorMessage: string;
-  private auth: Credentials;
+  private _errorMessage?: string;
+  private auth?: Credentials;
 
   constructor(options: NgwMapOptions) {
     this.connector = new NgwConnector({
@@ -82,8 +82,8 @@ export class Auth {
 
   private _createDialogHtml(
     defAuth: Credentials = { login: '', password: '' },
-    resolve,
-    reject
+    resolve: (auth: Credentials) => void,
+    reject: (er: Error) => void,
   ): HTMLElement {
     const { login, password } = defAuth;
     const form = document.createElement('div');
@@ -101,24 +101,24 @@ export class Auth {
     `;
     form.innerHTML = formHtml;
     const loginElement = form.getElementsByClassName(
-      'name'
+      'name',
     )[0] as HTMLInputElement;
     const passwordElement = form.getElementsByClassName(
-      'password'
+      'password',
     )[0] as HTMLInputElement;
     if (this._errorMessage) {
       const errorMessageElement = form.getElementsByClassName(
-        'dialog-error'
+        'dialog-error',
       )[0] as HTMLButtonElement;
       errorMessageElement.className = 'dialog-error';
       errorMessageElement.innerHTML = `<div class="dialog-error--message">${this._errorMessage}</div>`;
     }
 
     const loginBtn = form.getElementsByClassName(
-      'accept'
+      'accept',
     )[0] as HTMLButtonElement;
     const cancelBtn = form.getElementsByClassName(
-      'cancel'
+      'cancel',
     )[0] as HTMLButtonElement;
     const getAuthOpt: () => Credentials = () => {
       return {
@@ -136,14 +136,14 @@ export class Auth {
     const addEventListener = () => {
       [loginElement, passwordElement].forEach((x) => {
         ['change', 'input'].forEach((y) =>
-          x.addEventListener(y, onInputChange)
+          x.addEventListener(y, onInputChange),
         );
       });
     };
     const removeEventListener = () => {
       [loginElement, passwordElement].forEach((x) => {
         ['change', 'input'].forEach((y) =>
-          x.removeEventListener(y, onInputChange)
+          x.removeEventListener(y, onInputChange),
         );
       });
     };
@@ -153,7 +153,7 @@ export class Auth {
     };
     cancelBtn.onclick = () => {
       removeEventListener();
-      reject('Login cancel');
+      reject(new Error('Login cancel'));
     };
     validate();
     addEventListener();

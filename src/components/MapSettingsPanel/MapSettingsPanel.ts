@@ -1,21 +1,21 @@
 import './MapSettingsPanel.css';
-
+// @ts-ignore
 import Sidebar from 'leaflet-sidebar';
 import 'leaflet-sidebar/src/L.Control.Sidebar.css';
 
-import { MapSettingsPanelOptions } from './interfaces';
-
 import { NgwLayers } from '@nextgis/ngw-map';
 
+import { ActionMap } from '../ActionMap';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
 import { FiresContainer } from './FiresContainer';
 import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
-import { ActionMap } from '../ActionMap';
 import { UserFiresContainer } from './UserFiresContainer';
 
-const OPTIONS: MapSettingsPanelOptions = {
+import type { MapSettingsPanelOptions } from './interfaces';
+
+const OPTIONS: Partial<MapSettingsPanelOptions> = {
   target: 'tree',
   // width: 300
 };
@@ -26,7 +26,7 @@ export class MapSettingsPanel {
   sidebar: Sidebar;
 
   private _container: HTMLElement;
-  private _target: HTMLElement;
+  private _target?: HTMLElement;
 
   private ngwLayers!: NgwLayers;
 
@@ -57,7 +57,7 @@ export class MapSettingsPanel {
     if (!this.options.status) {
       this.hide();
     }
-    this._target.appendChild(this._container);
+    this._target && this._target.appendChild(this._container);
   }
 
   show(): void {
@@ -70,7 +70,7 @@ export class MapSettingsPanel {
     this._container.classList.add('hidden');
   }
 
-  private _createContainer() {
+  private _createContainer(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'tree-container';
 
@@ -143,10 +143,9 @@ export class MapSettingsPanel {
 
   private _createUserFiresContainer() {
     const container = document.createElement('div');
-    const fires = [this.options.userFires];
-    if (fires) {
+    if (this.options.userFires) {
       const firesContainer = new UserFiresContainer({
-        fires,
+        fires: [this.options.userFires],
         ngwMap: this.options.ngwMap,
       });
       container.appendChild(firesContainer.getContainer());

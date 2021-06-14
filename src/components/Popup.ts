@@ -1,3 +1,4 @@
+// @ts-ignore
 import bulmaCarousel from 'bulma-carousel';
 import { NgwMap } from '@nextgis/ngw-map';
 import { Feature, Geometry } from 'geojson';
@@ -15,30 +16,36 @@ interface CollectorTime {
   second: number;
 }
 
+interface KeyValue {
+  key: string;
+  value: any;
+}
+
 type CollectorProperty = string | number | CollectorDate | CollectorTime;
 
 export class Popup {
+  private ngwMap!: NgwMap;
   private _resourceItems: { [resourceId: number]: ResourceItem } = {};
-
-  constructor(private ngwMap: NgwMap) {}
 
   setNgwMap(ngwMap: NgwMap): void {
     this.ngwMap = ngwMap;
   }
 
-  createPopupContent<G extends Geometry = any, P = any>(
+  createPopupContent<G extends Geometry = any, P = Record<string, any>>(
     feature: Feature<G, P>,
     resourceId?: number,
   ): HTMLElement {
     const popupElement = document.createElement('div');
     const properties = document.createElement('div');
     properties.className = 'properties';
-    const propertiesList = Object.keys(feature.properties).map((k) => {
-      return {
-        key: k,
-        value: feature.properties[k],
-      };
-    });
+    const propertiesList: KeyValue[] = Object.entries(feature.properties).map(
+      ([key, value]) => {
+        return {
+          key,
+          value,
+        };
+      },
+    );
     properties.innerHTML = this.createPropertiesHtml(propertiesList);
 
     if (resourceId) {
@@ -77,14 +84,17 @@ export class Popup {
     return elem;
   }
 
-  async updateElementContent<G extends Geometry = any, P = any>(
+  async updateElementContent<
+    G extends Geometry = any,
+    P extends Record<string, any> = Record<string, any>
+  >(
     element: HTMLElement,
     resourceId: number,
     feature: Feature<G, P>,
   ): Promise<ResourceItem> {
     const item = await this._getResourceItem(resourceId);
     if (item.feature_layer) {
-      const newProperties = [];
+      const newProperties: KeyValue[] = [];
       item.feature_layer.fields.forEach((x) => {
         if (x.grid_visibility) {
           const property = feature.properties[x.keyname];

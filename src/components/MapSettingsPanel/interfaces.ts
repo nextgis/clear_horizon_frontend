@@ -8,8 +8,8 @@ export interface MapSettingsPanelOptions {
   target?: HTMLElement | string;
   width?: number;
   status?: boolean;
-  ngwMap?: NgwMap<Map>;
-  ngwLayers?: NgwLayers;
+  ngwMap: NgwMap<Map>;
+  ngwLayers: NgwLayers;
   userFires?: NgwLayerOptions<'GEOJSON'>;
   fires?: NgwLayerOptions<'GEOJSON'>[];
   bookmarks?: ResourceHierarchy[];

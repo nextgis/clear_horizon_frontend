@@ -11,7 +11,7 @@ export interface CollapsiblePanelOptions {
 
 export class CollapsiblePanel {
   private readonly _container = document.createElement('div');
-  private _content: HTMLElement;
+  private _content?: HTMLElement;
   private _toggle?: HTMLElement;
   private status: boolean;
 
@@ -28,7 +28,7 @@ export class CollapsiblePanel {
   }
 
   open(): void {
-    if (!this._content.innerHTML) {
+    if (this._content && !this._content.innerHTML) {
       this._updateContent();
     }
     // this._container.appendChild(this._content);
@@ -91,7 +91,7 @@ export class CollapsiblePanel {
 
     const title = document.createElement('div');
     title.className = 'level-item panel-header__title';
-    title.innerHTML = this.options.title;
+    title.innerHTML = this.options.title || '';
     leftLevel.appendChild(title);
 
     const rightLevel = document.createElement('div');
@@ -112,17 +112,21 @@ export class CollapsiblePanel {
   }
 
   private _cleanContent() {
-    this._content.innerHTML = '';
+    if (this._content) {
+      this._content.innerHTML = '';
+    }
   }
 
   private _updateContent() {
     this._cleanContent();
-    const html =
-      typeof this.options.content === 'function'
-        ? this.options.content()
-        : this.options.content;
+    if (this._content) {
+      const html =
+        typeof this.options.content === 'function'
+          ? this.options.content()
+          : this.options.content;
 
-    this._content.appendChild(html);
+      this._content.appendChild(html);
+    }
     return this._content;
   }
 }

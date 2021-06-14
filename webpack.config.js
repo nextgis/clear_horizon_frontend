@@ -1,7 +1,8 @@
 const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 let alias = {};
 try {
@@ -36,18 +37,27 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.tsx?$/,
+          // test: /\.jsx?$/,
+          test: /\.(js|ts)x?$/,
           exclude: /node_modules/,
-          use: [
-            {
-              loader: 'ts-loader',
-              options: {
-                // disable type checker - we will use it in fork plugin
-                // transpileOnly: !isProd,
-              },
-            },
-          ],
+          use: {
+            loader: 'babel-loader',
+          },
         },
+        // {
+        //   test: /\.tsx?$/,
+        //   exclude: /node_modules/,
+        //   use: [
+        //     {
+        //       loader: 'ts-loader',
+        //       options: {
+        //         // disable type checker - we will use it in fork plugin
+        //         // transpileOnly: !isProd,
+        //         transpileOnly: false,
+        //       },
+        //     },
+        //   ],
+        // },
         {
           test: /\.css$/i,
           use: [
@@ -78,10 +88,10 @@ module.exports = (env, argv) => {
       ],
     },
 
+    target: isProd ? 'browserslist' : 'web',
+
     plugins: [
-      new MiniCssExtractPlugin({
-        filename: '[name][hash:7].css',
-      }),
+      new ForkTsCheckerWebpackPlugin(),
       new ESLintPlugin({
         fix: true,
         files: ['src/'],
@@ -96,8 +106,6 @@ module.exports = (env, argv) => {
       // new FaviconsWebpackPlugin('./src/img/favicon.png')
     ],
 
-    target: ['web', 'es5'],
-
     optimization: {
       runtimeChunk: 'single',
       splitChunks: {
@@ -107,6 +115,12 @@ module.exports = (env, argv) => {
       },
     },
   };
+
+  if (isProd) {
+    config.plugins.push(
+      new MiniCssExtractPlugin({ filename: '[name][hash:5].css' }),
+    );
+  }
 
   return config;
 };

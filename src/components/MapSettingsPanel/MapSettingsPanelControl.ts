@@ -19,27 +19,31 @@ export class MapSettingsPanelControl implements ToggleControlOptions {
 
   tree: MapSettingsPanel;
 
-  constructor(private actionMap: ActionMap, options?: MapSettingsPanelOptions) {
+  constructor(
+    private actionMap: ActionMap,
+    options = {} as MapSettingsPanelOptions,
+  ) {
     this.tree = new MapSettingsPanel(actionMap, options);
   }
 
-  onClick(status: boolean) {
+  onClick(status?: boolean): void {
     this.toggleControl(status);
   }
 
-  show() {
+  show(): void {
     this.tree.show();
     this.invalidateMapSize();
   }
 
-  hide() {
+  hide(): void {
     this.tree.hide();
     this.invalidateMapSize();
   }
 
   private invalidateMapSize() {
-    if (this.actionMap.ngwMap.mapAdapter.map.invalidateSize) {
-      this.actionMap.ngwMap.mapAdapter.map.invalidateSize();
+    const map = this.actionMap.ngwMap.mapAdapter.map;
+    if (map && map.invalidateSize) {
+      map.invalidateSize();
     }
   }
 

@@ -36,7 +36,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
 
   constructor(
     private actionMap: ActionMap,
-    options?: GetCoordinatePanelControlOptions,
+    options: GetCoordinatePanelControlOptions = {},
   ) {
     this._toggle = options.toggle;
     this.actionMap.ngwMap
@@ -47,9 +47,11 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
         popup: true,
         popupOptions: {
           createPopupContent: (d: LayerDefinition<Feature<Point>>) => {
-            return this._createPopupContent(
-              d.feature.geometry.coordinates.map((x) => x.toFixed(5)),
-            );
+            if (d.feature) {
+              return this._createPopupContent(
+                d.feature.geometry.coordinates.map((x) => x.toFixed(5)),
+              );
+            }
           },
         },
       })
@@ -60,7 +62,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
       });
   }
 
-  onClick(status: boolean): void {
+  onClick(status?: boolean): void {
     this.toggleControl(status);
   }
 
@@ -80,7 +82,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
   private _removeClickListener() {
     if (this.__onMapClick) {
       this.actionMap.ngwMap.emitter.off('click', this.__onMapClick);
-      this.__onMapClick = null;
+      this.__onMapClick = undefined;
     }
   }
 
@@ -88,7 +90,7 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
     const feature: Feature<Point> = {
       type: 'Feature',
       properties: {},
-      geometry: { type: 'Point', coordinates: [e.latLng.lng, e.latLng.lat] },
+      geometry: { type: 'Point', coordinates: e.lngLat },
     };
     this.actionMap.ngwMap.setLayerData(this._layer, feature);
   }

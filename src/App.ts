@@ -36,9 +36,11 @@ export interface AppOptions {
 }
 
 export class App {
-  actionMap = new ActionMap(this.options);
+  actionMap: ActionMap;
 
-  constructor(public options?: AppOptions) {}
+  constructor(public options: AppOptions = {}) {
+    this.actionMap = new ActionMap(options);
+  }
 
   async create(options?: AppOptions): Promise<void> {
     this.options = { ...this.options, ...options };

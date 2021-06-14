@@ -1,5 +1,6 @@
 import './FiresContainer.css';
 
+import { defined } from '@nextgis/utils';
 import { VectorResourceAdapter } from '@nextgis/ngw-kit';
 import { UserFiresContainer } from './UserFiresContainer';
 
@@ -36,14 +37,19 @@ export class FiresContainer extends UserFiresContainer {
 
     selector.onchange = () => {
       this.options.fires.forEach((x) => {
-        const layer = this.ngwMap.getLayer(x.id) as VectorResourceAdapter;
-        layer.propertiesFilter([
-          [
-            'timestamp',
-            'ge',
-            Math.floor(Date.now() / 1000) - Number(selector.value) * 3600,
-          ],
-        ]);
+        const id = x.id;
+        if (defined(id)) {
+          const layer = this.ngwMap.getLayer(id) as VectorResourceAdapter;
+          if (layer.propertiesFilter) {
+            layer.propertiesFilter([
+              [
+                'timestamp',
+                'ge',
+                Math.floor(Date.now() / 1000) - Number(selector.value) * 3600,
+              ],
+            ]);
+          }
+        }
       });
     };
 

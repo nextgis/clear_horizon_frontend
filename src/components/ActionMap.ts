@@ -3,6 +3,7 @@ import 'bulma-carousel/dist/css/bulma-carousel.min.css';
 import './ActionMap.css';
 
 import { Control, Map, Layer } from 'leaflet';
+// @ts-ignore
 import ShareButtons from 'share-buttons/dist/share-buttons';
 
 import {
@@ -34,7 +35,7 @@ import { createMeasureControl } from './createMeasureControl';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
 
 export class ActionMap {
-  ngwMap: NgwMap<Map, Layer, any>;
+  ngwMap!: NgwMap<Map, Layer, any>;
 
   tree?: MapSettingsPanel;
   treeControl?: Control & ToggleControl;
@@ -45,7 +46,7 @@ export class ActionMap {
   private _promises: { [name: string]: CancelablePromise<any> } = {};
 
   constructor(private options: AppOptions) {
-    this.popup = new Popup(this.ngwMap);
+    this.popup = new Popup();
   }
 
   async create(opt: AppOptions): Promise<void> {
@@ -58,40 +59,46 @@ export class ActionMap {
     //   // cancel login
     // }
 
-    this.ngwMap = new NgwMap({
+    const { basemaps, fires, userFires } = opt;
+
+    const ngwMap = new NgwMap<Map, Layer>({
       mapAdapter: new MapAdapter(),
       controls: [],
       minZoom: 4,
       runtimeParams: [new UrlRuntimeParams()],
       ...mapOpt,
     });
-    this.ngwMap.setCursor('default');
-    this.popup.setNgwMap(this.ngwMap);
-    if (opt.basemaps) {
-      this.ngwMap.onLoad().then(() =>
-        opt.basemaps.forEach((x, i) => {
-          this.ngwMap.addBaseLayer<any, QmsAdapterOptions>('QMS', {
+
+    this.ngwMap = ngwMap;
+
+    ngwMap.setCursor('default');
+    this.popup.setNgwMap(ngwMap);
+
+    if (basemaps) {
+      ngwMap.onLoad().then(() =>
+        basemaps.forEach((x, i) => {
+          ngwMap.addBaseLayer<any, QmsAdapterOptions>('QMS', {
             ...x,
             visibility: i === 0,
           });
         }),
       );
     }
-    this.ngwMap.getPaintFunctions = { base: getIcon };
+    ngwMap.getPaintFunctions = { base: getIcon };
 
-    this.ngwMap.addControl('ZOOM', 'top-left');
+    ngwMap.addControl('ZOOM', 'top-left');
     this._createLocateControl();
-    this.ngwMap.addControl('ATTRIBUTION', 'bottom-right', {
+    ngwMap.addControl('ATTRIBUTION', 'bottom-right', {
       customAttribution: [
         '<a href="https://nextgis.com" target="_blank">©NextGIS</a>',
       ],
     });
-    createMeasureControl(this.ngwMap);
+    createMeasureControl(ngwMap);
     this._createShareControl();
     // await this._createAuthControl(auth);
     // this.ngwMap.addControl(this.authControl, 'top-right');
 
-    const ngwLayers = await this.ngwMap.getNgwLayers();
+    const ngwLayers = await ngwMap.getNgwLayers();
     const bookmarks: ResourceHierarchy[] = [];
     Object.values(ngwLayers).forEach((x) => {
       const bookmark =
@@ -102,13 +109,15 @@ export class ActionMap {
         bookmarks.push(bookmark);
       }
     });
+
     await this._addUserFires(opt.userFires);
     await this._addFires(opt.fires);
     this._createGetCoordinateControl();
+
     this._addTreeControl({
       ngwLayers,
-      fires: opt.fires,
-      userFires: opt.userFires,
+      fires,
+      userFires,
       bookmarks,
     });
     // this.ngwMap.addControl(crateLineMeasureControl(), 'top-left');
@@ -240,11 +249,13 @@ export class ActionMap {
     adapterOptions?: VectorAdapterOptions,
   ) {
     if (x) {
-      const paint = x.adapterOptions.paint as CirclePaint;
+      const paint =
+        x.adapterOptions && x.adapterOptions.paint
+          ? (x.adapterOptions.paint as CirclePaint)
+          : {};
       this.ngwMap.addNgwLayer({
         resource: x,
         id: x.id,
-
         adapterOptions: {
           paint: {
             ...paint,
@@ -284,9 +295,9 @@ export class ActionMap {
 
   private async _addTreeControl(opt: {
     ngwLayers: NgwLayers;
-    fires: NgwLayerOptions<'GEOJSON'>[];
-    userFires: NgwLayerOptions<'GEOJSON'>;
-    bookmarks: ResourceHierarchy[];
+    fires?: NgwLayerOptions<'GEOJSON'>[];
+    userFires?: NgwLayerOptions<'GEOJSON'>;
+    bookmarks?: ResourceHierarchy[];
   }) {
     const sidebarToggleBtn = document.getElementsByClassName('js-sidebar')[0];
 
@@ -306,10 +317,10 @@ export class ActionMap {
       status = status !== undefined ? status : isActive();
       if (status) {
         stopToggleControlsFor('tree');
-        this.tree.show();
+        this.tree && this.tree.show();
         activeBurger();
       } else {
-        this.tree.hide();
+        this.tree && this.tree.hide();
         disactiveBurger();
       }
     };
@@ -343,40 +354,41 @@ export class ActionMap {
           extensions: ['attachment'],
         })
         .then((item) => {
-          item.toGeojson().then((geojson) => {
-            this.ngwMap.addLayer('GEOJSON', {
-              id: 'highlight',
-              data: geojson,
-              visibility: true,
-              paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
-              // selectable: true,
-              selectOnHover: true,
-              popup: true,
-              // popupOnSelect: true,
-              popupOptions: {
-                createPopupContent: (e) => {
-                  if (e.feature) {
-                    const element = this.popup.createPopupContent(
-                      e.feature,
-                      resourceId,
-                    );
-                    if (
-                      item.extensions.attachment &&
-                      item.extensions.attachment.length
-                    ) {
-                      this.popup._addPhotos(
-                        element,
-                        item.extensions.attachment,
-                        params.resourceId,
-                        params.featureId,
+          item &&
+            item.toGeojson().then((geojson) => {
+              this.ngwMap.addLayer('GEOJSON', {
+                id: 'highlight',
+                data: geojson,
+                visibility: true,
+                paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
+                // selectable: true,
+                selectOnHover: true,
+                popup: true,
+                // popupOnSelect: true,
+                popupOptions: {
+                  createPopupContent: (e) => {
+                    if (e.feature) {
+                      const element = this.popup.createPopupContent(
+                        e.feature,
+                        resourceId,
                       );
+                      if (
+                        item.extensions.attachment &&
+                        item.extensions.attachment.length
+                      ) {
+                        this.popup._addPhotos(
+                          element,
+                          item.extensions.attachment,
+                          params.resourceId,
+                          params.featureId,
+                        );
+                      }
+                      return element;
                     }
-                    return element;
-                  }
+                  },
                 },
-              },
+              });
             });
-          });
         });
     }
   }
@@ -385,6 +397,6 @@ export class ActionMap {
     this.ngwMap.emitter.on('click', () => {
       this.ngwMap.cancelPromises('identify', 'select');
     });
-    this.ngwMap.emitter.on('ngw:select', (e) => this._highlighNgwLayer(e));
+    this.ngwMap.emitter.on('ngw:select', (e) => e && this._highlighNgwLayer(e));
   }
 }
