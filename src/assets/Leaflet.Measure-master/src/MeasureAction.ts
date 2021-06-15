@@ -256,7 +256,15 @@ export class MeasureAction extends Handler {
     this._trail.overlays.push(lable);
     if (ended) {
       const closeButton = lable.enableClose();
-      DomEvent.on(closeButton, 'click', this._clearOverlay, this);
+      DomEvent.on(
+        closeButton,
+        'click',
+        (e) => {
+          DomEvent.stopPropagation(e);
+          this._clearOverlay();
+        },
+        this,
+      );
     }
   }
   _clearOverlay(): void {
