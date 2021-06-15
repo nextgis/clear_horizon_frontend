@@ -1,6 +1,6 @@
 {
   "name": "clear_horizon",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "",
   "main": "dist/index.html",
   "scripts": {
@@ -20,8 +20,10 @@
     "@nextgis/ngw-map": "^1.0.1",
     "@nextgis/url-runtime-params": "^1.0.1",
     "bulma": "^0.9.2",
+    "bulma-calendar": "^6.1.6",
     "bulma-carousel": "^4.0.24",
     "core-js": "^3.14.0",
+    "date-fns": "^2.22.1",
     "leaflet": "^1.7.1",
     "leaflet-sidebar": "github:rendrom/leaflet-sidebar",
     "leaflet.polylinemeasure": "github:ppete2/Leaflet.PolylineMeasure#master",

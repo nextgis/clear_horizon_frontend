@@ -25,7 +25,10 @@ const options: AppOptions = {
   userFires: {
     resource: 'userfirepoints',
     id: 'USERFIRE',
-    adapterOptions: { paint: { color: 'rgb(100,20,40)' } },
+    adapterOptions: {
+      paint: { color: 'rgb(100,20,40)' },
+      props: { dateField: 'field_9' },
+    },
   },
   fires: [
     {

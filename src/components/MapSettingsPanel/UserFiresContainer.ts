@@ -1,100 +1,96 @@
-import './FiresContainer.css';
+import { fetchNgwLayerItems } from '@nextgis/ngw-kit';
 
-import { defined } from '@nextgis/utils';
+import { createCalendar } from './createCalendar';
+import { FiresContainer } from './FiresContainer';
 
-import type { FireResource } from 'src/App';
-import type { LayerAdapter, NgwMap } from '@nextgis/ngw-map';
-import type { CirclePaint } from '@nextgis/paint';
-import type { ResourceAdapter, NgwLayerOptions } from '@nextgis/ngw-kit';
+import type { ResourceAdapter, FetchNgwItemsOptions } from '@nextgis/ngw-kit';
+import type { FeatureItem, NgwDateFormat } from '@nextgis/ngw-connector';
+import type { PropertiesFilter } from '@nextgis/properties-filter';
+import type { CreateCalendarOptions } from './createCalendar';
+export class UserFiresContainer extends FiresContainer {
+  protected _createContainer(): HTMLElement {
+    const container = super._createContainer();
 
-export interface FiresContainerOptions {
-  ngwMap: NgwMap;
-  fires: NgwLayerOptions<'GEOJSON'>[];
-}
-
-export class UserFiresContainer {
-  protected readonly ngwMap: NgwMap;
-  protected _container: HTMLElement;
-
-  constructor(protected options: FiresContainerOptions) {
-    this.ngwMap = options.ngwMap;
-    this._container = this._createContainer();
-  }
-
-  getContainer(): HTMLElement {
-    return this._container;
-  }
-
-  _createContainer(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'fires-contentainer panel-content-padding ';
-
-    const fires = document.createElement('div');
-    fires.className = 'fires-contentainer__layers';
-    this.options.fires.forEach((f) => {
-      this._createFireItem(f, fires);
-    });
-    container.appendChild(fires);
-
+    const calendarWrapper = this._createCalendar();
+    container.insertBefore(calendarWrapper, container.firstChild);
     return container;
   }
 
-  _createFireItem(fire: FireResource, container: HTMLElement): void {
-    const elem = document.createElement('div');
-    elem.className = 'tree-container__item';
-    const id = fire.id;
-    if (!defined(id)) return;
-
-    const createItem = (layer_: ResourceAdapter): void => {
-      const item = layer_.item;
-
-      if (item) {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'checkbox');
-
-        input.checked = true;
-
-        // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
-        //   input.checked = ev.value;
-        // });
-        input.onclick = () => {
-          this.ngwMap.toggleLayer(id, input.checked);
+  private _createCalendar(): HTMLElement {
+    const calendarWrapper = document.createElement('div');
+    const fireItem = this.options.fires[0];
+    const connector = this.options.ngwMap.connector;
+    const resource = fireItem.resource;
+    if (fireItem && resource && connector) {
+      const dateField = fireItem.adapterOptions?.props?.dateField || 'field_9';
+      connector.getResourceIdOrFail(resource).then((resourceId) => {
+        const extremeReqOpt: FetchNgwItemsOptions = {
+          resourceId,
+          fields: [dateField],
+          geom: false,
+          connector,
         };
-
-        const name = document.createElement('span');
-        const displayName = item.resource.display_name.split('__')[0];
-        name.innerHTML = displayName.replace('fires', '').trim();
-        const symbol = this._createSymbol(fire);
-        elem.appendChild(input);
-        elem.appendChild(symbol);
-        elem.appendChild(name);
-        container.appendChild(elem);
-      }
-    };
-
-    const layer = this.ngwMap.getLayer(id) as ResourceAdapter;
-    if (layer) {
-      createItem(layer);
-    } else {
-      const onLayerAdd = (e: LayerAdapter) => {
-        if (e.id === id) {
-          createItem(e as ResourceAdapter);
-          this.ngwMap.emitter.off('layer:add', onLayerAdd);
-        }
-      };
-      this.ngwMap.emitter.on('layer:add', onLayerAdd);
+        const extremePromises = [
+          fetchNgwLayerItems({ ...extremeReqOpt, orderBy: [dateField] }),
+          fetchNgwLayerItems({ ...extremeReqOpt, orderBy: ['-' + dateField] }),
+        ];
+        Promise.all(extremePromises).then(([minItem, maxItem]) => {
+          this.onLayerAdd(fireItem.id || String(fireItem.resource), (layer) => {
+            const block = this._buildCalendarBlock(
+              layer,
+              [minItem, maxItem],
+              dateField,
+            );
+            calendarWrapper.appendChild(block);
+          });
+        });
+      });
     }
+
+    return calendarWrapper;
   }
 
-  _createSymbol(fire: FireResource): HTMLElement {
-    const symbol = document.createElement('span');
-    symbol.className = 'item-symbol';
-    const color = (fire.adapterOptions?.paint as CirclePaint).color;
-    if (typeof color === 'string') {
-      symbol.style.color = color;
-      symbol.style.borderColor = color;
-      symbol.style.backgroundColor = color;
+  private _buildCalendarBlock(
+    layer: ResourceAdapter,
+    extremeItems: FeatureItem[][],
+    dateField: string,
+  ) {
+    const [min, max]: (null | Date)[] = extremeItems.map((items) => {
+      const item = items[0];
+      if (item) {
+        const ngwDate = item.fields[dateField] as NgwDateFormat;
+        if (ngwDate) {
+          return this._parseNgwDate(ngwDate);
+        }
+      }
+      return null;
+    });
+    const opt: CreateCalendarOptions = {
+      onChange: (e) => {
+        const filter: PropertiesFilter = [];
+        if (e.start) {
+          filter.push([dateField, 'ge', e.start.toISOString()]);
+        }
+        if (e.end) {
+          filter.push([dateField, 'le', e.end.toISOString()]);
+        }
+        if (layer.propertiesFilter) {
+          layer.propertiesFilter(filter);
+        }
+      },
+    };
+    if (min) {
+      opt.minDate = min;
+      opt.startDate = min;
     }
-    return symbol;
+    if (max) {
+      opt.maxDate = max;
+      opt.endDate = max;
+    }
+    return createCalendar(opt);
+  }
+
+  private _parseNgwDate(dt: NgwDateFormat): Date {
+    return new Date(dt.year, dt.month, dt.day);
   }
 }

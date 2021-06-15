@@ -67,14 +67,20 @@ export class MeasureLabel extends Layer {
     this._updateContent();
     return this;
   }
-  _initLayout(): void {
+  enableClose(): HTMLElement {
+    this._closeButton = DomUtil.create('span', 'close', this._container);
+    this._closeButton.innerHTML =
+      '<svg class="icon" viewBox="0 0 40 40"><path stroke="#FF0000" stroke-width="3" d="M 10,10 L 30,30 M 30,10 L 10,30" /></svg>';
+    return this._closeButton;
+  }
+  private _initLayout(): void {
     this._container = DomUtil.create('div', this.options.className);
     this._contentNode = DomUtil.create('div', 'content', this._container);
   }
-  _update(): void {
+  private _update(): void {
     this._map && (this._updateContent(), this._updatePosition());
   }
-  _updateContent(): void {
+  private _updateContent(): void {
     if (this._contentNode && this.options.content) {
       if (typeof this.options.content == 'string') {
         this._contentNode.innerHTML = this.options.content;
@@ -84,7 +90,7 @@ export class MeasureLabel extends Layer {
       }
     }
   }
-  _updatePosition(): void {
+  private _updatePosition(): void {
     if (this.options.latlng && this._container) {
       const point = this._map.latLngToLayerPoint(this.options.latlng);
       const is3D = Browser.any3d;
@@ -96,7 +102,7 @@ export class MeasureLabel extends Layer {
       this._container.style.left = this._containerLeft + 'px';
     }
   }
-  _zoomAnimation(a: ZoomAnimEvent): void {
+  private _zoomAnimation(a: ZoomAnimEvent): void {
     if (this._container) {
       const point = (this._map as any)._latLngToNewLayerPoint(
         this.options.latlng,
@@ -105,11 +111,5 @@ export class MeasureLabel extends Layer {
       ) as Point;
       DomUtil.setPosition(this._container, point);
     }
-  }
-  enableClose(): HTMLElement {
-    this._closeButton = DomUtil.create('span', 'close', this._container);
-    this._closeButton.innerHTML =
-      '<svg class="icon" viewBox="0 0 40 40"><path stroke="#FF0000" stroke-width="3" d="M 10,10 L 30,30 M 30,10 L 10,30" /></svg>';
-    return this._closeButton;
   }
 }

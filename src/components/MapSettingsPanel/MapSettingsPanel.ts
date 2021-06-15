@@ -8,7 +8,7 @@ import { NgwLayers } from '@nextgis/ngw-map';
 import { ActionMap } from '../ActionMap';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
-import { FiresContainer } from './FiresContainer';
+import { FirmsFiresContainer } from './FirmsFiresContainer';
 import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
 import { UserFiresContainer } from './UserFiresContainer';
@@ -157,7 +157,7 @@ export class MapSettingsPanel {
     const container = document.createElement('div');
     const fires = this.options.fires;
     if (fires) {
-      const firesContainer = new FiresContainer({
+      const firesContainer = new FirmsFiresContainer({
         fires,
         ngwMap: this.options.ngwMap,
       });

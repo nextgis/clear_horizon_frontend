@@ -254,7 +254,7 @@ export class ActionMap {
           ? (x.adapterOptions.paint as CirclePaint)
           : {};
       this.ngwMap.addNgwLayer({
-        resource: x,
+        resource: x.resource,
         id: x.id,
         adapterOptions: {
           paint: {

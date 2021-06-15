@@ -55,12 +55,12 @@ export class MeasureAction extends Handler {
   removeHooks(): void {
     this._disableMeasure();
   }
-  _activeMeasure(): void {
+  private _activeMeasure(): void {
     this._measureHandler._measurementStarted &&
       this._measureHandler._finishMeasure();
     this._measurementStarted ? this._finishMeasure() : this._enableMeasure();
   }
-  _onMouseClick(event: LeafletMouseEvent): void {
+  private _onMouseClick(event: LeafletMouseEvent): void {
     const latlng = event.latlng || this._map.mouseEventToLatLng(event as any);
     if (this._lastPoint && latlng.equals(this._lastPoint)) {
       return;
@@ -98,7 +98,7 @@ export class MeasureAction extends Handler {
     this._lastPoint = latlng;
     this._startMove = false;
   }
-  _onMouseMove(event: LeafletMouseEvent): void {
+  private _onMouseMove(event: LeafletMouseEvent): void {
     const latlng = event.latlng;
     if (this._directPath && this._trail.points.length > 0) {
       if (this._startMove) {
@@ -109,7 +109,7 @@ export class MeasureAction extends Handler {
       }
     }
   }
-  _enableMeasure(): void {
+  private _enableMeasure(): void {
     this._trail = {
       overlays: [],
       points: [],
@@ -126,7 +126,7 @@ export class MeasureAction extends Handler {
     map.on('mousemove', this._onMouseMove, this);
     map.fire('measure:start');
   }
-  _disableMeasure(): void {
+  private _disableMeasure(): void {
     const map = this._map;
     DomUtil.removeClass(map.getContainer(), 'leaflet-measure-map');
     // @ts-ignore
@@ -142,7 +142,7 @@ export class MeasureAction extends Handler {
     }
     map.fire('measure:stop');
   }
-  _finishMeasure(event?: LeafletMouseEvent): void {
+  private _finishMeasure(event?: LeafletMouseEvent): void {
     if (this._trail.points.length > 0) {
       if (this._trail.points.length > 1) {
         if (this._directPath && (!event || event.type === 'contextmenu')) {
@@ -173,7 +173,7 @@ export class MeasureAction extends Handler {
     }
     this.disable();
   }
-  _resetDirectPath(latlng: LatLng): void {
+  private _resetDirectPath(latlng: LatLng): void {
     if (!this._directPath) {
       let directPath: DirectPath;
       if (this.options.model === 'area') {
@@ -200,7 +200,7 @@ export class MeasureAction extends Handler {
       this._directPath.addLatLng(latlng);
     }
   }
-  _addMeasurePoint(latlng: LatLng): void {
+  private _addMeasurePoint(latlng: LatLng): void {
     if (!this._measurePath) {
       let measurePath: DirectPath;
       if (this.options.model === 'area') {
@@ -227,7 +227,7 @@ export class MeasureAction extends Handler {
     }
     this._resetDirectPath(latlng);
   }
-  _addMarker(latLng: LatLng): void {
+  private _addMarker(latLng: LatLng): void {
     const marker = new CircleMarker(latLng, {
       color: this.options.color,
       opacity: 1,
@@ -241,7 +241,7 @@ export class MeasureAction extends Handler {
     this._map.addLayer(marker);
     this._trail.overlays.push(marker);
   }
-  _addLable(
+  private _addLable(
     latlng: LatLng,
     content: string,
     className: string,
@@ -267,7 +267,7 @@ export class MeasureAction extends Handler {
       );
     }
   }
-  _clearOverlay(): void {
+  private _clearOverlay(): void {
     const overlays = this._trail.overlays;
     let i = 0,
       length;

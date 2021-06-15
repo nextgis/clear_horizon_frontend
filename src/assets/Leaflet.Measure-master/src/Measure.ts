@@ -48,7 +48,7 @@ export class Measure extends Control {
       this._measureHandler = undefined;
     }
   }
-  _buildContainer(): HTMLElement {
+  private _buildContainer(): HTMLElement {
     this._container = DomUtil.create(
       'div',
       'leaflet-control-measure leaflet-bar leaflet-control',
@@ -76,7 +76,7 @@ export class Measure extends Control {
     this._buildItems();
     return this._container;
   }
-  _buildItems(): void {
+  private _buildItems(): void {
     const ele_ul = DomUtil.create(
       'ul',
       'leaflet-measure-actions',
@@ -104,7 +104,7 @@ export class Measure extends Control {
     DomEvent.disableClickPropagation(ele_link_area);
     DomEvent.on(ele_link_area, 'click', this._enableMeasureArea, this);
   }
-  _initLayout(): HTMLElement {
+  private _initLayout(): HTMLElement {
     const container = this._buildContainer();
     DomEvent.disableClickPropagation(container);
     DomEvent.disableScrollPropagation(container);
@@ -122,7 +122,7 @@ export class Measure extends Control {
     }
     return container;
   }
-  _enableMeasureLine(ev: Event): void {
+  private _enableMeasureLine(ev: Event): void {
     DomEvent.stopPropagation(ev);
     this.disableMeasure();
     if (this._map) {
@@ -134,7 +134,7 @@ export class Measure extends Control {
       this._measureHandler.enable();
     }
   }
-  _enableMeasureArea(ev: Event): void {
+  private _enableMeasureArea(ev: Event): void {
     DomEvent.stopPropagation(ev);
     this.disableMeasure();
     if (this._map) {
@@ -146,14 +146,14 @@ export class Measure extends Control {
       this._measureHandler.enable();
     }
   }
-  _expand(): this {
+  private _expand(): this {
     if (this._link && this._container) {
       this._link.style.display = 'none';
       DomUtil.addClass(this._container, 'leaflet-measure-expanded');
     }
     return this;
   }
-  _collapse(): this {
+  private _collapse(): this {
     if (this._link && this._container) {
       this._link.style.display = 'block';
       DomUtil.removeClass(this._container, 'leaflet-measure-expanded');
