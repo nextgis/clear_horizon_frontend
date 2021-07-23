@@ -86,7 +86,7 @@ export class Popup {
 
   async updateElementContent<
     G extends Geometry = any,
-    P extends Record<string, any> = Record<string, any>
+    P extends Record<string, any> = Record<string, any>,
   >(
     element: HTMLElement,
     resourceId: number,

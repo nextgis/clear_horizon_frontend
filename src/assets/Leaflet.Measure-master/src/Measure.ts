@@ -17,7 +17,7 @@ export class Measure extends Control {
 
   private _map?: Map;
   private _container?: HTMLElement;
-  private _link?: HTMLLinkElement;
+  private _link?: HTMLAnchorElement;
   private _contents?: HTMLElement;
   private _measureHandler?: Handler;
 
@@ -60,11 +60,7 @@ export class Measure extends Control {
       this._container,
     );
 
-    this._link = DomUtil.create(
-      'a',
-      'leaflet-measure-toggle',
-      this._container,
-    ) as HTMLLinkElement;
+    this._link = DomUtil.create('a', 'leaflet-measure-toggle', this._container);
     this._link.title = this.options.title || 'Measurement';
     this._link.href = '#';
 
@@ -83,11 +79,7 @@ export class Measure extends Control {
       this._contents,
     );
     let ele_li = DomUtil.create('li', 'leaflet-measure-action', ele_ul);
-    const ele_link_line = DomUtil.create(
-      'a',
-      'start',
-      ele_li,
-    ) as HTMLLinkElement;
+    const ele_link_line = DomUtil.create('a', 'start', ele_li);
     ele_link_line.innerText = this.options.messages.linearMeasurement;
     ele_link_line.href = '#';
     DomEvent.disableClickPropagation(ele_link_line);
@@ -98,7 +90,7 @@ export class Measure extends Control {
       'a',
       'leaflet-measure-action start',
       ele_li,
-    ) as HTMLLinkElement;
+    );
     ele_link_area.innerText = this.options.messages.areaMeasurement;
     ele_link_area.href = '#';
     DomEvent.disableClickPropagation(ele_link_area);

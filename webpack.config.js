@@ -4,10 +4,11 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-let alias = {};
+const supportedLocales = ['ru', 'en'];
+const alias = {};
 try {
   const { getAliases } = require('./@nextgis/scripts/aliases');
-  alias = getAliases();
+  Object.assign(alias, getAliases());
 } catch (er) {
   // ignore
 }
@@ -103,11 +104,16 @@ module.exports = (env, argv) => {
         __BROWSER__: true,
         __DEV__: !isProd,
       }),
+      new webpack.ContextReplacementPlugin(
+        /date-fns[/\\]/,
+        new RegExp(`[/\\\\](${supportedLocales.join('|')})[/\\\\]index.js$`),
+      ),
       // new FaviconsWebpackPlugin('./src/img/favicon.png')
     ],
 
     optimization: {
       runtimeChunk: 'single',
+      usedExports: true,
       splitChunks: {
         chunks: 'all',
         minSize: 10000,
