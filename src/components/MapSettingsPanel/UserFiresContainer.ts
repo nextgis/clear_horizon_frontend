@@ -72,10 +72,10 @@ export class UserFiresContainer extends FiresContainer {
       onChange: (e) => {
         const filter: PropertiesFilter = [];
         if (e.start) {
-          filter.push([dateField, 'ge', e.start.toISOString()]);
+          filter.push([dateField, 'ge', e.start.getTime()]);
         }
         if (e.end) {
-          filter.push([dateField, 'le', e.end.toISOString()]);
+          filter.push([dateField, 'le', e.end.getTime()]);
         }
         if (layer.propertiesFilter) {
           layer.propertiesFilter(filter);
