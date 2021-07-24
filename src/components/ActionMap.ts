@@ -257,6 +257,7 @@ export class ActionMap {
         resource: x.resource,
         id: x.id,
         adapterOptions: {
+          ...x.adapterOptions,
           paint: {
             ...paint,
             stroke: true,

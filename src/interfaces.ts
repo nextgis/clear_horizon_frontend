@@ -13,3 +13,10 @@ export interface Firms {
   track: number;
   version: string;
 }
+
+export type TimeUnit = 's' | 'ms';
+
+export interface FiresLayerProps {
+  timeUnit?: TimeUnit;
+  dateField?: string;
+}

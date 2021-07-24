@@ -10,6 +10,7 @@ import type { FireResource } from '../../App';
 export interface FiresContainerOptions {
   ngwMap: NgwMap;
   fires: NgwLayerOptions<'GEOJSON'>[];
+  dateRange: [Date | undefined, Date | undefined];
 }
 
 export abstract class FiresContainer {
@@ -29,12 +30,12 @@ export abstract class FiresContainer {
     const container = document.createElement('div');
     container.className = 'fires-contentainer panel-content-padding ';
 
-    const fires = document.createElement('div');
-    fires.className = 'fires-contentainer__layers';
-    this.options.fires.forEach((f) => {
-      this._createFireItem(f, fires);
-    });
-    container.appendChild(fires);
+    const firesEl = document.createElement('div');
+    firesEl.className = 'fires-contentainer__layers';
+    for (const f of this.options.fires) {
+      this._createFireItem(f, firesEl);
+    }
+    container.appendChild(firesEl);
 
     return container;
   }
@@ -61,9 +62,13 @@ export abstract class FiresContainer {
     const id = fire.id;
     if (!defined(id)) return;
 
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = 'загрузка...';
+    container.appendChild(wrapper);
+
     const createItem = (layer_: ResourceAdapter): void => {
       const item = layer_.item;
-
+      wrapper.innerHTML = '';
       if (item) {
         const input = document.createElement('input');
         input.setAttribute('type', 'checkbox');
@@ -84,7 +89,7 @@ export abstract class FiresContainer {
         elem.appendChild(input);
         elem.appendChild(symbol);
         elem.appendChild(name);
-        container.appendChild(elem);
+        wrapper.appendChild(elem);
       }
     };
     this.onLayerAdd(id, (layer) => createItem(layer));

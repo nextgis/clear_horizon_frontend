@@ -13,7 +13,9 @@ import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
 import { UserFiresContainer } from './UserFiresContainer';
 
+import type { NgwLayerOptions } from '@nextgis/ngw-kit';
 import type { MapSettingsPanelOptions } from './interfaces';
+import { layerTimestampExtremum } from '../../utils/layerTimestampExtremum';
 
 const OPTIONS: Partial<MapSettingsPanelOptions> = {
   target: 'tree',
@@ -78,20 +80,20 @@ export class MapSettingsPanel {
       container.style.width = this.options.width + 'px';
     }
 
-    if (this.options.userFires) {
+    if (this.options.userFires || this.options.fires) {
       new CollapsiblePanel({
         title: 'Пожары',
         content: () => this._createUserFiresContainer(),
         parent: container,
       });
     }
-    if (this.options.fires) {
-      new CollapsiblePanel({
-        title: 'Термоточки (FIRMS)',
-        content: () => this._createFiresContainer(),
-        parent: container,
-      });
-    }
+    // if (this.options.fires) {
+    //   new CollapsiblePanel({
+    //     title: 'Термоточки (FIRMS)',
+    //     content: () => this._createFiresContainer(),
+    //     parent: container,
+    //   });
+    // }
     new CollapsiblePanel({
       title: 'Базовые слои',
       content: () => this._createNgwLayers(),
@@ -141,30 +143,47 @@ export class MapSettingsPanel {
     return container;
   }
 
-  private _createUserFiresContainer() {
+  private async _createUserFiresContainer() {
     const container = document.createElement('div');
-    if (this.options.userFires) {
+    const { fires: firm, userFires } = this.options;
+    let dateRange: [Date | undefined, Date | undefined] = [
+      undefined,
+      undefined,
+    ];
+    if (firm || userFires) {
+      const fires: NgwLayerOptions<'GEOJSON'>[] = [];
+      if (userFires && userFires.id) {
+        fires.push(userFires);
+        dateRange = await layerTimestampExtremum({
+          layer: userFires,
+          connector: this.options.ngwMap.connector,
+        });
+      }
+      if (firm) {
+        firm.forEach((x) => fires.push(x));
+      }
       const firesContainer = new UserFiresContainer({
-        fires: [this.options.userFires],
+        fires,
         ngwMap: this.options.ngwMap,
+        dateRange,
       });
       container.appendChild(firesContainer.getContainer());
     }
     return container;
   }
 
-  private _createFiresContainer() {
-    const container = document.createElement('div');
-    const fires = this.options.fires;
-    if (fires) {
-      const firesContainer = new FirmsFiresContainer({
-        fires,
-        ngwMap: this.options.ngwMap,
-      });
-      container.appendChild(firesContainer.getContainer());
-    }
-    return container;
-  }
+  // private _createFiresContainer() {
+  //   const container = document.createElement('div');
+  //   const fires = this.options.fires;
+  //   if (fires) {
+  //     const firesContainer = new FirmsFiresContainer({
+  //       fires,
+  //       ngwMap: this.options.ngwMap,
+  //     });
+  //     container.appendChild(firesContainer.getContainer());
+  //   }
+  //   return container;
+  // }
 
   private _createBasemapsContainer() {
     const container = document.createElement('div');

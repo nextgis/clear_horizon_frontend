@@ -34,12 +34,18 @@ const options: AppOptions = {
     {
       resource: 103,
       id: 'MODIS',
-      adapterOptions: { paint: { color: 'red' } },
+      adapterOptions: {
+        paint: { color: 'red' },
+        props: { dateField: 'timestamp', timeUnit: 's' },
+      },
     },
     {
       resource: 105,
       id: 'VIIRS',
-      adapterOptions: { paint: { color: 'orange' } },
+      adapterOptions: {
+        paint: { color: 'orange' },
+        props: { dateField: 'timestamp', timeUnit: 's' },
+      },
     },
   ],
 };

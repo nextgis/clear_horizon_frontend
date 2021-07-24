@@ -1,12 +1,11 @@
-import { fetchNgwLayerItems } from '@nextgis/ngw-kit';
-
+import { formatTime } from '../../utils/formatTime';
 import { createCalendar } from './createCalendar';
 import { FiresContainer } from './FiresContainer';
 
-import type { ResourceAdapter, FetchNgwItemsOptions } from '@nextgis/ngw-kit';
-import type { NgwDateFormat } from '@nextgis/ngw-connector';
+import type { ResourceAdapter } from '@nextgis/ngw-kit';
 import type { PropertiesFilter } from '@nextgis/properties-filter';
 import type { CreateCalendarOptions } from './createCalendar';
+import type { FiresLayerProps } from '../../interfaces';
 export class UserFiresContainer extends FiresContainer {
   protected _createContainer(): HTMLElement {
     const container = super._createContainer();
@@ -18,67 +17,49 @@ export class UserFiresContainer extends FiresContainer {
 
   private _createCalendar(): HTMLElement {
     const calendarWrapper = document.createElement('div');
-    const fireItem = this.options.fires[0];
-    const connector = this.options.ngwMap.connector;
-    const resource = fireItem.resource;
-    if (fireItem && resource && connector) {
-      const dateField = fireItem.adapterOptions?.props?.dateField || 'field_9';
-      connector.getResourceIdOrFail(resource).then((resourceId) => {
-        const extremeReqOpt: FetchNgwItemsOptions = {
-          resourceId,
-          fields: [dateField],
-          geom: false,
-          connector,
-          limit: 1,
-        };
-        const extremePromises = [
-          fetchNgwLayerItems({ ...extremeReqOpt, orderBy: [dateField] }),
-          // fetchNgwLayerItems({ ...extremeReqOpt, orderBy: ['-' + dateField] }),
-        ];
-        Promise.all(extremePromises).then(([minItem, maxItem]) => {
-          const range = [minItem, maxItem].map((items) => {
-            const item = items && items[0];
-            if (item) {
-              const ngwDate = item.fields[dateField] as NgwDateFormat;
-              if (ngwDate) {
-                return this._parseNgwDate(ngwDate);
-              }
-            }
-            return undefined;
-          });
-          const max = new Date();
-          this.onLayerAdd(fireItem.id || String(fireItem.resource), (layer) => {
-            const block = this._buildCalendarBlock(
-              layer,
-              [range[0], max],
-              dateField,
-            );
-            calendarWrapper.appendChild(block);
-          });
+    const fires = this.options.fires;
+
+    const promises: Promise<ResourceAdapter>[] = [];
+    fires.forEach((x) => {
+      const id = x.id;
+      if (id) {
+        const promise = new Promise<ResourceAdapter>((resolve) => {
+          this.onLayerAdd(id, resolve);
         });
-      });
-    }
+        promises.push(promise);
+      }
+    });
+    Promise.all(promises).then((fires) => {
+      const block = this._buildCalendarBlock(fires, this.options.dateRange);
+      calendarWrapper.appendChild(block);
+    });
 
     return calendarWrapper;
   }
 
   private _buildCalendarBlock(
-    layer: ResourceAdapter,
+    layers: ResourceAdapter[],
     extremeItems: [Date?, Date?],
-    dateField: string,
   ) {
     const [min, max]: (Date | undefined)[] = extremeItems;
+
     const opt: CreateCalendarOptions = {
       onChange: (e) => {
-        const filter: PropertiesFilter = [];
-        if (e.start) {
-          filter.push([dateField, 'ge', e.start.getTime()]);
-        }
-        if (e.end) {
-          filter.push([dateField, 'le', e.end.getTime()]);
-        }
-        if (layer.propertiesFilter) {
-          layer.propertiesFilter(filter);
+        for (const l of layers) {
+          const { dateField, timeUnit } = (l.options.props ||
+            {}) as FiresLayerProps;
+          if (dateField) {
+            const filter: PropertiesFilter = [];
+            if (e.start) {
+              filter.push([dateField, 'ge', formatTime(e.start, timeUnit)]);
+            }
+            if (e.end) {
+              filter.push([dateField, 'le', formatTime(e.end, timeUnit)]);
+            }
+            if (l.propertiesFilter) {
+              l.propertiesFilter(filter);
+            }
+          }
         }
       },
     };
@@ -91,9 +72,5 @@ export class UserFiresContainer extends FiresContainer {
       opt.endDate = max;
     }
     return createCalendar(opt);
-  }
-
-  private _parseNgwDate(dt: NgwDateFormat): Date {
-    return new Date(dt.year, dt.month - 1, dt.day);
   }
 }

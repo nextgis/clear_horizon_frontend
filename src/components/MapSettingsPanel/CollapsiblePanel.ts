@@ -1,6 +1,8 @@
 import './CollapsiblePanel.css';
 
-type GetHTML = () => HTMLElement;
+type GetHTML = () => HTMLElement | Promise<HTMLElement>;
+
+const LOADING_TEXT = 'Загрузка данных...';
 
 export interface CollapsiblePanelOptions {
   title?: string;
@@ -28,7 +30,10 @@ export class CollapsiblePanel {
   }
 
   open(): void {
-    if (this._content && !this._content.innerHTML) {
+    if (
+      this._content &&
+      (!this._content.innerHTML || this._content.innerHTML === LOADING_TEXT)
+    ) {
       this._updateContent();
     }
     // this._container.appendChild(this._content);
@@ -71,6 +76,7 @@ export class CollapsiblePanel {
       this._container.appendChild(header);
     }
     const content = document.createElement('div');
+    content.innerHTML = LOADING_TEXT;
     content.className = 'panel-content';
     this._content = content;
     this._container.appendChild(content);
@@ -117,12 +123,12 @@ export class CollapsiblePanel {
     }
   }
 
-  private _updateContent() {
+  private async _updateContent() {
     this._cleanContent();
     if (this._content) {
       const html =
         typeof this.options.content === 'function'
-          ? this.options.content()
+          ? await this.options.content()
           : this.options.content;
 
       this._content.appendChild(html);
