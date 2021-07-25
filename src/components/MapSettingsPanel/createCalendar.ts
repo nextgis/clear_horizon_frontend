@@ -1,12 +1,16 @@
 import 'flatpickr/dist/flatpickr.min.css';
 import flatpickr from 'flatpickr';
-import rangePlugin from 'flatpickr/dist/plugins/rangePlugin';
+// import rangePlugin from 'flatpickr/dist/plugins/rangePlugin';
 import { Russian } from 'flatpickr/dist/l10n/ru.js';
+import { DATE_RANGE_SELECT } from '../../constants';
+import { daysBehindRange } from '../../utils/daysBehindRange';
+import { debounce } from '../../../@nextgis/packages/utils/src';
 export interface CreateCalendarOptions {
   maxDate?: Date;
   minDate?: Date;
   startDate?: Date;
   endDate?: Date;
+  timedelta: number;
   onChange: (val: { start?: Date; end?: Date }) => void;
 }
 
@@ -17,32 +21,56 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
     <div class="field">
         <input class="input input-from is-small" type="text" >
     </div>
-    <div class="field">
-        <input class="input input-to is-small" type="text" >
+
+    <div class="select is-small">
+      <select class="select-input">
+        ${DATE_RANGE_SELECT.map((x) => {
+          return `<option ${
+            options.timedelta === x[0] ? 'selected' : ''
+          } value=${x[0]}>${x[1]}</option>`;
+        })}
+      </select>
     </div>
     `;
 
+  // <div class="field">
+  //     <input class="input input-to is-small" type="text" >
+  // </div>
+
+  const select = html.querySelector('.select-input') as HTMLSelectElement;
   const inputFrom = html.querySelector('.input.input-from') as HTMLInputElement;
-  const inputTo = html.querySelector('.input.input-to') as HTMLInputElement;
-  const input = [inputFrom, inputTo];
+  // const inputTo = html.querySelector('.input.input-to') as HTMLInputElement;
   const { onChange, maxDate, minDate, startDate, endDate } = options;
 
   const today = new Date();
 
+  const changeFunction = debounce((prop: { start: Date; end: Date }) => {
+    if (prop.start && prop.end) {
+      onChange(prop);
+    }
+  });
+
   const defaultDate = startDate && endDate ? [startDate, endDate] : undefined;
 
-  flatpickr(input, {
+  const datepicker = flatpickr(inputFrom, {
     mode: 'range',
     locale: Russian,
     allowInput: true,
     maxDate: maxDate || today,
     minDate,
     defaultDate,
-    plugins: [rangePlugin({ input: inputTo })],
+    // plugins: [rangePlugin({ input: inputTo })],
     onChange: ([start, end]) => {
-      onChange({ start, end });
+      select.value = '';
+      changeFunction({ start, end });
     },
   });
+
+  select.onchange = () => {
+    const [start, end] = daysBehindRange(Number(select.value), endDate);
+    datepicker.setDate([start, end]);
+    changeFunction({ start, end });
+  };
 
   // calendar.on('select', () => {
   //   // const val = calendar.value(); // string - string

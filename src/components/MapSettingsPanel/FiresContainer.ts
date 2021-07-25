@@ -11,6 +11,8 @@ export interface FiresContainerOptions {
   ngwMap: NgwMap;
   fires: NgwLayerOptions<'GEOJSON'>[];
   dateRange: [Date | undefined, Date | undefined];
+  defaultDateRange: [Date | undefined, Date | undefined];
+  timedelta: number;
 }
 
 export abstract class FiresContainer {

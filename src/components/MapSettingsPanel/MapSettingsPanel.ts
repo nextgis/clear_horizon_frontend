@@ -8,7 +8,6 @@ import { NgwLayers } from '@nextgis/ngw-map';
 import { ActionMap } from '../ActionMap';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
-import { FirmsFiresContainer } from './FirmsFiresContainer';
 import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
 import { UserFiresContainer } from './UserFiresContainer';
@@ -16,6 +15,8 @@ import { UserFiresContainer } from './UserFiresContainer';
 import type { NgwLayerOptions } from '@nextgis/ngw-kit';
 import type { MapSettingsPanelOptions } from './interfaces';
 import { layerTimestampExtremum } from '../../utils/layerTimestampExtremum';
+import { daysBehindRange } from '../../utils/daysBehindRange';
+import { NOW } from '../../constants';
 
 const OPTIONS: Partial<MapSettingsPanelOptions> = {
   target: 'tree',
@@ -87,13 +88,6 @@ export class MapSettingsPanel {
         parent: container,
       });
     }
-    // if (this.options.fires) {
-    //   new CollapsiblePanel({
-    //     title: 'Термоточки (FIRMS)',
-    //     content: () => this._createFiresContainer(),
-    //     parent: container,
-    //   });
-    // }
     new CollapsiblePanel({
       title: 'Базовые слои',
       content: () => this._createNgwLayers(),
@@ -162,28 +156,19 @@ export class MapSettingsPanel {
       if (firm) {
         firm.forEach((x) => fires.push(x));
       }
+      const timedelta = this.actionMap.options.timedelta || 24;
+      const defaultDateRange = daysBehindRange(timedelta, NOW);
       const firesContainer = new UserFiresContainer({
         fires,
         ngwMap: this.options.ngwMap,
         dateRange,
+        defaultDateRange,
+        timedelta: this.actionMap.options.timedelta || 72,
       });
       container.appendChild(firesContainer.getContainer());
     }
     return container;
   }
-
-  // private _createFiresContainer() {
-  //   const container = document.createElement('div');
-  //   const fires = this.options.fires;
-  //   if (fires) {
-  //     const firesContainer = new FirmsFiresContainer({
-  //       fires,
-  //       ngwMap: this.options.ngwMap,
-  //     });
-  //     container.appendChild(firesContainer.getContainer());
-  //   }
-  //   return container;
-  // }
 
   private _createBasemapsContainer() {
     const container = document.createElement('div');

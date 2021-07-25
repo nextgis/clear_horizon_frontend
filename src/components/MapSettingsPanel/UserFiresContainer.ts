@@ -6,6 +6,7 @@ import type { ResourceAdapter } from '@nextgis/ngw-kit';
 import type { PropertiesFilter } from '@nextgis/properties-filter';
 import type { CreateCalendarOptions } from './createCalendar';
 import type { FiresLayerProps } from '../../interfaces';
+
 export class UserFiresContainer extends FiresContainer {
   protected _createContainer(): HTMLElement {
     const container = super._createContainer();
@@ -30,7 +31,11 @@ export class UserFiresContainer extends FiresContainer {
       }
     });
     Promise.all(promises).then((fires) => {
-      const block = this._buildCalendarBlock(fires, this.options.dateRange);
+      const block = this._buildCalendarBlock(
+        fires,
+        this.options.dateRange,
+        this.options.defaultDateRange,
+      );
       calendarWrapper.appendChild(block);
     });
 
@@ -40,10 +45,12 @@ export class UserFiresContainer extends FiresContainer {
   private _buildCalendarBlock(
     layers: ResourceAdapter[],
     extremeItems: [Date?, Date?],
+    defaultItems: [Date?, Date?],
   ) {
     const [min, max]: (Date | undefined)[] = extremeItems;
-
+    const [startDate, endDate]: (Date | undefined)[] = defaultItems;
     const opt: CreateCalendarOptions = {
+      timedelta: this.options.timedelta,
       onChange: (e) => {
         for (const l of layers) {
           const { dateField, timeUnit } = (l.options.props ||
@@ -65,11 +72,15 @@ export class UserFiresContainer extends FiresContainer {
     };
     if (min) {
       opt.minDate = min;
-      opt.startDate = min;
+    }
+    if (startDate) {
+      opt.startDate = startDate;
     }
     if (max) {
       opt.maxDate = max;
-      opt.endDate = max;
+    }
+    if (endDate) {
+      opt.endDate = endDate;
     }
     return createCalendar(opt);
   }

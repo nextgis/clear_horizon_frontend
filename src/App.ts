@@ -3,9 +3,6 @@ import './bulma';
 
 import type { NgwMapOptions } from '@nextgis/ngw-map';
 import type { NgwLayerOptions } from '@nextgis/ngw-kit';
-export interface AsuLayer {
-  name: string;
-}
 
 export interface ConnectionOptions {
   acsUrl?: string;
@@ -32,13 +29,13 @@ export interface AppOptions {
   fires?: NgwLayerOptions<'GEOJSON'>[];
   userFires?: NgwLayerOptions<'GEOJSON'>;
   basemaps?: BaseLayer[];
-  timedelta?: 24;
+  timedelta: number;
 }
 
 export class App {
   actionMap: ActionMap;
 
-  constructor(public options: AppOptions = {}) {
+  constructor(public options: Partial<AppOptions> = {}) {
     this.actionMap = new ActionMap(options);
   }
 

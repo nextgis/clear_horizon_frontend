@@ -5,7 +5,7 @@ import { App, AppOptions } from './App';
 
 import './style/style.scss';
 
-let config: AppOptions = {};
+let config: Partial<AppOptions> = {};
 try {
   config = require('../config').default;
 } catch (er) {
@@ -17,7 +17,7 @@ const OPTIONS: AppOptions = {
     target: 'map',
     bounds: [36.59, 43.385, 49.374, 50.214],
   },
-  timedelta: 24,
+  timedelta: 72,
 };
 const options = deepmerge(OPTIONS, config);
 const app = new App(options);

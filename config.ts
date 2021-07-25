@@ -1,4 +1,10 @@
-import { AppOptions } from './src/App';
+import type { AppOptions } from './src/App';
+import type { FiresAdapterOptions } from './src/interfaces';
+
+const firmsAdapterOptions: FiresAdapterOptions = {
+  limit: 2000,
+  props: { dateField: 'timestamp', timeUnit: 's' },
+};
 
 const options: AppOptions = {
   mapOptions: {
@@ -27,7 +33,7 @@ const options: AppOptions = {
     id: 'USERFIRE',
     adapterOptions: {
       paint: { color: 'rgb(100,20,40)' },
-      props: { dateField: 'field_9' },
+      props: { dateField: 'field_9', timeUnit: 'ISO' },
     },
   },
   fires: [
@@ -36,7 +42,7 @@ const options: AppOptions = {
       id: 'MODIS',
       adapterOptions: {
         paint: { color: 'red' },
-        props: { dateField: 'timestamp', timeUnit: 's' },
+        ...firmsAdapterOptions,
       },
     },
     {
@@ -44,7 +50,7 @@ const options: AppOptions = {
       id: 'VIIRS',
       adapterOptions: {
         paint: { color: 'orange' },
-        props: { dateField: 'timestamp', timeUnit: 's' },
+        ...firmsAdapterOptions,
       },
     },
   ],

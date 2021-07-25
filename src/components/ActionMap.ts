@@ -33,6 +33,9 @@ import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
 import { createMeasureControl } from './createMeasureControl';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
+import { daysBehindFilter } from '../utils/daysBehindRange';
+import { FiresAdapterOptions } from '../interfaces';
+import { NOW } from '../constants';
 
 export class ActionMap {
   ngwMap!: NgwMap<Map, Layer, any>;
@@ -45,11 +48,11 @@ export class ActionMap {
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};
 
-  constructor(private options: AppOptions) {
+  constructor(public options: Partial<AppOptions>) {
     this.popup = new Popup();
   }
 
-  async create(opt: AppOptions): Promise<void> {
+  async create(opt: Partial<AppOptions>): Promise<void> {
     // const auth = new Auth(opt.mapOptions);
     const mapOpt = { ...opt.mapOptions };
     // try {
@@ -120,7 +123,6 @@ export class ActionMap {
       userFires,
       bookmarks,
     });
-    // this.ngwMap.addControl(crateLineMeasureControl(), 'top-left');
 
     this._addEventsListeners();
   }
@@ -128,18 +130,6 @@ export class ActionMap {
   private _locate() {
     const locationfound = (e: LocationEvent) => {
       const lngLat = e.lngLat;
-      // const lngLat: [number, number] = [40, 46];
-      // TODO: get extent from webmap or frame layer;
-      // const extent = this.ngwMap.getBounds();
-      // if (extent) {
-      //   const [minLng, minLat, maxLng, maxLat] = extent;
-      //   const [lng, lat] = lngLat;
-      //   const isLngInBbox = minLng < lng && lng < maxLng;
-      //   const isLatInBbox = minLat < lat && lat < maxLat;
-      //   if (isLngInBbox && isLatInBbox) {
-      //     this.ngwMap.setCenter(lngLat);
-      //   }
-      // }
       this.ngwMap.setCenter(lngLat);
     };
 
@@ -272,6 +262,11 @@ export class ActionMap {
             radius: 7,
           },
           ...adapterOptions,
+          propertiesFilter: daysBehindFilter(
+            this.options.timedelta || 24,
+            x.adapterOptions as FiresAdapterOptions,
+            NOW,
+          ),
         },
       });
     }
@@ -280,16 +275,7 @@ export class ActionMap {
   private async _addFires(fires?: NgwLayerOptions<'GEOJSON'>[]) {
     if (fires) {
       for (const x of fires) {
-        await this._addUserFires(x, {
-          propertiesFilter: [
-            [
-              'timestamp',
-              'ge',
-              Math.floor(Date.now() / 1000) -
-                Number(this.options.timedelta) * 3600,
-            ],
-          ],
-        });
+        await this._addUserFires(x);
       }
     }
   }

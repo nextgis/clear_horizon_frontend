@@ -1,8 +1,9 @@
 import { fetchNgwLayerItems } from '@nextgis/ngw-kit';
+import { NgwDateFormat } from '@nextgis/ngw-connector';
+import { NOW } from '../constants';
 
 import type NgwConnector from '@nextgis/ngw-connector';
 import type { FetchNgwItemsOptions, NgwLayerOptions } from '@nextgis/ngw-kit';
-import { NgwDateFormat } from '@nextgis/ngw-connector';
 
 export function layerTimestampExtremum({
   connector,
@@ -37,7 +38,7 @@ export function layerTimestampExtremum({
           }
           return undefined;
         });
-        const max = new Date();
+        const max = NOW;
         return [min, max];
       });
     });
