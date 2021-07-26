@@ -98,7 +98,9 @@ module.exports = (env, argv) => {
         files: ['src/'],
         extensions: ['ts'],
       }),
-      new HtmlWebpackPlugin({ template: 'src/index.html' }),
+      new HtmlWebpackPlugin({
+        template: 'src/index.html',
+      }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
         __BROWSER__: true,
