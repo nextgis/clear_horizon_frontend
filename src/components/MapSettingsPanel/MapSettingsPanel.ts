@@ -10,13 +10,14 @@ import { CollapsiblePanel } from './CollapsiblePanel';
 import { WebmapTreeItem } from './WebmapTreeItem';
 import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
-import { UserFiresContainer } from './UserFiresContainer';
+import { FiresContainer } from './FiresContainer';
 
 import type { NgwLayerOptions } from '@nextgis/ngw-kit';
 import type { MapSettingsPanelOptions } from './interfaces';
 import { layerTimestampExtremum } from '../../utils/layerTimestampExtremum';
 import { daysBehindRange } from '../../utils/daysBehindRange';
 import { NOW } from '../../constants';
+import { LayersContainer } from './LayersContainer';
 
 const OPTIONS: Partial<MapSettingsPanelOptions> = {
   target: 'tree',
@@ -81,10 +82,17 @@ export class MapSettingsPanel {
       container.style.width = this.options.width + 'px';
     }
 
-    if (this.options.userFires || this.options.fires) {
+    if (this.options.userFires || this.options.firms) {
       new CollapsiblePanel({
         title: 'Пожары',
-        content: () => this._createUserFiresContainer(),
+        content: () => this._createFiresContainer(),
+        parent: container,
+      });
+    }
+    if (this.options.sensors) {
+      new CollapsiblePanel({
+        title: 'Датчики',
+        content: () => this._createSensorContainer(),
         parent: container,
       });
     }
@@ -137,14 +145,14 @@ export class MapSettingsPanel {
     return container;
   }
 
-  private async _createUserFiresContainer() {
+  private async _createFiresContainer() {
     const container = document.createElement('div');
-    const { fires: firm, userFires } = this.options;
+    const { firms, userFires } = this.options;
     let dateRange: [Date | undefined, Date | undefined] = [
       undefined,
       undefined,
     ];
-    if (firm || userFires) {
+    if (firms || userFires) {
       const fires: NgwLayerOptions<'GEOJSON'>[] = [];
       if (userFires && userFires.id) {
         fires.push(userFires);
@@ -153,17 +161,35 @@ export class MapSettingsPanel {
           connector: this.options.ngwMap.connector,
         });
       }
-      if (firm) {
-        firm.forEach((x) => fires.push(x));
+      if (firms) {
+        firms.forEach((x) => fires.push(x));
       }
       const timedelta = this.actionMap.options.timedelta || 24;
       const defaultDateRange = daysBehindRange(timedelta, NOW);
-      const firesContainer = new UserFiresContainer({
-        fires,
+      const firesContainer = new FiresContainer({
+        layers: fires,
         ngwMap: this.options.ngwMap,
         dateRange,
         defaultDateRange,
         timedelta: this.actionMap.options.timedelta || 72,
+        onDateChange: () => {
+          if (this.options.onDateChange) {
+            this.options.onDateChange();
+          }
+        },
+      });
+      container.appendChild(firesContainer.getContainer());
+    }
+    return container;
+  }
+
+  private async _createSensorContainer() {
+    const container = document.createElement('div');
+    const { sensors } = this.options;
+    if (sensors) {
+      const firesContainer = new LayersContainer({
+        layers: [sensors],
+        ngwMap: this.options.ngwMap,
       });
       container.appendChild(firesContainer.getContainer());
     }
@@ -172,7 +198,7 @@ export class MapSettingsPanel {
 
   private _createBasemapsContainer() {
     const container = document.createElement('div');
-    const fires = this.options.fires;
+    const fires = this.options.firms;
     if (fires) {
       const baseMapsContainer = new BaseMapsContainer({
         ngwMap: this.options.ngwMap,

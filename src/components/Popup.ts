@@ -2,7 +2,7 @@
 import bulmaCarousel from 'bulma-carousel';
 import { NgwMap } from '@nextgis/ngw-map';
 import { Feature, Geometry } from 'geojson';
-import { FeatureItemAttachment, ResourceItem } from '@nextgis/ngw-connector';
+import { FeatureItemAttachment } from '@nextgis/ngw-connector';
 import { prepareColumnValue } from '../utils';
 
 interface CollectorDate {
@@ -25,7 +25,6 @@ type CollectorProperty = string | number | CollectorDate | CollectorTime;
 
 export class Popup {
   private ngwMap!: NgwMap;
-  private _resourceItems: { [resourceId: number]: ResourceItem } = {};
 
   setNgwMap(ngwMap: NgwMap): void {
     this.ngwMap = ngwMap;
@@ -34,66 +33,74 @@ export class Popup {
   createPopupContent<G extends Geometry = any, P = Record<string, any>>(
     feature: Feature<G, P>,
     resourceId?: number,
+    attachment?: FeatureItemAttachment[],
   ): HTMLElement {
     const popupElement = document.createElement('div');
+    popupElement.className = 'columns';
+    popupElement.style.minWidth = '300px';
+    popupElement.style.maxWidth = '700px';
+
     const properties = document.createElement('div');
-    properties.className = 'properties';
-    const propertiesList: KeyValue[] = Object.entries(feature.properties).map(
-      ([key, value]) => {
-        return {
-          key,
-          value,
-        };
-      },
-    );
-    properties.innerHTML = this.createPropertiesHtml(propertiesList);
+
+    properties.style.maxHeight = '300px';
+    properties.style.maxWidth = '350px';
+    properties.style.overflow = 'auto';
+
+    properties.className = 'column properties';
 
     if (resourceId) {
-      const pre = document.createElement('div');
-      pre.appendChild(properties);
       popupElement.innerHTML = 'Загрузка';
-      this.updateElementContent(pre, resourceId, feature).then(() => {
+      this.getPropertiesContent(resourceId, feature).then((inner) => {
         popupElement.innerHTML = '';
-        popupElement.appendChild(pre);
+        if (inner) {
+          properties.innerHTML = inner;
+        }
+        popupElement.appendChild(properties);
       });
-    } else {
-      popupElement.appendChild(properties);
+
+      if (attachment && attachment.length) {
+        this._addPhotos(
+          popupElement,
+          attachment,
+          resourceId,
+          Number(feature.id),
+        );
+      }
     }
+
     return popupElement;
   }
 
   createPropertiesHtml(
     properties: Array<{ key: string; value: CollectorProperty }>,
   ): string {
-    let elem = '';
-    properties.forEach(({ key, value }) => {
+    let elem = '<table class="table"><tbody>';
+    for (const { key, value } of properties) {
+      let val = String(value);
       if (typeof value === 'object' && value) {
         if ('year' in value) {
-          value = [value.day, value.month, value.year].join('.');
+          val = [value.day, value.month, value.year].join('.');
         } else if ('hour' in value) {
-          value = [value.hour, value.minute].join(':');
+          val = [value.hour, value.minute].join(':');
         }
       }
       elem += `
-      <div class="columns is-mobile">
-        <div class="column is-two-fifths">${key}</div>
-        <div class="column">${prepareColumnValue(value)}</div>
-      </div>
+      <tr>
+        <th>${key}</th>
+        <td>${prepareColumnValue(val)}</td>
+      </tr>
       `;
-    });
+    }
+    elem += '</tbody></table>';
     return elem;
   }
 
-  async updateElementContent<
+  async getPropertiesContent<
     G extends Geometry = any,
     P extends Record<string, any> = Record<string, any>,
-  >(
-    element: HTMLElement,
-    resourceId: number,
-    feature: Feature<G, P>,
-  ): Promise<ResourceItem> {
-    const item = await this._getResourceItem(resourceId);
-    if (item.feature_layer) {
+  >(resourceId: number, feature: Feature<G, P>): Promise<string | undefined> {
+    const item = await this.ngwMap.connector.getResource(resourceId);
+    if (item && item.feature_layer) {
       const newProperties: KeyValue[] = [];
       item.feature_layer.fields.forEach((x) => {
         if (x.grid_visibility) {
@@ -103,13 +110,8 @@ export class Popup {
           }
         }
       });
-      const newContent = this.createPropertiesHtml(newProperties);
-      const pre = element.getElementsByClassName('properties')[0];
-      if (pre) {
-        pre.innerHTML = newContent;
-      }
+      return this.createPropertiesHtml(newProperties);
     }
-    return item;
   }
 
   async _addPhotos(
@@ -119,13 +121,13 @@ export class Popup {
     fid: number,
   ): Promise<void> {
     const attachmentElement = document.createElement('div');
-
-    attachmentElement.className = 'carousel attachment';
+    attachmentElement.style.width = '300px';
+    attachmentElement.className = 'column carousel attachment';
     for (const img of attachment) {
-      const width = 300;
-      const height = 300;
+      const width = 350;
+      const height = 350;
       const figure = document.createElement('figure');
-      figure.className = `image is-${width}x${height}`;
+      figure.className = `image`;
       const src = await this._loadImage(img, {
         width,
         height,
@@ -138,17 +140,7 @@ export class Popup {
       attachmentElement.appendChild(figure);
     }
     element.appendChild(attachmentElement);
-    bulmaCarousel.attach(attachmentElement);
-  }
-
-  private async _getResourceItem(resourceId: number) {
-    if (!this._resourceItems[resourceId]) {
-      const item = await this.ngwMap.connector.get('resource.item', null, {
-        id: resourceId,
-      });
-      this._resourceItems[resourceId] = item;
-    }
-    return this._resourceItems[resourceId];
+    bulmaCarousel.attach(attachmentElement, { slidesToShow: 1 });
   }
 
   private _loadImage(

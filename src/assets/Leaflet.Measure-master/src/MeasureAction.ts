@@ -79,7 +79,7 @@ export class MeasureAction extends Handler {
         this._addLable(
           latlng,
           getDistanceString(this._totalDistance, this.options.messages),
-          'leaflet-measure-lable',
+          'leaflet-measure-label',
         );
       }
     } else {
@@ -90,7 +90,7 @@ export class MeasureAction extends Handler {
         this._addLable(
           latlng,
           this.options.messages.start,
-          'leaflet-measure-lable',
+          'leaflet-measure-label',
         );
       }
       this._trail.points.push(latlng);
@@ -153,14 +153,14 @@ export class MeasureAction extends Handler {
             this._addLable(
               this._lastPoint,
               getAreaString(this._trail.points, this.options.messages),
-              'leaflet-measure-lable',
+              'leaflet-measure-label',
               true,
             );
           } else {
             this._addLable(
               this._lastPoint,
               getDistanceString(this._totalDistance, this.options.messages),
-              'leaflet-measure-lable',
+              'leaflet-measure-label',
               true,
             );
           }

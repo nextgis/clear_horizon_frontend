@@ -2,7 +2,7 @@ import './FiresContainer.css';
 
 import { defined } from '@nextgis/utils';
 import { VectorResourceAdapter } from '@nextgis/ngw-kit';
-import { FiresContainer } from './FiresContainer';
+import { LayersContainer } from './LayersContainer';
 
 const SELECT = [
   ['24', '24 часа'],
@@ -11,7 +11,7 @@ const SELECT = [
   ['168', 'неделя'],
 ];
 
-export class FirmsFiresContainer extends FiresContainer {
+export class FirmsFiresContainer extends LayersContainer {
   _createContainer(): HTMLElement {
     const container = super._createContainer();
 
@@ -36,7 +36,7 @@ export class FirmsFiresContainer extends FiresContainer {
     });
 
     selector.onchange = () => {
-      this.options.fires.forEach((x) => {
+      this.options.layers.forEach((x) => {
         const id = x.id;
         if (defined(id)) {
           const layer = this.ngwMap.getLayer(id) as VectorResourceAdapter;

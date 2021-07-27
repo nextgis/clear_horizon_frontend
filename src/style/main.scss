@@ -1,31 +1,35 @@
-@import "./variables.scss";
+@import './variables.scss';
 
 $top: $navbar-height;
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
-html, body, #container, #map {
-    width: 100%;
-    height: 100%;
+html,
+body,
+#container,
+#map {
+	width: 100%;
+	height: 100%;
 }
 
 html {
-    overflow: hidden;
+	overflow: hidden;
 }
 
 #container {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: stretch;
-    height: 100%;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: stretch;
+	height: 100%;
 }
 
-#tree, #map {
-    height: 100%;
+#tree,
+#map {
+	height: 100%;
 }
 
 .overlap-navbar {
@@ -34,17 +38,12 @@ html {
 	width: 100%;
 }
 
-
-
-
-.dialog--form {}
-
 .dialog--input {
-    margin: 5px;
+	margin: 5px;
 }
 
 .dialog--button {
-    padding: 5px;
+	padding: 5px;
 }
 
 .leaflet-top {
@@ -53,22 +52,22 @@ html {
 }
 
 .ngw-map-container.leaflet-container {
-    background: #fff;
+	background: #fff;
 }
 
 .leaflet-pane.leaflet-popup-pane {
-    z-index: 4500;
+	z-index: 4500;
 }
 
 .leaflet-pane.leaflet-tooltip-pane {
-    z-index: 10002;
+	z-index: 10002;
 }
 
 .leaflet-pane.leaflet-marker-pane {
 	z-index: 4030;
 }
 
-.leaflet-sidebar{
+.leaflet-sidebar {
 	padding-top: $top;
 	padding-bottom: 0;
 }
@@ -91,14 +90,13 @@ html {
 
 .navbar-brand .left-burger {
 	align-items: flex-start;
-	display: block!important;
+	display: block !important;
 }
 
 .navbar-brand .left-burger.navbar-burger {
 	margin-left: 0;
 	margin-right: 0;
 }
-
 
 .polyline-measure-controlOnBgColor,
 .toggle-control.active {
@@ -117,8 +115,7 @@ html {
 	display: flex;
 }
 
-
 // fix measure label
-.leaflet-measure-lable .content {
-    margin-bottom: 0!important;
+.leaflet-measure-label .content {
+	margin-bottom: 0 !important;
 }

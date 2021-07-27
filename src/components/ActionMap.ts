@@ -1,5 +1,4 @@
 import 'leaflet/dist/leaflet.css';
-import 'bulma-carousel/dist/css/bulma-carousel.min.css';
 import './ActionMap.css';
 
 import { Control, Map, Layer } from 'leaflet';
@@ -8,9 +7,9 @@ import ShareButtons from 'share-buttons/dist/share-buttons';
 
 import {
   NgwMap,
-  ToggleControl,
   NgwLayers,
   LocationEvent,
+  ToggleControl,
   VectorAdapterOptions,
 } from '@nextgis/ngw-map';
 import { CirclePaint } from '@nextgis/paint';
@@ -26,15 +25,19 @@ import { QmsAdapterOptions } from '@nextgis/qms-kit';
 import CancelablePromise from '@nextgis/cancelable-promise';
 import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
-import { AppOptions } from '../App';
-import { Auth } from './Auth/Auth';
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
 import { createMeasureControl } from './createMeasureControl';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
 import { daysBehindFilter } from '../utils/daysBehindRange';
-import { FiresAdapterOptions } from '../interfaces';
+import {
+  AppOptions,
+  FiresAdapterOptions,
+  FirmsLayerOptions,
+  SensorLayerOptions,
+  UserFiresLayerOptions,
+} from '../interfaces';
 import { NOW } from '../constants';
 
 export class ActionMap {
@@ -62,7 +65,7 @@ export class ActionMap {
     //   // cancel login
     // }
 
-    const { basemaps, fires, userFires } = opt;
+    const { basemaps, firms, userFires, sensors } = opt;
 
     const ngwMap = new NgwMap<Map, Layer>({
       mapAdapter: new MapAdapter(),
@@ -113,13 +116,15 @@ export class ActionMap {
       }
     });
 
-    await this._addUserFires(opt.userFires);
-    await this._addFires(opt.fires);
+    await this._addFireLayer(opt.userFires);
+    await this._addFirms(opt.firms);
+    await this._addSensors(opt.sensors);
     this._createGetCoordinateControl();
 
     this._addTreeControl({
       ngwLayers,
-      fires,
+      firms,
+      sensors,
       userFires,
       bookmarks,
     });
@@ -136,21 +141,21 @@ export class ActionMap {
     this.ngwMap.locate({ setView: false }, { locationfound });
   }
 
-  private async _createAuthControl(auth: Auth) {
-    const authBtn = document.getElementsByClassName(
-      'js-auth-btn',
-    )[0] as HTMLElement;
-    const getStatus = () => {
-      return !!(this.ngwMap.connector && this.ngwMap.connector.user);
-    };
-    const onClick = () => {
-      auth.logout();
-      window.location.reload();
-    };
-    authBtn.innerHTML = getStatus() ? 'Выйти' : 'Войти';
-    authBtn.style.display = 'block';
-    authBtn.addEventListener('click', onClick);
-  }
+  // private async _createAuthControl(auth: Auth) {
+  //   const authBtn = document.getElementsByClassName(
+  //     'js-auth-btn',
+  //   )[0] as HTMLElement;
+  //   const getStatus = () => {
+  //     return !!(this.ngwMap.connector && this.ngwMap.connector.user);
+  //   };
+  //   const onClick = () => {
+  //     auth.logout();
+  //     window.location.reload();
+  //   };
+  //   authBtn.innerHTML = getStatus() ? 'Выйти' : 'Войти';
+  //   authBtn.style.display = 'block';
+  //   authBtn.addEventListener('click', onClick);
+  // }
 
   private _createShareControl() {
     const shareModal = document.getElementsByClassName('js-modal')[0];
@@ -234,7 +239,7 @@ export class ActionMap {
     return html;
   }
 
-  private async _addUserFires(
+  private async _addFireLayer(
     x?: NgwLayerOptions<'GEOJSON'>,
     adapterOptions?: VectorAdapterOptions,
   ) {
@@ -243,22 +248,18 @@ export class ActionMap {
         x.adapterOptions && x.adapterOptions.paint
           ? (x.adapterOptions.paint as CirclePaint)
           : {};
-      this.ngwMap.addNgwLayer({
+      return this.ngwMap.addNgwLayer({
         resource: x.resource,
         id: x.id,
         adapterOptions: {
           ...x.adapterOptions,
           paint: {
             ...paint,
-            stroke: true,
-            fillOpacity: 0.6,
             radius: 5,
           },
           selectable: true,
           selectedPaint: {
             ...paint,
-            stroke: true,
-            fillOpacity: 0.9,
             radius: 7,
           },
           ...adapterOptions,
@@ -272,31 +273,39 @@ export class ActionMap {
     }
   }
 
-  private async _addFires(fires?: NgwLayerOptions<'GEOJSON'>[]) {
+  private async _addFirms(fires?: FirmsLayerOptions[]) {
     if (fires) {
       for (const x of fires) {
-        await this._addUserFires(x);
+        await this._addFireLayer(x);
       }
     }
   }
 
+  private async _addSensors(sensor?: SensorLayerOptions) {
+    return sensor && this.ngwMap.addNgwLayer(sensor);
+  }
+
   private async _addTreeControl(opt: {
     ngwLayers: NgwLayers;
-    fires?: NgwLayerOptions<'GEOJSON'>[];
-    userFires?: NgwLayerOptions<'GEOJSON'>;
+    firms?: FirmsLayerOptions[];
+    userFires?: UserFiresLayerOptions;
+    sensors?: SensorLayerOptions;
     bookmarks?: ResourceHierarchy[];
   }) {
     const sidebarToggleBtn = document.getElementsByClassName('js-sidebar')[0];
 
     const isActive = () => sidebarToggleBtn.classList.contains('is-active');
-    const activeBurger = () => sidebarToggleBtn.classList.add('is-active');
-    const disactiveBurger = () =>
+    const activateBurger = () => sidebarToggleBtn.classList.add('is-active');
+    const deactivateBurger = () =>
       sidebarToggleBtn.classList.remove('is-active');
 
     await this.ngwMap.onLoad();
 
     this.tree = new MapSettingsPanel(this, {
       ...opt,
+      onDateChange: () => {
+        this._cleanSelection();
+      },
       ngwMap: this.ngwMap,
     });
 
@@ -305,10 +314,10 @@ export class ActionMap {
       if (status) {
         stopToggleControlsFor('tree');
         this.tree && this.tree.show();
-        activeBurger();
+        activateBurger();
       } else {
         this.tree && this.tree.hide();
-        disactiveBurger();
+        deactivateBurger();
       }
     };
     sidebarToggleBtn.addEventListener('click', () => {
@@ -320,7 +329,7 @@ export class ActionMap {
     addStopToggleControl('tree', () => toggle(false));
   }
 
-  private _clean() {
+  private _cleanSelection() {
     if (
       this._promises.getFeaturePromise &&
       this._promises.getFeaturePromise.cancel
@@ -331,7 +340,7 @@ export class ActionMap {
   }
 
   private _highlighNgwLayer(e: NgwIdentify) {
-    this._clean();
+    this._cleanSelection();
     const paramsList = getIdentifyItems(e);
     const params = paramsList[0];
     if (params) {
@@ -341,41 +350,31 @@ export class ActionMap {
           extensions: ['attachment'],
         })
         .then((item) => {
-          item &&
+          if (item) {
             item.toGeojson().then((geojson) => {
               this.ngwMap.addLayer('GEOJSON', {
                 id: 'highlight',
                 data: geojson,
                 visibility: true,
                 paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
-                // selectable: true,
                 selectOnHover: true,
                 popup: true,
-                // popupOnSelect: true,
                 popupOptions: {
                   createPopupContent: (e) => {
                     if (e.feature) {
                       const element = this.popup.createPopupContent(
                         e.feature,
                         resourceId,
+                        item.extensions.attachment,
                       );
-                      if (
-                        item.extensions.attachment &&
-                        item.extensions.attachment.length
-                      ) {
-                        this.popup._addPhotos(
-                          element,
-                          item.extensions.attachment,
-                          params.resourceId,
-                          params.featureId,
-                        );
-                      }
+
                       return element;
                     }
                   },
                 },
               });
             });
+          }
         });
     }
   }

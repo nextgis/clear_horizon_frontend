@@ -51,7 +51,7 @@
 .leaflet-measure-map {
   cursor: crosshair !important;
 }
-.leaflet-measure-lable {
+.leaflet-measure-label {
     padding: 1px 7px;
     background-color: #ffffff;
     box-shadow: 0 1px 3px rgba(0,0,0,0.4);
@@ -60,12 +60,12 @@
     display: inline-block;
     position: absolute;
 }
-.leaflet-measure-lable .content {
+.leaflet-measure-label .content {
     width: auto;
     display: inline-block;
 }
 
-.leaflet-measure-lable .close {
+.leaflet-measure-label .close {
     width: 15px;
     height: 15px;
     position: relative !important;
@@ -74,7 +74,7 @@
     cursor: pointer;
 }
 
-.leaflet-measure-lable .close .icon {
+.leaflet-measure-label .close .icon {
     width: 15px;
     height: 15px;
     cursor: pointer;

@@ -8,6 +8,11 @@ export const DATE_RANGE_SELECT: [days: number, text: string][] = [
   [168, 'неделя'],
 ];
 
+export const USERFIRE_ID = 'USERFIRE';
+export const MODIS_ID = 'MODIS';
+export const VIIRS_ID = 'VIIRS';
+export const SENSOR_ID = 'SENSOR';
+
 export let NOW = new Date();
 
 // update global NOW each hour for long session

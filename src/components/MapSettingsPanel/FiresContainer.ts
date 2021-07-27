@@ -1,111 +1,97 @@
-import './FiresContainer.css';
+import { formatTime } from '../../utils/formatTime';
+import { createCalendar } from './createCalendar';
+import { LayersContainer, LayersContainerOptions } from './LayersContainer';
 
-import { defined } from '@nextgis/utils';
+import type { ResourceAdapter } from '@nextgis/ngw-kit';
+import type { PropertiesFilter } from '@nextgis/properties-filter';
+import type { CreateCalendarOptions } from './createCalendar';
+import type { FiresLayerProps } from '../../interfaces';
 
-import type { LayerAdapter, NgwMap } from '@nextgis/ngw-map';
-import type { CirclePaint } from '@nextgis/paint';
-import type { ResourceAdapter, NgwLayerOptions } from '@nextgis/ngw-kit';
-import type { FireResource } from '../../App';
-
-export interface FiresContainerOptions {
-  ngwMap: NgwMap;
-  fires: NgwLayerOptions<'GEOJSON'>[];
+export interface FiresContainerOptions extends LayersContainerOptions {
   dateRange: [Date | undefined, Date | undefined];
   defaultDateRange: [Date | undefined, Date | undefined];
   timedelta: number;
+  onDateChange?: () => void;
 }
 
-export abstract class FiresContainer {
-  protected readonly ngwMap: NgwMap;
-  protected _container: HTMLElement;
-
-  constructor(protected options: FiresContainerOptions) {
-    this.ngwMap = options.ngwMap;
-    this._container = this._createContainer();
-  }
-
-  getContainer(): HTMLElement {
-    return this._container;
-  }
-
+export class FiresContainer extends LayersContainer<FiresContainerOptions> {
   protected _createContainer(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'fires-contentainer panel-content-padding ';
+    const container = super._createContainer();
 
-    const firesEl = document.createElement('div');
-    firesEl.className = 'fires-contentainer__layers';
-    for (const f of this.options.fires) {
-      this._createFireItem(f, firesEl);
-    }
-    container.appendChild(firesEl);
-
+    const calendarWrapper = this._createCalendar();
+    container.insertBefore(calendarWrapper, container.firstChild);
     return container;
   }
 
-  protected onLayerAdd(id: string, cb: (layer: ResourceAdapter) => void): void {
-    const ngwMap = this.options.ngwMap;
-    const layer = ngwMap && (ngwMap.getLayer(id) as ResourceAdapter);
-    if (layer) {
-      cb(layer);
-    } else {
-      const onLayerAdd = (e: LayerAdapter) => {
-        if (e.id === id) {
-          cb(e as ResourceAdapter);
-          this.ngwMap.emitter.off('layer:add', onLayerAdd);
-        }
-      };
-      this.ngwMap.emitter.on('layer:add', onLayerAdd);
-    }
-  }
+  private _createCalendar(): HTMLElement {
+    const calendarWrapper = document.createElement('div');
+    const fires = this.options.layers;
 
-  private _createFireItem(fire: FireResource, container: HTMLElement): void {
-    const elem = document.createElement('div');
-    elem.className = 'tree-container__item';
-    const id = fire.id;
-    if (!defined(id)) return;
-
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = 'загрузка...';
-    container.appendChild(wrapper);
-
-    const createItem = (layer_: ResourceAdapter): void => {
-      const item = layer_.item;
-      wrapper.innerHTML = '';
-      if (item) {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'checkbox');
-
-        input.checked = true;
-
-        // visibility.emitter.on('change', (ev: CheckChangeEvent) => {
-        //   input.checked = ev.value;
-        // });
-        input.onclick = () => {
-          this.ngwMap.toggleLayer(id, input.checked);
-        };
-
-        const name = document.createElement('span');
-        const displayName = item.resource.display_name.split('__')[0];
-        name.innerHTML = displayName.replace('fires', '').trim();
-        const symbol = this._createSymbol(fire);
-        elem.appendChild(input);
-        elem.appendChild(symbol);
-        elem.appendChild(name);
-        wrapper.appendChild(elem);
+    const promises: Promise<ResourceAdapter>[] = [];
+    fires.forEach((x) => {
+      const id = x.id;
+      if (id) {
+        const promise = new Promise<ResourceAdapter>((resolve) => {
+          this.onLayerAdd(id, resolve);
+        });
+        promises.push(promise);
       }
-    };
-    this.onLayerAdd(id, (layer) => createItem(layer));
+    });
+    Promise.all(promises).then((fires) => {
+      const block = this._buildCalendarBlock(
+        fires,
+        this.options.dateRange,
+        this.options.defaultDateRange,
+      );
+      calendarWrapper.appendChild(block);
+    });
+
+    return calendarWrapper;
   }
 
-  private _createSymbol(fire: FireResource): HTMLElement {
-    const symbol = document.createElement('span');
-    symbol.className = 'item-symbol';
-    const color = (fire.adapterOptions?.paint as CirclePaint).color;
-    if (typeof color === 'string') {
-      symbol.style.color = color;
-      symbol.style.borderColor = color;
-      symbol.style.backgroundColor = color;
+  private _buildCalendarBlock(
+    layers: ResourceAdapter[],
+    extremeItems: [Date?, Date?],
+    defaultItems: [Date?, Date?],
+  ) {
+    const [min, max]: (Date | undefined)[] = extremeItems;
+    const [startDate, endDate]: (Date | undefined)[] = defaultItems;
+    const opt: CreateCalendarOptions = {
+      timedelta: this.options.timedelta,
+      onChange: (e) => {
+        for (const l of layers) {
+          const { dateField, timeUnit } = (l.options.props ||
+            {}) as FiresLayerProps;
+          if (dateField) {
+            const filter: PropertiesFilter = [];
+            if (e.start) {
+              filter.push([dateField, 'ge', formatTime(e.start, timeUnit)]);
+            }
+            if (e.end) {
+              filter.push([dateField, 'le', formatTime(e.end, timeUnit)]);
+            }
+            if (l.propertiesFilter) {
+              l.propertiesFilter(filter);
+            }
+          }
+        }
+        if (this.options.onDateChange) {
+          this.options.onDateChange();
+        }
+      },
+    };
+    if (min) {
+      opt.minDate = min;
     }
-    return symbol;
+    if (startDate) {
+      opt.startDate = startDate;
+    }
+    if (max) {
+      opt.maxDate = max;
+    }
+    if (endDate) {
+      opt.endDate = endDate;
+    }
+    return createCalendar(opt);
   }
 }

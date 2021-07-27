@@ -2,7 +2,11 @@ import type { Map } from 'leaflet';
 
 import type { NgwMap, NgwLayers } from '@nextgis/ngw-map';
 import type { ResourceHierarchy } from '@nextgis/ngw-connector';
-import type { NgwLayerOptions } from '@nextgis/ngw-kit';
+import type {
+  FirmsLayerOptions,
+  SensorLayerOptions,
+  UserFiresLayerOptions,
+} from '../../interfaces';
 
 export interface MapSettingsPanelOptions {
   target?: HTMLElement | string;
@@ -10,7 +14,9 @@ export interface MapSettingsPanelOptions {
   status?: boolean;
   ngwMap: NgwMap<Map>;
   ngwLayers: NgwLayers;
-  userFires?: NgwLayerOptions<'GEOJSON'>;
-  fires?: NgwLayerOptions<'GEOJSON'>[];
+  userFires?: UserFiresLayerOptions;
+  firms?: FirmsLayerOptions[];
+  sensors?: SensorLayerOptions;
   bookmarks?: ResourceHierarchy[];
+  onDateChange?: () => void;
 }
