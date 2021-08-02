@@ -1,7 +1,6 @@
-import 'leaflet/dist/leaflet.css';
+// import 'leaflet/dist/leaflet.css';
 import './ActionMap.css';
 
-import { Control, Map, Layer } from 'leaflet';
 // @ts-ignore
 import ShareButtons from 'share-buttons/dist/share-buttons';
 
@@ -19,7 +18,8 @@ import {
   getIdentifyItems,
 } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
-import MapAdapter from '@nextgis/leaflet-map-adapter';
+// import MapAdapter from '@nextgis/leaflet-map-adapter';
+import MapAdapter from '@nextgis/ol-map-adapter';
 import UrlRuntimeParams from '@nextgis/url-runtime-params';
 import { QmsAdapterOptions } from '@nextgis/qms-kit';
 import CancelablePromise from '@nextgis/cancelable-promise';
@@ -27,18 +27,21 @@ import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
-import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
-import { createMeasureControl } from './createMeasureControl';
+// import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
+// import { createMeasureControl } from './createMeasureControl';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
 import { daysBehindFilter } from '../utils/daysBehindRange';
-import {
+
+import { NOW } from '../constants';
+
+import type { Control, Map, Layer } from 'leaflet';
+import type {
   AppOptions,
   FiresAdapterOptions,
   FirmsLayerOptions,
   SensorLayerOptions,
   UserFiresLayerOptions,
 } from '../interfaces';
-import { NOW } from '../constants';
 
 export class ActionMap {
   ngwMap!: NgwMap<Map, Layer, any>;
@@ -99,7 +102,7 @@ export class ActionMap {
         '<a href="https://nextgis.com" target="_blank">©NextGIS</a>',
       ],
     });
-    createMeasureControl(ngwMap);
+    // createMeasureControl(ngwMap);
     this._createShareControl();
     // await this._createAuthControl(auth);
     // this.ngwMap.addControl(this.authControl, 'top-right');
@@ -119,7 +122,7 @@ export class ActionMap {
     await this._addFireLayer(opt.userFires);
     await this._addFirms(opt.firms);
     await this._addSensors(opt.sensors);
-    this._createGetCoordinateControl();
+    // this._createGetCoordinateControl();
 
     this._addTreeControl({
       ngwLayers,
@@ -191,21 +194,21 @@ export class ActionMap {
     this.ngwMap.addControl(shareControl, 'bottom-right');
   }
 
-  private async _createGetCoordinateControl() {
-    const control = new GetCoordinatePanelControl(this, {
-      toggle: (status) => {
-        if (status) {
-          stopToggleControlsFor('coordinate');
-          this.ngwMap.disableSelection();
-        } else {
-          this.ngwMap.enableSelection();
-        }
-      },
-    });
-    const toggleControl = await this.ngwMap.createToggleControl(control);
-    this.ngwMap.addControl(toggleControl, 'top-left');
-    addStopToggleControl('coordinate', () => toggleControl.onClick(false));
-  }
+  // private async _createGetCoordinateControl() {
+  //   const control = new GetCoordinatePanelControl(this, {
+  //     toggle: (status) => {
+  //       if (status) {
+  //         stopToggleControlsFor('coordinate');
+  //         this.ngwMap.disableSelection();
+  //       } else {
+  //         this.ngwMap.enableSelection();
+  //       }
+  //     },
+  //   });
+  //   const toggleControl = await this.ngwMap.createToggleControl(control);
+  //   this.ngwMap.addControl(toggleControl, 'top-left');
+  //   addStopToggleControl('coordinate', () => toggleControl.onClick(false));
+  // }
 
   private _createLocateControl() {
     const onClick = () => this._locate();
