@@ -1,15 +1,10 @@
 import { EventEmitter } from 'events';
 import { create } from '@nextgis/dom';
+import { treeFind } from '@nextgis/tree';
 
 import type StrictEventEmitter from 'strict-event-emitter-types';
-import type { MapControl, WebMap } from '@nextgis/webmap';
-import type { SidebarControlEvents } from './interfaces';
-
-export interface SidebarControlOptions {
-  closeButton?: boolean;
-  autoPan?: boolean;
-  position?: 'left' | 'right';
-}
+import type { MapAdapter, MapControl } from '@nextgis/webmap';
+import type { SidebarControlEvents, SidebarControlOptions } from './interfaces';
 
 export class SidebarControl implements MapControl {
   readonly emitter: StrictEventEmitter<EventEmitter, SidebarControlEvents> =
@@ -25,7 +20,7 @@ export class SidebarControl implements MapControl {
   private _container: HTMLElement;
   private _contentContainer?: HTMLElement;
   private _closeButton?: HTMLElement;
-  private _map?: WebMap;
+  private _map?: MapAdapter;
 
   constructor(
     placeholder: HTMLElement | string,
@@ -71,7 +66,7 @@ export class SidebarControl implements MapControl {
     }
   }
 
-  onAdd(map: WebMap): HTMLElement {
+  onAdd(map: MapAdapter): HTMLElement {
     const container = this._container;
     const content = this._contentContainer;
 
@@ -87,7 +82,8 @@ export class SidebarControl implements MapControl {
     );
 
     // Attach sidebar container to controls container
-    const controlContainer = map.getControlContainer();
+    const controlContainer =
+      map.getControlContainer && map.getControlContainer();
     if (controlContainer) {
       controlContainer.insertBefore(container, controlContainer.firstChild);
     }
@@ -119,7 +115,8 @@ export class SidebarControl implements MapControl {
     const content = this._contentContainer;
 
     // Remove sidebar container from controls container
-    const controlContainer = map.getControlContainer();
+    const controlContainer =
+      map.getControlContainer && map.getControlContainer();
     if (controlContainer) {
       controlContainer.removeChild(container);
     }
@@ -157,7 +154,7 @@ export class SidebarControl implements MapControl {
 
   show(): void {
     if (!this.isVisible()) {
-      this._container.classList.add('visible');
+      this._getTopSideControlContainer().classList.add('visible');
       // if (this.options.autoPan) {
       //   this._map.panBy([-this.getOffset() / 2, 0], {
       //     duration: 0.5,
@@ -170,7 +167,7 @@ export class SidebarControl implements MapControl {
 
   hide(e?: MouseEvent): void {
     if (this.isVisible()) {
-      this._container.classList.remove('visible');
+      this._getTopSideControlContainer().classList.remove('visible');
       // if (this.options.autoPan) {
       //   this._map.panBy([this.getOffset() / 2, 0], {
       //     duration: 0.5,
@@ -231,6 +228,14 @@ export class SidebarControl implements MapControl {
     }
   }
 
+  private _getTopSideControlContainer(): HTMLElement {
+    const topElement = treeFind(
+      this._container,
+      (x) => x.classList.contains('webmap-ctrl-' + this.options.position),
+      (x) => x.parentNode as HTMLElement,
+    );
+    return topElement || this._container;
+  }
   private $stop = (e: Event) => e.stopPropagation();
   private $hide = (e?: MouseEvent) => this.hide(e);
   private $handleTransitionEvent = (e: Event) => {

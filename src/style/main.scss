@@ -46,7 +46,11 @@ html {
 	padding: 5px;
 }
 
-.leaflet-top {
+.leaflet-top,
+.webmap-ctrl-top-left,
+.webmap-ctrl-top-right,
+.webmap-ctrl-left,
+.webmap-ctrl-right {
 	top: $top;
 	margin-top: 0;
 }
@@ -76,14 +80,18 @@ html {
 	padding-left: 0;
 }
 
-.leaflet-sidebar > .leaflet-control {
+.webmap-ctrl-left {
+	padding: 0;
+}
+
+.webmap-sidebar {
 	padding: 0;
 	background-color: $navbar-background-color;
 	border: none;
 	border-radius: 0;
 }
 
-.leaflet-touch .leaflet-sidebar > .leaflet-control {
+.webmap-touch .webmap-sidebar {
 	border: none;
 	border-radius: 0;
 }

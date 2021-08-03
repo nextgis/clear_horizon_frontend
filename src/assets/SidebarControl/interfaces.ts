@@ -16,3 +16,9 @@ export interface SidebarControlEvents {
    */
   hidden: any;
 }
+
+export interface SidebarControlOptions {
+  closeButton?: boolean;
+  autoPan?: boolean;
+  position?: 'left' | 'right';
+}

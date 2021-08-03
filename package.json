@@ -26,6 +26,7 @@
     "date-fns": "^2.23.0",
     "flatpickr": "^4.6.9",
     "leaflet-sidebar": "github:rendrom/leaflet-sidebar",
+    "polylabel": "^1.1.0",
     "regenerator-runtime": "^0.13.9",
     "share-buttons": "github:rendrom/share-buttons"
   },
@@ -37,6 +38,7 @@
     "@types/geojson": "^7946.0.8",
     "@types/leaflet": "^1.7.4",
     "@types/node": "^16.4.7",
+    "@types/polylabel": "^1.0.5",
     "@types/wellknown": "^0.5.1",
     "babel-loader": "^8.2.2",
     "css-loader": "^6.2.0",

@@ -1,4 +1,5 @@
 // import 'leaflet/dist/leaflet.css';
+import 'ol/ol.css';
 import './ActionMap.css';
 
 // @ts-ignore
@@ -27,7 +28,7 @@ import { ResourceHierarchy } from '@nextgis/ngw-connector';
 
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
-// import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
+import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
 // import { createMeasureControl } from './createMeasureControl';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
 import { daysBehindFilter } from '../utils/daysBehindRange';
@@ -122,7 +123,7 @@ export class ActionMap {
     await this._addFireLayer(opt.userFires);
     await this._addFirms(opt.firms);
     await this._addSensors(opt.sensors);
-    // this._createGetCoordinateControl();
+    this._createGetCoordinateControl();
 
     this._addTreeControl({
       ngwLayers,
@@ -194,21 +195,21 @@ export class ActionMap {
     this.ngwMap.addControl(shareControl, 'bottom-right');
   }
 
-  // private async _createGetCoordinateControl() {
-  //   const control = new GetCoordinatePanelControl(this, {
-  //     toggle: (status) => {
-  //       if (status) {
-  //         stopToggleControlsFor('coordinate');
-  //         this.ngwMap.disableSelection();
-  //       } else {
-  //         this.ngwMap.enableSelection();
-  //       }
-  //     },
-  //   });
-  //   const toggleControl = await this.ngwMap.createToggleControl(control);
-  //   this.ngwMap.addControl(toggleControl, 'top-left');
-  //   addStopToggleControl('coordinate', () => toggleControl.onClick(false));
-  // }
+  private async _createGetCoordinateControl() {
+    const control = new GetCoordinatePanelControl(this, {
+      toggle: (status) => {
+        if (status) {
+          stopToggleControlsFor('coordinate');
+          this.ngwMap.disableSelection();
+        } else {
+          this.ngwMap.enableSelection();
+        }
+      },
+    });
+    const toggleControl = await this.ngwMap.createToggleControl(control);
+    this.ngwMap.addControl(toggleControl, 'top-left');
+    addStopToggleControl('coordinate', () => toggleControl.onClick(false));
+  }
 
   private _createLocateControl() {
     const onClick = () => this._locate();

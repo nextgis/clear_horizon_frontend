@@ -1,7 +1,6 @@
 import './MapSettingsPanel.css';
-// @ts-ignore
-import Sidebar from 'leaflet-sidebar';
-import 'leaflet-sidebar/src/L.Control.Sidebar.css';
+import Sidebar from '../../assets/SidebarControl';
+import '../../assets/SidebarControl/SidebarControl.scss';
 
 import { NgwLayers } from '@nextgis/ngw-map';
 
@@ -30,7 +29,7 @@ export class MapSettingsPanel {
   sidebar: Sidebar;
 
   private _container: HTMLElement;
-  private _target?: HTMLElement;
+  private _target: HTMLElement;
 
   private ngwLayers!: NgwLayers;
 
@@ -47,13 +46,17 @@ export class MapSettingsPanel {
       }
     } else if (this.options.target instanceof HTMLElement) {
       this._target = this.options.target;
+    } else {
+      throw new Error('`target` option is not set');
     }
     this.sidebar = new Sidebar(this._target, {
       closeButton: false,
       position: 'left',
       autoPan: false,
     });
-    this.sidebar.addTo(this.actionMap.ngwMap.mapAdapter.map);
+    const sidebarControl = this.actionMap.ngwMap.createControl(this.sidebar);
+    this.actionMap.ngwMap.addControl(sidebarControl, 'left');
+    // this.sidebar.addTo(this.actionMap.ngwMap.mapAdapter.map);
 
     this.ngwLayers = this.options.ngwLayers;
 
