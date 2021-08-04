@@ -84,6 +84,18 @@ html {
 	padding: 0;
 }
 
+.leaflet-sidebar > .leaflet-control {
+	padding: 0;
+	background-color: $navbar-background-color;
+	border: none;
+	border-radius: 0;
+}
+
+.leaflet-touch .leaflet-sidebar > .leaflet-control {
+	border: none;
+	border-radius: 0;
+}
+
 .webmap-sidebar {
 	padding: 0;
 	background-color: $navbar-background-color;

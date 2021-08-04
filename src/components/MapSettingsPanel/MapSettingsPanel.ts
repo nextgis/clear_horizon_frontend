@@ -1,6 +1,10 @@
 import './MapSettingsPanel.css';
-import Sidebar from '../../assets/SidebarControl';
-import '../../assets/SidebarControl/SidebarControl.scss';
+// @ts-ignore
+import Sidebar from 'leaflet-sidebar';
+import 'leaflet-sidebar/src/L.Control.Sidebar.css';
+// import Sidebar from '../../assets/SidebarControl';
+// import '../../assets/SidebarControl/SidebarControl.scss';
+import '../../assets/SidebarControl/SidebarControlLeaflet.scss';
 
 import { NgwLayers } from '@nextgis/ngw-map';
 
@@ -54,8 +58,13 @@ export class MapSettingsPanel {
       position: 'left',
       autoPan: false,
     });
-    const sidebarControl = this.actionMap.ngwMap.createControl(this.sidebar);
-    this.actionMap.ngwMap.addControl(sidebarControl, 'left');
+
+    this.sidebar.addTo(this.actionMap.ngwMap.mapAdapter.map);
+    // this.actionMap.ngwMap.createControl(this.sidebar).then((x) => {
+    //   x.onAdd(this.actionMap.ngwMap.mapAdapter);
+    // });
+
+    // this.actionMap.ngwMap.addControl(sidebarControl, 'top-left');
     // this.sidebar.addTo(this.actionMap.ngwMap.mapAdapter.map);
 
     this.ngwLayers = this.options.ngwLayers;

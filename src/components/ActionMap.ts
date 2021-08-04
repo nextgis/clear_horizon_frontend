@@ -1,5 +1,5 @@
-// import 'leaflet/dist/leaflet.css';
-import 'ol/ol.css';
+import 'leaflet/dist/leaflet.css';
+// import 'ol/ol.css';
 import './ActionMap.css';
 
 // @ts-ignore
@@ -19,8 +19,8 @@ import {
   getIdentifyItems,
 } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
-// import MapAdapter from '@nextgis/leaflet-map-adapter';
-import MapAdapter from '@nextgis/ol-map-adapter';
+import MapAdapter from '@nextgis/leaflet-map-adapter';
+// import MapAdapter from '@nextgis/ol-map-adapter';
 import UrlRuntimeParams from '@nextgis/url-runtime-params';
 import { QmsAdapterOptions } from '@nextgis/qms-kit';
 import CancelablePromise from '@nextgis/cancelable-promise';
@@ -29,7 +29,7 @@ import { ResourceHierarchy } from '@nextgis/ngw-connector';
 import { Popup } from './Popup';
 import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
 import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
-// import { createMeasureControl } from './createMeasureControl';
+import { createMeasureControl } from './createMeasureControl';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
 import { daysBehindFilter } from '../utils/daysBehindRange';
 
@@ -103,7 +103,7 @@ export class ActionMap {
         '<a href="https://nextgis.com" target="_blank">©NextGIS</a>',
       ],
     });
-    // createMeasureControl(ngwMap);
+    createMeasureControl(ngwMap);
     this._createShareControl();
     // await this._createAuthControl(auth);
     // this.ngwMap.addControl(this.authControl, 'top-right');

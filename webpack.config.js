@@ -106,10 +106,10 @@ module.exports = (env, argv) => {
         __BROWSER__: true,
         __DEV__: !isProd,
       }),
-      new webpack.ContextReplacementPlugin(
-        /date-fns[/\\]/,
-        new RegExp(`[/\\\\](${supportedLocales.join('|')})[/\\\\]index.js$`),
-      ),
+      // new webpack.ContextReplacementPlugin(
+      //   /date-fns[/\\]/,
+      //   new RegExp(`[/\\\\](${supportedLocales.join('|')})[/\\\\]index.js$`),
+      // ),
       // new FaviconsWebpackPlugin('./src/img/favicon.png')
     ],
 
