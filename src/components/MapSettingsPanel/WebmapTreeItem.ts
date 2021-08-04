@@ -40,12 +40,12 @@ export class WebmapTreeItem {
     if (item.display_name) {
       const input = document.createElement('input');
       input.setAttribute('type', 'checkbox');
-      const value = item.item_type === 'layer' ? item.layer_enabled : true;
-      input.checked = value;
-
+      // const value = item.item_type === 'layer' ? item.layer_enabled : true;
       const visibility = layer.properties.property(
         'visibility',
       ) as CheckProperty;
+      input.checked = !!visibility.get();
+
       if (visibility) {
         visibility.emitter.on('change', (ev: ChangeEvent) => {
           input.checked = ev.value;
