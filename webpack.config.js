@@ -4,7 +4,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const supportedLocales = ['ru', 'en'];
+// const supportedLocales = ['ru', 'en'];
 const alias = {};
 try {
   const { getAliases } = require('./@nextgis/scripts/aliases');

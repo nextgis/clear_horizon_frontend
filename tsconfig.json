@@ -31,7 +31,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.json",
-    "@nextgis/packages/global.d.ts"
+    "@nextgis/packages/global.d.ts",
+    "@nextgis/packages/leaflet-map-adapter/src/leaflet.d.ts",
   ],
   "exclude": [
     "node_modules"

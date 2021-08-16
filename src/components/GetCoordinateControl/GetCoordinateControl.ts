@@ -1,16 +1,15 @@
 import './GetCoordinateControl.css';
 import '../ToggleControl.css';
 import { ActionMap } from '../ActionMap';
-import {
-  ToggleControlOptions,
+import { Clipboard } from '@nextgis/utils';
+import { EventEmitter } from 'events';
+
+import type { Feature, Point } from 'geojson';
+import type {
   MapClickEvent,
   VectorLayerAdapter,
-  LayerDefinition,
+  ToggleControlOptions,
 } from '@nextgis/ngw-map';
-import { Clipboard } from '@nextgis/utils';
-
-import { EventEmitter } from 'events';
-import { Feature, Point } from 'geojson';
 
 export interface GetCoordinatePanelControlOptions {
   toggle?: (status: boolean) => void;
@@ -40,13 +39,13 @@ export class GetCoordinatePanelControl implements ToggleControlOptions {
   ) {
     this._toggle = options.toggle;
     this.actionMap.ngwMap
-      .addLayer('GEOJSON', {
+      .addFeatureLayer<any, Point>({
         id: 'show-coordinate-click',
         visibility: true,
         paint: { radius: 6 },
         popup: true,
         popupOptions: {
-          createPopupContent: (d: LayerDefinition<Feature<Point>>) => {
+          createPopupContent: (d) => {
             if (d.feature) {
               return this._createPopupContent(
                 d.feature.geometry.coordinates.map((x) => x.toFixed(5)),

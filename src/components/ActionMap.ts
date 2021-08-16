@@ -361,7 +361,6 @@ export class ActionMap {
                 data: geojson,
                 visibility: true,
                 paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
-                selectOnHover: true,
                 popup: true,
                 popupOptions: {
                   createPopupContent: (e) => {
