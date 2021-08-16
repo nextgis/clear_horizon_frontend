@@ -364,6 +364,10 @@ export class ActionMap {
                 popup: true,
                 popupOptions: {
                   createPopupContent: (e) => {
+                    e.onClose(() => {
+                      this._cleanSelection();
+                      this.ngwMap.unSelectLayers();
+                    });
                     if (e.feature) {
                       const element = this.popup.createPopupContent(
                         e.feature,
