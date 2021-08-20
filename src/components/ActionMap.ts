@@ -11,13 +11,10 @@ import {
   LocationEvent,
   ToggleControl,
   VectorAdapterOptions,
+  NgwIdentifyEvent,
 } from '@nextgis/ngw-map';
 import { CirclePaint } from '@nextgis/paint';
-import {
-  NgwIdentify,
-  NgwLayerOptions,
-  getIdentifyItems,
-} from '@nextgis/ngw-kit';
+import { NgwLayerOptions } from '@nextgis/ngw-kit';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
 // import MapAdapter from '@nextgis/ol-map-adapter';
@@ -343,46 +340,42 @@ export class ActionMap {
     this.ngwMap.removeLayer('highlight');
   }
 
-  private _highlighNgwLayer(e: NgwIdentify) {
+  private _highlighNgwLayer(e: NgwIdentifyEvent) {
     this._cleanSelection();
-    const paramsList = getIdentifyItems(e);
-    const params = paramsList[0];
-    if (params) {
-      const resourceId = params.resourceId;
-      this.ngwMap
-        .fetchIdentifyItem(e, {
-          extensions: ['attachment'],
-        })
-        .then((item) => {
-          if (item) {
-            item.toGeojson().then((geojson) => {
-              this.ngwMap.addLayer('GEOJSON', {
-                id: 'highlight',
-                data: geojson,
-                visibility: true,
-                paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
-                popup: true,
-                popupOptions: {
-                  createPopupContent: (e) => {
-                    e.onClose(() => {
-                      this._cleanSelection();
-                      this.ngwMap.unSelectLayers();
-                    });
-                    if (e.feature) {
-                      const element = this.popup.createPopupContent(
-                        e.feature,
-                        resourceId,
-                        item.extensions.attachment,
-                      );
+    const paramsList = e.getIdentifyItems();
+    const paramsLast = paramsList[paramsList.length - 1];
+    if (paramsLast) {
+      // const resourceId = params.resourceId;
+      paramsLast.identify().then((item) => {
+        if (item) {
+          item.toGeojson().then((geojson) => {
+            this.ngwMap.addLayer('GEOJSON', {
+              id: 'highlight',
+              data: geojson,
+              visibility: true,
+              paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
+              popup: true,
+              popupOptions: {
+                createPopupContent: (e) => {
+                  e.onClose(() => {
+                    this._cleanSelection();
+                    this.ngwMap.unSelectLayers();
+                  });
+                  if (e.feature) {
+                    const element = this.popup.createPopupContent(
+                      geojson,
+                      paramsLast.layerId,
+                      item.extensions.attachment,
+                    );
 
-                      return element;
-                    }
-                  },
+                    return element;
+                  }
                 },
-              });
+              },
             });
-          }
-        });
+          });
+        }
+      });
     }
   }
 
