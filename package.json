@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.html",
   "scripts": {
-    "start": "webpack serve --mode development --open chrome --https",
+    "start": "webpack serve --mode development --open chrome",
     "build": "webpack --progress",
     "watch": "rimraf ./dist && npm run build -- --watch",
     "dev": "rimraf ./dist && npm run build",
@@ -37,7 +37,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@types/geojson": "^7946.0.8",
     "@types/leaflet": "^1.7.4",
-    "@types/node": "^16.6.2",
+    "@types/node": "^16.7.1",
     "@types/polylabel": "^1.0.5",
     "@types/wellknown": "^0.5.1",
     "babel-loader": "^8.2.2",

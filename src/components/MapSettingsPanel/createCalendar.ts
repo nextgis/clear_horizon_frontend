@@ -15,6 +15,7 @@ export interface CreateCalendarOptions {
 }
 
 export function createCalendar(options: CreateCalendarOptions): HTMLElement {
+  const { onChange, maxDate, minDate, startDate, endDate, timedelta } = options;
   const html = document.createElement('div');
   html.className = 'field is-horizontal';
   html.innerHTML = `
@@ -25,12 +26,13 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
     <div class="select is-small">
       <select class="select-input">
         ${DATE_RANGE_SELECT.map((x) => {
-          return `<option ${
-            options.timedelta === x[0] ? 'selected' : ''
-          } value=${x[0]}>${x[1]}</option>`;
+          return `<option ${timedelta === x[0] ? 'selected' : ''} value=${
+            x[0]
+          }>${x[1]}</option>`;
         })}
       </select>
     </div>
+    <button class="button calendar-clean is-small">✖</button>
     `;
 
   // <div class="field">
@@ -39,8 +41,10 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
 
   const select = html.querySelector('.select-input') as HTMLSelectElement;
   const inputFrom = html.querySelector('.input.input-from') as HTMLInputElement;
+  const calendarCleanBtn = html.querySelector(
+    '.calendar-clean',
+  ) as HTMLButtonElement;
   // const inputTo = html.querySelector('.input.input-to') as HTMLInputElement;
-  const { onChange, maxDate, minDate, startDate, endDate } = options;
 
   const today = new Date();
 
@@ -62,14 +66,30 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
     // plugins: [rangePlugin({ input: inputTo })],
     onChange: ([start, end]) => {
       select.value = '';
+      updateCleanBtnDisplay();
       changeFunction({ start, end });
     },
   });
+  const updateCleanBtnDisplay = () => {
+    calendarCleanBtn.style.display =
+      Number(select.value) === timedelta ? 'none' : 'block';
+  };
+  updateCleanBtnDisplay();
 
-  select.onchange = () => {
-    const [start, end] = daysBehindRange(Number(select.value), endDate);
+  const setRange = (val: number) => {
+    updateCleanBtnDisplay();
+    const [start, end] = daysBehindRange(val, endDate);
     datepicker.setDate([start, end]);
     changeFunction({ start, end });
+  };
+
+  calendarCleanBtn.onclick = () => {
+    select.value = String(timedelta);
+    setRange(timedelta);
+  };
+  select.onchange = () => {
+    updateCleanBtnDisplay();
+    setRange(Number(select.value));
   };
 
   // calendar.on('select', () => {
