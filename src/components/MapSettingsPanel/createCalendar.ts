@@ -19,6 +19,9 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
   const html = document.createElement('div');
   html.className = 'field is-horizontal';
   html.innerHTML = `
+  <button class="button calendar-open calendar-control-btn is-small">
+    <i class="fa fa-calendar" aria-hidden="true"></i>
+  </button>
     <div class="field">
         <input class="input input-from is-small" type="text" >
     </div>
@@ -32,7 +35,7 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
         })}
       </select>
     </div>
-    <button class="button calendar-clean is-small">✖</button>
+    <button class="button calendar-clean calendar-control-btn is-small">✖</button>
     `;
 
   // <div class="field">
@@ -44,8 +47,9 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
   const calendarCleanBtn = html.querySelector(
     '.calendar-clean',
   ) as HTMLButtonElement;
-  // const inputTo = html.querySelector('.input.input-to') as HTMLInputElement;
-
+  const calendarOpenBtn = html.querySelector(
+    '.calendar-open',
+  ) as HTMLButtonElement;
   const today = new Date();
 
   const changeFunction = debounce((prop: { start: Date; end: Date }) => {
@@ -82,11 +86,16 @@ export function createCalendar(options: CreateCalendarOptions): HTMLElement {
     datepicker.setDate([start, end]);
     changeFunction({ start, end });
   };
-
+  calendarOpenBtn.onclick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    datepicker.isOpen ? datepicker.close() : datepicker.open();
+  };
   calendarCleanBtn.onclick = () => {
     select.value = String(timedelta);
     setRange(timedelta);
   };
+
   select.onchange = () => {
     updateCleanBtnDisplay();
     setRange(Number(select.value));
