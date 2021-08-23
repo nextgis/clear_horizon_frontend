@@ -356,6 +356,7 @@ export class ActionMap {
               paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
               popup: true,
               popupOptions: {
+                maxWidth: 300,
                 createPopupContent: (e) => {
                   e.onClose(() => {
                     this._cleanSelection();

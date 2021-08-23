@@ -2,7 +2,7 @@
 import bulmaCarousel from 'bulma-carousel';
 import { NgwMap } from '@nextgis/ngw-map';
 import { Feature, Geometry } from 'geojson';
-import { FeatureItemAttachment } from '@nextgis/ngw-connector';
+import { FeatureItemAttachment, ResourceItem } from '@nextgis/ngw-connector';
 import { prepareColumnValue } from '../utils';
 
 interface CollectorDate {
@@ -25,6 +25,7 @@ type CollectorProperty = string | number | CollectorDate | CollectorTime;
 
 export class Popup {
   private ngwMap!: NgwMap;
+  private _resourceItems: { [resourceId: number]: ResourceItem } = {};
 
   setNgwMap(ngwMap: NgwMap): void {
     this.ngwMap = ngwMap;
@@ -36,28 +37,26 @@ export class Popup {
     attachment?: FeatureItemAttachment[],
   ): HTMLElement {
     const popupElement = document.createElement('div');
-    popupElement.className = 'columns';
-    popupElement.style.minWidth = '300px';
-    popupElement.style.maxWidth = '700px';
-
     const properties = document.createElement('div');
-
-    properties.style.maxHeight = '300px';
-    properties.style.maxWidth = '350px';
-    properties.style.overflow = 'auto';
-
-    properties.className = 'column properties';
+    properties.className = 'properties';
+    const propertiesList: KeyValue[] = Object.entries(feature.properties).map(
+      ([key, value]) => {
+        return {
+          key,
+          value,
+        };
+      },
+    );
+    properties.innerHTML = this.createPropertiesHtml(propertiesList);
 
     if (resourceId) {
+      const pre = document.createElement('div');
+      pre.appendChild(properties);
       popupElement.innerHTML = 'Загрузка';
-      this.getPropertiesContent(resourceId, feature).then((inner) => {
+      this.updateElementContent(pre, resourceId, feature).then(() => {
         popupElement.innerHTML = '';
-        if (inner) {
-          properties.innerHTML = inner;
-        }
-        popupElement.appendChild(properties);
+        popupElement.appendChild(pre);
       });
-
       if (attachment && attachment.length) {
         this._addPhotos(
           popupElement,
@@ -66,52 +65,65 @@ export class Popup {
           Number(feature.id),
         );
       }
+    } else {
+      popupElement.appendChild(properties);
     }
-
     return popupElement;
   }
 
   createPropertiesHtml(
     properties: Array<{ key: string; value: CollectorProperty }>,
   ): string {
-    let elem = '<table class="table"><tbody>';
-    for (const { key, value } of properties) {
-      let val = String(value);
+    let elem = '';
+    properties.forEach(({ key, value }) => {
       if (typeof value === 'object' && value) {
         if ('year' in value) {
-          val = [value.day, value.month, value.year].join('.');
+          value = [value.day, value.month, value.year].join('.');
         } else if ('hour' in value) {
-          val = [value.hour, value.minute].join(':');
+          value = [value.hour, value.minute].join(':');
         }
       }
       elem += `
-      <tr>
-        <th>${key}</th>
-        <td>${prepareColumnValue(val)}</td>
-      </tr>
+      <div class="columns is-mobile">
+        <div class="column is-two-fifths">${key}</div>
+        <div class="column">${prepareColumnValue(value)}</div>
+      </div>
       `;
-    }
-    elem += '</tbody></table>';
+    });
     return elem;
   }
 
-  async getPropertiesContent<
+  async updateElementContent<
     G extends Geometry = any,
     P extends Record<string, any> = Record<string, any>,
-  >(resourceId: number, feature: Feature<G, P>): Promise<string | undefined> {
-    const item = await this.ngwMap.connector.getResource(resourceId);
-    if (item && item.feature_layer) {
+  >(
+    element: HTMLElement,
+    resourceId: number,
+    feature: Feature<G, P>,
+  ): Promise<ResourceItem> {
+    const item = await this._getResourceItem(resourceId);
+    if (item.feature_layer) {
       const newProperties: KeyValue[] = [];
       item.feature_layer.fields.forEach((x) => {
         if (x.grid_visibility) {
-          const property = feature.properties[x.keyname];
+          let property = feature.properties[x.keyname];
           if (property) {
+            if (typeof property === 'string') {
+              property = property.replace(/\w+(;)\w+/g, (a, b) =>
+                a.replace(b, b + ' '),
+              );
+            }
             newProperties.push({ key: x.display_name, value: property });
           }
         }
       });
-      return this.createPropertiesHtml(newProperties);
+      const newContent = this.createPropertiesHtml(newProperties);
+      const pre = element.getElementsByClassName('properties')[0];
+      if (pre) {
+        pre.innerHTML = newContent;
+      }
     }
+    return item;
   }
 
   async _addPhotos(
@@ -121,13 +133,15 @@ export class Popup {
     fid: number,
   ): Promise<void> {
     const attachmentElement = document.createElement('div');
-    attachmentElement.style.width = '300px';
-    attachmentElement.className = 'column carousel attachment';
+
+    attachmentElement.className = 'carousel attachment';
     for (const img of attachment) {
-      const width = 350;
-      const height = 350;
+      const width = 300;
+      const height = 300;
       const figure = document.createElement('figure');
-      figure.className = `image`;
+      figure.className = `image is-${width}x${height}`;
+      figure.style.maxHeight = height + 'px';
+      figure.style.maxWidth = width + 'px';
       const src = await this._loadImage(img, {
         width,
         height,
@@ -140,7 +154,17 @@ export class Popup {
       attachmentElement.appendChild(figure);
     }
     element.appendChild(attachmentElement);
-    bulmaCarousel.attach(attachmentElement, { slidesToShow: 1 });
+    bulmaCarousel.attach(attachmentElement);
+  }
+
+  private async _getResourceItem(resourceId: number) {
+    if (!this._resourceItems[resourceId]) {
+      const item = await this.ngwMap.connector.get('resource.item', null, {
+        id: resourceId,
+      });
+      this._resourceItems[resourceId] = item;
+    }
+    return this._resourceItems[resourceId];
   }
 
   private _loadImage(
