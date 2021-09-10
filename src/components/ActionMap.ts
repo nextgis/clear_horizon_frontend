@@ -331,10 +331,7 @@ export class ActionMap {
   }
 
   private _cleanSelection() {
-    if (
-      this._promises.getFeaturePromise &&
-      this._promises.getFeaturePromise.cancel
-    ) {
+    if (this._promises.getFeaturePromise instanceof CancelablePromise) {
       this._promises.getFeaturePromise.cancel();
     }
     this.ngwMap.removeLayer('highlight');
