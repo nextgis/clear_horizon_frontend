@@ -3,6 +3,7 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 // const supportedLocales = ['ru', 'en'];
 const alias = {};
@@ -38,27 +39,12 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          // test: /\.jsx?$/,
           test: /\.(js|ts)x?$/,
           exclude: /node_modules/,
           use: {
             loader: 'babel-loader',
           },
         },
-        // {
-        //   test: /\.tsx?$/,
-        //   exclude: /node_modules/,
-        //   use: [
-        //     {
-        //       loader: 'ts-loader',
-        //       options: {
-        //         // disable type checker - we will use it in fork plugin
-        //         // transpileOnly: !isProd,
-        //         transpileOnly: false,
-        //       },
-        //     },
-        //   ],
-        // },
         {
           test: /\.css$/i,
           use: [
@@ -110,7 +96,7 @@ module.exports = (env, argv) => {
       //   /date-fns[/\\]/,
       //   new RegExp(`[/\\\\](${supportedLocales.join('|')})[/\\\\]index.js$`),
       // ),
-      // new FaviconsWebpackPlugin('./src/img/favicon.png')
+      new FaviconsWebpackPlugin('./src/images/favicon.png'),
     ],
 
     optimization: {

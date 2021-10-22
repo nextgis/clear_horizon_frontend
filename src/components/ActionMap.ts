@@ -10,8 +10,8 @@ import {
   NgwLayers,
   LocationEvent,
   ToggleControl,
-  VectorAdapterOptions,
   NgwIdentifyEvent,
+  VectorAdapterOptions,
 } from '@nextgis/ngw-map';
 import { CirclePaint } from '@nextgis/paint';
 import { NgwLayerOptions } from '@nextgis/ngw-kit';
@@ -136,7 +136,8 @@ export class ActionMap {
   private _locate() {
     const locationfound = (e: LocationEvent) => {
       const lngLat = e.lngLat;
-      this.ngwMap.setCenter(lngLat);
+
+      this.ngwMap.setView(lngLat, Math.max(...[this.ngwMap.getZoom(), 16]));
     };
 
     this.ngwMap.locate({ setView: false }, { locationfound });
