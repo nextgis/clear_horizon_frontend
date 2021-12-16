@@ -1,10 +1,14 @@
 // @ts-ignore
 import bulmaCarousel from 'bulma-carousel';
-import { NgwMap } from '@nextgis/ngw-map';
-import { Feature, Geometry } from 'geojson';
-import { FeatureItemAttachment, ResourceItem } from '@nextgis/ngw-connector';
 import { prepareColumnValue } from '../utils';
+import { fetchSensorData } from '../utils/fetchSensorData';
 
+import type { Feature, Geometry } from 'geojson';
+import type {
+  FeatureItemAttachment,
+  ResourceItem,
+} from '@nextgis/ngw-connector';
+import type { NgwMap } from '@nextgis/ngw-map';
 interface CollectorDate {
   year: number;
   month: number;
@@ -29,6 +33,20 @@ export class Popup {
 
   setNgwMap(ngwMap: NgwMap): void {
     this.ngwMap = ngwMap;
+  }
+
+  async createSensorPopupContent<
+    G extends Geometry = any,
+    P = Record<string, any>,
+  >(
+    feature: Feature<G, P>,
+    resourceId?: number,
+    attachment?: FeatureItemAttachment[],
+  ): Promise<HTMLElement> {
+    const popupElement = document.createElement('div');
+    const sensor = await fetchSensorData('esp8266-71568');
+    console.log(sensor);
+    return popupElement;
   }
 
   createPopupContent<G extends Geometry = any, P = Record<string, any>>(

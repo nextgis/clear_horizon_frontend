@@ -338,11 +338,14 @@ export class ActionMap {
     this.ngwMap.removeLayer('highlight');
   }
 
-  private _highlighNgwLayer(e: NgwIdentifyEvent) {
+  private _highlighNgwLayer(i: NgwIdentifyEvent) {
     this._cleanSelection();
-    const paramsList = e.getIdentifyItems();
+    const paramsList = i.getIdentifyItems();
     const paramsLast = paramsList[paramsList.length - 1];
     if (paramsLast) {
+      const isSensor =
+        this.options.sensors &&
+        paramsLast.layerId === this.options.sensors.resource;
       // const resourceId = params.resourceId;
       paramsLast.identify().then((item) => {
         if (item) {
@@ -350,7 +353,6 @@ export class ActionMap {
             this.ngwMap.addLayer('GEOJSON', {
               id: 'highlight',
               data: geojson,
-              visibility: true,
               paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
               popup: true,
               popupOptions: {
@@ -361,7 +363,11 @@ export class ActionMap {
                     this.ngwMap.unSelectLayers();
                   });
                   if (e.feature) {
-                    const element = this.popup.createPopupContent(
+                    const createFun = isSensor
+                      ? this.popup.createSensorPopupContent
+                      : this.popup.createPopupContent;
+
+                    const element = createFun(
                       geojson,
                       paramsLast.layerId,
                       item.extensions.attachment,
