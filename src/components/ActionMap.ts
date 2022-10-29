@@ -137,7 +137,10 @@ export class ActionMap {
     const locationfound = (e: LocationEvent) => {
       const lngLat = e.lngLat;
 
-      this.ngwMap.setView(lngLat, Math.max(...[this.ngwMap.getZoom(), 16]));
+      this.ngwMap.setView(
+        lngLat,
+        Math.max(...[this.ngwMap.getZoom() ?? 0, 16]),
+      );
     };
 
     this.ngwMap.locate({ setView: false }, { locationfound });
@@ -363,17 +366,19 @@ export class ActionMap {
                     this.ngwMap.unSelectLayers();
                   });
                   if (e.feature) {
-                    const createFun = isSensor
-                      ? this.popup.createSensorPopupContent
-                      : this.popup.createPopupContent;
-
-                    const element = createFun(
-                      geojson,
-                      paramsLast.layerId,
-                      item.extensions.attachment,
-                    );
-
-                    return element;
+                    if (isSensor) {
+                      return this.popup.createSensorPopupContent(
+                        geojson,
+                        paramsLast.layerId,
+                        item.extensions.attachment,
+                      );
+                    } else {
+                      return this.popup.createPopupContent(
+                        geojson,
+                        paramsLast.layerId,
+                        item.extensions.attachment,
+                      );
+                    }
                   }
                 },
               },

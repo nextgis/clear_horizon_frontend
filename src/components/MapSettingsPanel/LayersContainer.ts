@@ -99,14 +99,16 @@ export class LayersContainer<
   private _createSymbol(fire: FireResource): HTMLElement {
     const symbol = document.createElement('span');
     symbol.className = 'item-symbol';
-    const { color, stroke, strokeColor } = fire.adapterOptions
-      ?.paint as CirclePaint;
-    if (typeof color === 'string') {
-      symbol.style.color = color;
-      symbol.style.backgroundColor = color;
-    }
-    if (stroke && typeof strokeColor === 'string') {
-      symbol.style.borderColor = strokeColor;
+    if (fire.adapterOptions?.paint) {
+      const { color, stroke, strokeColor } = fire.adapterOptions
+        ?.paint as CirclePaint;
+      if (typeof color === 'string') {
+        symbol.style.color = color;
+        symbol.style.backgroundColor = color;
+      }
+      if (stroke && typeof strokeColor === 'string') {
+        symbol.style.borderColor = strokeColor;
+      }
     }
     return symbol;
   }

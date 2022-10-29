@@ -199,7 +199,7 @@ export class Popup {
         `/attachment/${img.id}/image` +
         (width && height ? `?size=${width}x${height}` : '');
       this.ngwMap.connector
-        .makeQuery(url, {}, { responseType: 'blob' })
+        .makeQuery<Blob>(url, {}, { responseType: 'blob' })
         .then((blob) => {
           const reader = new FileReader();
           reader.readAsDataURL(blob);
