@@ -32,9 +32,9 @@ const options: AppOptions = {
     {
       qmsId: 1135,
     },
-    {
-      qmsId: 487,
-    },
+    // {
+    //   qmsId: 487,
+    // },
   ],
   userFires: {
     resource: 'userfirepoints',
