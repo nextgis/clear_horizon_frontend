@@ -45,7 +45,7 @@ const options: AppOptions = {
     },
   },
   sensors: {
-    resource: 359,
+    resource: 446,
     id: SENSOR_ID,
     adapterOptions: {
       selectable: true,
