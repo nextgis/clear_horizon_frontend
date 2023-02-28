@@ -13,6 +13,8 @@ export const MODIS_ID = 'MODIS';
 export const VIIRS_ID = 'VIIRS';
 export const SENSOR_ID = 'SENSOR';
 
+export const SENSOR_MEASUREMENT_API = process.env.SENSOR_MEASUREMENT_API;
+
 export let NOW = new Date();
 
 // update global NOW each hour for long session

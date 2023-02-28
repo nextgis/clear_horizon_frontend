@@ -352,10 +352,10 @@ export class ActionMap {
       // const resourceId = params.resourceId;
       paramsLast.identify().then((item) => {
         if (item) {
-          item.toGeojson().then((geojson) => {
+          item.toGeojson().then((feature) => {
             this.ngwMap.addLayer('GEOJSON', {
               id: 'highlight',
-              data: geojson,
+              data: feature,
               paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
               popup: true,
               popupOptions: {
@@ -367,14 +367,16 @@ export class ActionMap {
                   });
                   if (e.feature) {
                     if (isSensor) {
-                      return this.popup.createSensorPopupContent(
-                        geojson,
-                        paramsLast.layerId,
-                        item.extensions.attachment,
-                      );
+                      // const range = daysBehindRange(
+                      //   this.options.timedelta || 24,
+                      //   NOW,
+                      // );
+                      return this.popup.createSensorPopupContent({
+                        feature,
+                      });
                     } else {
                       return this.popup.createPopupContent(
-                        geojson,
+                        feature,
                         paramsLast.layerId,
                         item.extensions.attachment,
                       );

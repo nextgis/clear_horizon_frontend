@@ -1,14 +1,18 @@
 // @ts-ignore
 import bulmaCarousel from 'bulma-carousel';
-import { prepareColumnValue } from '../utils';
-import { fetchSensorData } from '../utils/fetchSensorData';
 
-import type { Feature, Geometry } from 'geojson';
 import type {
   FeatureItemAttachment,
   ResourceItem,
 } from '@nextgis/ngw-connector';
+import type { Feature, Geometry } from 'geojson';
+
+import { prepareColumnValue } from '../utils';
+import { createSensorPopupContent } from '../utils/createSensorPopupContent';
+
 import type { NgwMap } from '@nextgis/ngw-map';
+
+import type { CreateExportPopupContentProps } from '../utils/createSensorPopupContent';
 interface CollectorDate {
   year: number;
   month: number;
@@ -35,41 +39,39 @@ export class Popup {
     this.ngwMap = ngwMap;
   }
 
-  async createSensorPopupContent<
-    G extends Geometry = any,
-    P = Record<string, any>,
-  >(
-    feature: Feature<G, P>,
-    resourceId?: number,
-    attachment?: FeatureItemAttachment[],
+  async createSensorPopupContent(
+    props: CreateExportPopupContentProps,
   ): Promise<HTMLElement> {
-    const popupElement = document.createElement('div');
-    const sensor = await fetchSensorData('esp8266-71568');
-    console.log(sensor);
-    return popupElement;
+    return createSensorPopupContent(props);
   }
 
-  createPopupContent<G extends Geometry = any, P = Record<string, any>>(
+  createPopupContent<
+    G extends Geometry = any,
+    P extends Record<string, any> = Record<string, any>,
+  >(
     feature: Feature<G, P>,
     resourceId?: number,
     attachment?: FeatureItemAttachment[],
   ): HTMLElement {
     const popupElement = document.createElement('div');
-    const properties = document.createElement('div');
-    properties.className = 'properties';
-    const propertiesList: KeyValue[] = Object.entries(feature.properties).map(
-      ([key, value]) => {
-        return {
-          key,
-          value,
-        };
-      },
-    );
-    properties.innerHTML = this.createPropertiesHtml(propertiesList);
+    const props = feature.properties;
+    const propContainer = document.createElement('div');
+    if (props) {
+      propContainer.className = 'properties';
+      const propertiesList: KeyValue[] = Object.entries(props).map(
+        ([key, value]) => {
+          return {
+            key,
+            value,
+          };
+        },
+      );
+      propContainer.innerHTML = this.createPropertiesHtml(propertiesList);
+    }
 
     if (resourceId) {
       const pre = document.createElement('div');
-      pre.appendChild(properties);
+      pre.appendChild(propContainer);
       popupElement.innerHTML = 'Загрузка';
       this.updateElementContent(pre, resourceId, feature).then(() => {
         popupElement.innerHTML = '';
@@ -84,7 +86,7 @@ export class Popup {
         );
       }
     } else {
-      popupElement.appendChild(properties);
+      popupElement.appendChild(propContainer);
     }
     return popupElement;
   }

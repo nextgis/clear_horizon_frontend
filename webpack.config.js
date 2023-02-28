@@ -89,6 +89,9 @@ module.exports = (env, argv) => {
       }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
+        'process.env.SENSOR_MEASUREMENT_API': JSON.stringify(
+          argv.mode === 'development' ? '/' : 'http://217.25.95.157:8000/',
+        ),
         __BROWSER__: true,
         __DEV__: !isProd,
       }),
@@ -98,6 +101,19 @@ module.exports = (env, argv) => {
       // ),
       new FaviconsWebpackPlugin('./src/images/favicon.png'),
     ],
+
+    devServer: {
+      historyApiFallback: true,
+      open: true,
+      hot: true,
+      proxy: [
+        {
+          context: ['/api/v1/'],
+          changeOrigin: true,
+          target: 'http://217.25.95.157:8000',
+        },
+      ],
+    },
 
     optimization: {
       runtimeChunk: 'single',

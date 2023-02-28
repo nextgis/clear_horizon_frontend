@@ -98,3 +98,11 @@ export interface FiresLayerProps {
 export type FiresAdapterOptions = VectorAdapterOptions & {
   props: FiresLayerProps;
 };
+
+export type SensorMeasureValueType = 'P1' | 'P2';
+export interface SensorMeasureItem {
+  datetime: string;
+  sensor_id: number;
+  value: number;
+  value_type: SensorMeasureValueType;
+}
