@@ -30,7 +30,8 @@
     "leaflet-sidebar": "github:rendrom/leaflet-sidebar",
     "moment": "^2.29.4",
     "regenerator-runtime": "^0.13.11",
-    "share-buttons": "github:rendrom/share-buttons"
+    "share-buttons": "github:rendrom/share-buttons",
+    "suntimes": "^6.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",

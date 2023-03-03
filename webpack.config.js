@@ -90,7 +90,7 @@ module.exports = (env, argv) => {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
         'process.env.SENSOR_MEASUREMENT_API': JSON.stringify(
-          argv.mode === 'development' ? '/' : 'http://217.25.95.157:8000/',
+          argv.mode === 'development' ? '/' : 'https://81.200.157.19/',
         ),
         __BROWSER__: true,
         __DEV__: !isProd,

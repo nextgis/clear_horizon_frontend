@@ -58,9 +58,9 @@ export async function createSensorPopupContent({
               type: 'time',
               time: {
                 unit: 'hour',
-                // displayFormats: {
-                //   day: 'MMM YYYY',
-                // },
+                displayFormats: {
+                  hour: 'HH:mm',
+                },
               },
             },
           },
