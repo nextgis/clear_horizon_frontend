@@ -38,7 +38,7 @@ export async function createSensorPopupContent({
             return {
               type: 'line',
               label: t,
-              // pointRadius: 0,
+              pointRadius: 1,
 
               data: sensor
                 .filter((s) => s.value_type === t)
