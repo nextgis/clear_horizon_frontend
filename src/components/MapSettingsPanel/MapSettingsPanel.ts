@@ -6,21 +6,21 @@ import 'leaflet-sidebar/src/L.Control.Sidebar.css';
 // import '../../assets/SidebarControl/SidebarControl.scss';
 import '../../assets/SidebarControl/SidebarControlLeaflet.scss';
 
-import { NgwLayers } from '@nextgis/ngw-map';
+import { NOW } from '../../constants';
+import { daysBehindRange } from '../../utils/daysBehindRange';
+import { layerTimestampExtremum } from '../../utils/layerTimestampExtremum';
 
-import { ActionMap } from '../ActionMap';
-import { CollapsiblePanel } from './CollapsiblePanel';
-import { WebmapTreeItem } from './WebmapTreeItem';
 import { BaseMapsContainer } from './BaseMapsContainer';
 import { BookmarksContainer } from './BookmarksContainer';
+import { CollapsiblePanel } from './CollapsiblePanel';
 import { FiresContainer } from './FiresContainer';
-
-import type { NgwLayerOptions } from '@nextgis/ngw-kit';
-import type { MapSettingsPanelOptions } from './interfaces';
-import { layerTimestampExtremum } from '../../utils/layerTimestampExtremum';
-import { daysBehindRange } from '../../utils/daysBehindRange';
-import { NOW } from '../../constants';
 import { LayersContainer } from './LayersContainer';
+import { WebmapTreeItem } from './WebmapTreeItem';
+
+import type { MapSettingsPanelOptions } from './interfaces';
+import type { ActionMap } from '../ActionMap';
+import type { NgwLayerOptions } from '@nextgis/ngw-kit';
+import type { NgwLayers } from '@nextgis/ngw-map';
 
 const OPTIONS: Partial<MapSettingsPanelOptions> = {
   target: 'tree',
@@ -37,7 +37,10 @@ export class MapSettingsPanel {
 
   private ngwLayers!: NgwLayers;
 
-  constructor(private actionMap: ActionMap, options: MapSettingsPanelOptions) {
+  constructor(
+    private actionMap: ActionMap,
+    options: MapSettingsPanelOptions,
+  ) {
     this.options = { ...OPTIONS, ...options };
     if (typeof this.options.target === 'string') {
       const target = document.getElementById(this.options.target);

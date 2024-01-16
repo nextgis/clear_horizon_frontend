@@ -1,4 +1,5 @@
 import { SENSOR_MEASUREMENT_API } from '../constants';
+
 import type { SensorMeasureItem, SensorMeasureValueType } from '../interfaces';
 
 export interface FetchSensorData {
@@ -7,12 +8,14 @@ export interface FetchSensorData {
   lastHours?: number;
   start?: Date;
   end?: Date;
+  signal?: AbortSignal;
 }
 
 export function fetchSensorData({
   valueType,
   lastHours,
   sensorId,
+  signal,
   start,
   end,
 }: FetchSensorData): Promise<SensorMeasureItem[]> {
@@ -39,6 +42,7 @@ export function fetchSensorData({
     `${apiUrl}api/v1/measurements?${new URLSearchParams(params).toString()}`,
     {
       method: 'GET',
+      signal,
     },
   ).then((resp) => {
     return resp.json();

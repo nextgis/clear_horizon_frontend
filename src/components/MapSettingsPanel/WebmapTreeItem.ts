@@ -1,6 +1,7 @@
 import { WebMap } from '@nextgis/webmap';
-import { CheckProperty, ChangeEvent } from '@nextgis/item';
-import { NgwWebmapItem, TreeGroup, TreeLayer } from '@nextgis/ngw-kit';
+
+import type { ChangeEvent, CheckProperty } from '@nextgis/item';
+import type { NgwWebmapItem, TreeGroup, TreeLayer } from '@nextgis/ngw-kit';
 
 export class WebmapTreeItem {
   private _container?: HTMLElement;

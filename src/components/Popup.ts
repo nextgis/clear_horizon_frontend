@@ -1,18 +1,17 @@
 // @ts-ignore
 import bulmaCarousel from 'bulma-carousel';
 
+import { prepareColumnValue } from '../utils';
+import { createSensorPopupContent } from '../utils/createSensorPopupContent';
+
+import type { CreateExportPopupContentProps } from '../utils/createSensorPopupContent';
 import type {
   FeatureItemAttachment,
   ResourceItem,
 } from '@nextgis/ngw-connector';
+import type { NgwMap } from '@nextgis/ngw-map';
 import type { Feature, Geometry } from 'geojson';
 
-import { prepareColumnValue } from '../utils';
-import { createSensorPopupContent } from '../utils/createSensorPopupContent';
-
-import type { NgwMap } from '@nextgis/ngw-map';
-
-import type { CreateExportPopupContentProps } from '../utils/createSensorPopupContent';
 interface CollectorDate {
   year: number;
   month: number;

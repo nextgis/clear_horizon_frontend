@@ -1,9 +1,10 @@
-import { Control, DomUtil, DomEvent, Util } from 'leaflet';
-import { I18N } from './i18n';
-import { MeasureAction } from './MeasureAction';
+import { Control, DomEvent, DomUtil, Util } from 'leaflet';
 
-import type { Map, Handler } from 'leaflet';
+import { MeasureAction } from './MeasureAction';
+import { I18N } from './i18n';
+
 import type { MeasureOptions } from './interfaces';
+import type { Handler, Map } from 'leaflet';
 
 export class Measure extends Control {
   options: MeasureOptions = {

@@ -1,11 +1,13 @@
 import { formatTime } from '../../utils/formatTime';
-import { createCalendar } from './createCalendar';
-import { LayersContainer, LayersContainerOptions } from './LayersContainer';
 
-import type { ResourceAdapter } from '@nextgis/ngw-kit';
-import type { PropertiesFilter } from '@nextgis/properties-filter';
+import { LayersContainer } from './LayersContainer';
+import { createCalendar } from './createCalendar';
+
+import type { LayersContainerOptions } from './LayersContainer';
 import type { CreateCalendarOptions } from './createCalendar';
 import type { FiresLayerProps } from '../../interfaces';
+import type { ResourceAdapter } from '@nextgis/ngw-kit';
+import type { PropertiesFilter } from '@nextgis/properties-filter';
 
 export interface FiresContainerOptions extends LayersContainerOptions {
   dateRange: [Date | undefined, Date | undefined];

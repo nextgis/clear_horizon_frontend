@@ -1,7 +1,8 @@
 import { fetchNgwLayerItems } from '@nextgis/ngw-kit';
-import { NgwDateFormat } from '@nextgis/ngw-connector';
+
 import { NOW } from '../constants';
 
+import type { NgwDateFormat } from '@nextgis/ngw-connector';
 import type NgwConnector from '@nextgis/ngw-connector';
 import type { FetchNgwItemsOptions, NgwLayerOptions } from '@nextgis/ngw-kit';
 

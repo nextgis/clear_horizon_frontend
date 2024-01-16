@@ -3,36 +3,23 @@ import 'leaflet/dist/leaflet.css';
 import './ActionMap.css';
 
 // @ts-ignore
-import ShareButtons from 'share-buttons/dist/share-buttons';
-
-import {
-  NgwMap,
-  NgwLayers,
-  LocationEvent,
-  ToggleControl,
-  NgwIdentifyEvent,
-  VectorAdapterOptions,
-} from '@nextgis/ngw-map';
-import { CirclePaint } from '@nextgis/paint';
-import { NgwLayerOptions } from '@nextgis/ngw-kit';
+import CancelablePromise from '@nextgis/cancelable-promise';
 import { getIcon } from '@nextgis/icons';
 import MapAdapter from '@nextgis/leaflet-map-adapter';
-// import MapAdapter from '@nextgis/ol-map-adapter';
+import { NgwMap } from '@nextgis/ngw-map';
 import UrlRuntimeParams from '@nextgis/url-runtime-params';
-import { QmsAdapterOptions } from '@nextgis/qms-kit';
-import CancelablePromise from '@nextgis/cancelable-promise';
-import { ResourceHierarchy } from '@nextgis/ngw-connector';
-
-import { Popup } from './Popup';
-import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
-import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
-import { createMeasureControl } from './createMeasureControl';
-import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
-import { daysBehindFilter } from '../utils/daysBehindRange';
+// @ts-ignore
+import ShareButtons from 'share-buttons/dist/share-buttons';
 
 import { NOW } from '../constants';
+import { daysBehindFilter } from '../utils/daysBehindRange';
 
-import type { Control, Map, Layer } from 'leaflet';
+import { GetCoordinatePanelControl } from './GetCoordinateControl/GetCoordinateControl';
+import { MapSettingsPanel } from './MapSettingsPanel/MapSettingsPanel';
+import { Popup } from './Popup';
+import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
+import { createMeasureControl } from './createMeasureControl';
+
 import type {
   AppOptions,
   FiresAdapterOptions,
@@ -40,6 +27,18 @@ import type {
   SensorLayerOptions,
   UserFiresLayerOptions,
 } from '../interfaces';
+import type { ResourceHierarchy } from '@nextgis/ngw-connector';
+import type { NgwLayerOptions } from '@nextgis/ngw-kit';
+import type {
+  LocationEvent,
+  NgwIdentifyEvent,
+  NgwLayers,
+  ToggleControl,
+  VectorAdapterOptions,
+} from '@nextgis/ngw-map';
+import type { CirclePaint } from '@nextgis/paint';
+import type { QmsAdapterOptions } from '@nextgis/qms-kit';
+import type { Control, Layer, Map } from 'leaflet';
 
 export class ActionMap {
   ngwMap!: NgwMap<Map, Layer, any>;
@@ -51,6 +50,7 @@ export class ActionMap {
   popup: Popup;
 
   private _promises: { [name: string]: CancelablePromise<any> } = {};
+  private _popupAbortController?: AbortController;
 
   constructor(public options: Partial<AppOptions>) {
     this.popup = new Popup();
@@ -334,6 +334,13 @@ export class ActionMap {
     addStopToggleControl('tree', () => toggle(false));
   }
 
+  private _abortPopup() {
+    if (this._popupAbortController) {
+      this._popupAbortController.abort();
+    }
+    this._popupAbortController = undefined;
+  }
+
   private _cleanSelection() {
     if (this._promises.getFeaturePromise instanceof CancelablePromise) {
       this._promises.getFeaturePromise.cancel();
@@ -361,18 +368,19 @@ export class ActionMap {
               popupOptions: {
                 maxWidth: 300,
                 createPopupContent: (e) => {
+                  this._abortPopup();
                   e.onClose(() => {
+                    this._abortPopup();
                     this._cleanSelection();
                     this.ngwMap.unSelectLayers();
                   });
                   if (e.feature) {
                     if (isSensor) {
-                      // const range = daysBehindRange(
-                      //   this.options.timedelta || 24,
-                      //   NOW,
-                      // );
+                      const popupAbortController = new AbortController();
+                      this._popupAbortController = popupAbortController;
                       return this.popup.createSensorPopupContent({
                         feature,
+                        signal: popupAbortController.signal,
                       });
                     } else {
                       return this.popup.createPopupContent(

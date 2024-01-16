@@ -1,4 +1,5 @@
 import { ActionMap } from './components/ActionMap';
+
 import './bulma';
 import type { AppOptions } from './interfaces';
 

@@ -1,6 +1,6 @@
-import { Layer, Point, Util, Browser, DomUtil, latLng } from 'leaflet';
+import { Browser, DomUtil, Layer, Point, Util, latLng } from 'leaflet';
 
-import type { Map, LayerOptions, LatLng, ZoomAnimEvent } from 'leaflet';
+import type { LatLng, LayerOptions, Map, ZoomAnimEvent } from 'leaflet';
 
 export interface MeasureLabelOptions extends LayerOptions {
   offset?: Point;

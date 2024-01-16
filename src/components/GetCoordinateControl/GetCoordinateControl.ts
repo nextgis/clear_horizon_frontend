@@ -1,15 +1,16 @@
 import './GetCoordinateControl.css';
 import '../ToggleControl.css';
-import { ActionMap } from '../ActionMap';
-import { Clipboard } from '@nextgis/utils';
 import { EventEmitter } from 'events';
 
-import type { Feature, Point } from 'geojson';
+import { Clipboard } from '@nextgis/utils';
+
+import type { ActionMap } from '../ActionMap';
 import type {
   MapClickEvent,
-  VectorLayerAdapter,
   ToggleControlOptions,
+  VectorLayerAdapter,
 } from '@nextgis/ngw-map';
+import type { Feature, Point } from 'geojson';
 
 export interface GetCoordinatePanelControlOptions {
   toggle?: (status: boolean) => void;

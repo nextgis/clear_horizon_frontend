@@ -1,17 +1,18 @@
 import { fetchSensorData } from './fetchSensorData';
 
-import type { Feature } from 'geojson';
-
 import type { SensorMeasureValueType } from '../interfaces';
+import type { Feature } from 'geojson';
 
 export interface CreateExportPopupContentProps {
   feature: Feature;
   end?: Date;
   start?: Date;
+  signal?: AbortSignal;
 }
 
 export async function createSensorPopupContent({
   feature,
+  signal,
 }: CreateExportPopupContentProps): Promise<HTMLElement> {
   const popupElement = document.createElement('div');
   const sensorId = feature.properties?.SID_T;
@@ -22,6 +23,7 @@ export async function createSensorPopupContent({
       // start,
       lastHours: 24,
       // valueType: 'P1',
+      signal,
     });
     if (sensor.length) {
       const chartCanvas = document.createElement('canvas');
@@ -53,6 +55,7 @@ export async function createSensorPopupContent({
           }),
         },
         options: {
+          responsive: true,
           scales: {
             x: {
               type: 'time',

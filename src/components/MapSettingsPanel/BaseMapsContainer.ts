@@ -1,6 +1,6 @@
 import './BaseMapsContainer.css';
 
-import { NgwMap, LayerAdapter } from '@nextgis/ngw-map';
+import type { LayerAdapter, NgwMap } from '@nextgis/ngw-map';
 
 export interface BaseMapsContainerOptions {
   ngwMap: NgwMap;

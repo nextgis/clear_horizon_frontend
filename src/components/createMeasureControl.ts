@@ -1,8 +1,9 @@
 import { Measure } from '../assets/Leaflet.Measure-master/src';
+
 import '../assets/Leaflet.Measure-master/src/leaflet.measure.css';
-import { NgwMap } from '@nextgis/ngw-map';
 import { addStopToggleControl, stopToggleControlsFor } from './ToggleControl';
 
+import type { NgwMap } from '@nextgis/ngw-map';
 import type { Map } from 'leaflet';
 
 export function createMeasureControl(ngwMap: NgwMap): void {

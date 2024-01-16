@@ -1,5 +1,5 @@
-import type { PropertiesFilter } from '@nextgis/properties-filter';
 import type { FiresAdapterOptions, TimeUnit } from '../interfaces';
+import type { PropertiesFilter } from '@nextgis/properties-filter';
 
 export function daysBehindRange(days: number, to?: Date): [Date, Date] {
   const to_ = to ? to.getTime() : Date.now();
@@ -16,8 +16,8 @@ export function daysBehindRangeFormat(
     unit === 'ISO'
       ? new Date(x).toISOString()
       : unit === 's'
-      ? Math.ceil(x.getTime()) / 1000
-      : x.getTime(),
+        ? Math.ceil(x.getTime()) / 1000
+        : x.getTime(),
   ) as [number | string, number | string];
 }
 

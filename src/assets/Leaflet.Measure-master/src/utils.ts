@@ -1,5 +1,5 @@
-import type { LatLng } from 'leaflet';
 import type { Messages } from './interfaces';
+import type { LatLng } from 'leaflet';
 
 export function toRadians(deg: number): number {
   return deg * (Math.PI / 180);

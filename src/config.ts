@@ -1,6 +1,7 @@
 import { MODIS_ID, SENSOR_ID, USERFIRE_ID, VIIRS_ID } from './constants';
-import type { CirclePaint } from '@nextgis/paint';
+
 import type { AppOptions, FiresAdapterOptions } from './interfaces';
+import type { CirclePaint } from '@nextgis/paint';
 
 const firmsAdapterOptions: FiresAdapterOptions = {
   limit: 2000,

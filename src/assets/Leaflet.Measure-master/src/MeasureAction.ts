@@ -1,24 +1,24 @@
 import {
-  Handler,
-  Util,
-  DomUtil,
+  CircleMarker,
   DomEvent,
+  DomUtil,
+  Handler,
   Polygon,
   Polyline,
-  CircleMarker,
+  Util,
 } from 'leaflet';
 
+import { MeasureLabel } from './MeasureLabel';
 import { I18N } from './i18n';
 import { getAreaString, getDistance, getDistanceString } from './utils';
-import { MeasureLabel } from './MeasureLabel';
 
-import type { Map, LatLng, LeafletMouseEvent } from 'leaflet';
-import {
+import type {
   DirectPath,
   MeasureActionOptions,
   MeasureModel,
   Trail,
 } from './interfaces';
+import type { LatLng, LeafletMouseEvent, Map } from 'leaflet';
 
 export class MeasureAction extends Handler {
   options: MeasureActionOptions = {

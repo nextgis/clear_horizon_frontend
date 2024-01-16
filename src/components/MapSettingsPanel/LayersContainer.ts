@@ -2,10 +2,10 @@ import './FiresContainer.css';
 
 import { defined } from '@nextgis/utils';
 
+import type { FireResource } from '../../interfaces';
+import type { NgwLayerOptions, ResourceAdapter } from '@nextgis/ngw-kit';
 import type { LayerAdapter, NgwMap } from '@nextgis/ngw-map';
 import type { CirclePaint } from '@nextgis/paint';
-import type { ResourceAdapter, NgwLayerOptions } from '@nextgis/ngw-kit';
-import { FireResource } from '../../interfaces';
 
 export interface LayersContainerOptions {
   ngwMap: NgwMap;

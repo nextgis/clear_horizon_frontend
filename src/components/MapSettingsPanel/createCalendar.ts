@@ -2,9 +2,11 @@ import 'flatpickr/dist/flatpickr.min.css';
 import flatpickr from 'flatpickr';
 // import rangePlugin from 'flatpickr/dist/plugins/rangePlugin';
 import { Russian } from 'flatpickr/dist/l10n/ru.js';
+
+import { debounce } from '../../../@nextgis/packages/utils/src';
 import { DATE_RANGE_SELECT } from '../../constants';
 import { daysBehindRange } from '../../utils/daysBehindRange';
-import { debounce } from '../../../@nextgis/packages/utils/src';
+
 export interface CreateCalendarOptions {
   maxDate?: Date;
   minDate?: Date;

@@ -18,6 +18,9 @@ export const SENSOR_MEASUREMENT_API = process.env.SENSOR_MEASUREMENT_API;
 export let NOW = new Date();
 
 // update global NOW each hour for long session
-setInterval(() => {
-  NOW = new Date();
-}, 60 * 60 * 1000);
+setInterval(
+  () => {
+    NOW = new Date();
+  },
+  60 * 60 * 1000,
+);

@@ -1,10 +1,12 @@
 import './BookmarksContainer.css';
 
-import { NgwMap } from '@nextgis/ngw-map';
-import { ResourceHierarchy, FeatureItem } from '@nextgis/ngw-connector';
-import { GeoJSON, Map } from 'leaflet';
-import { Polygon } from 'geojson';
-import { Bookmark } from '../../interfaces';
+import { GeoJSON } from 'leaflet';
+
+import type { Bookmark } from '../../interfaces';
+import type { FeatureItem, ResourceHierarchy } from '@nextgis/ngw-connector';
+import type { NgwMap } from '@nextgis/ngw-map';
+import type { Polygon } from 'geojson';
+import type { Map } from 'leaflet';
 
 export interface BookmarksContainerOptions {
   ngwMap: NgwMap<Map>;
