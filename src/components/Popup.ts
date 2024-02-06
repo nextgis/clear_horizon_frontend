@@ -71,7 +71,7 @@ export class Popup {
     if (resourceId) {
       const pre = document.createElement('div');
       pre.appendChild(propContainer);
-      popupElement.innerHTML = 'Загрузка';
+      popupElement.innerHTML = 'Загрузка...';
       this.updateElementContent(pre, resourceId, feature).then(() => {
         popupElement.innerHTML = '';
         popupElement.appendChild(pre);

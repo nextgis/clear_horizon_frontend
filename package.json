@@ -24,6 +24,7 @@
     "bulma-carousel": "^4.0.24",
     "chart.js": "^4.4.1",
     "chartjs-adapter-moment": "^1.0.1",
+    "chartjs-plugin-annotation": "^3.0.1",
     "core-js": "^3.35.0",
     "date-fns": "^3.2.0",
     "flatpickr": "^4.6.13",

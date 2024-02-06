@@ -366,7 +366,8 @@ export class ActionMap {
               paint: { color: 'green', stroke: true, fillOpacity: '0.8' },
               popup: true,
               popupOptions: {
-                maxWidth: 300,
+                maxWidth: 500,
+                minWidth: 400,
                 createPopupContent: (e) => {
                   this._abortPopup();
                   e.onClose(() => {
