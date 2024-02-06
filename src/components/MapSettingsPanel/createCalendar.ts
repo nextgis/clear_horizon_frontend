@@ -1,9 +1,9 @@
 import 'flatpickr/dist/flatpickr.min.css';
+import { debounce } from '@nextgis/utils';
 import flatpickr from 'flatpickr';
 // import rangePlugin from 'flatpickr/dist/plugins/rangePlugin';
 import { Russian } from 'flatpickr/dist/l10n/ru.js';
 
-import { debounce } from '../../../@nextgis/packages/utils/src';
 import { DATE_RANGE_SELECT } from '../../constants';
 import { daysBehindRange } from '../../utils/daysBehindRange';
 

@@ -1,10 +1,11 @@
 import { EventEmitter } from 'events';
+
 import { create } from '@nextgis/dom';
 import { treeFind } from '@nextgis/tree';
 
-import type StrictEventEmitter from 'strict-event-emitter-types';
-import type { MapAdapter, MapControl } from '@nextgis/webmap';
 import type { SidebarControlEvents, SidebarControlOptions } from './interfaces';
+import type { MapAdapter, MapControl } from '@nextgis/webmap';
+import type StrictEventEmitter from 'strict-event-emitter-types';
 
 export class SidebarControl implements MapControl {
   readonly emitter: StrictEventEmitter<EventEmitter, SidebarControlEvents> =

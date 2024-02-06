@@ -1,8 +1,7 @@
-import type { VectorAdapterOptions } from '@nextgis/webmap';
 import type { NgwDateFormat, NgwTimeFormat } from '@nextgis/ngw-connector';
-
-import type { NgwMapOptions } from '@nextgis/ngw-map';
 import type { NgwLayerOptions } from '@nextgis/ngw-kit';
+import type { NgwMapOptions } from '@nextgis/ngw-map';
+import type { VectorAdapterOptions } from '@nextgis/webmap';
 
 export interface ConnectionOptions {
   acsUrl?: string;
@@ -99,7 +98,7 @@ export type FiresAdapterOptions = VectorAdapterOptions & {
   props: FiresLayerProps;
 };
 
-export type SensorMeasureValueType = 'P1' | 'P2';
+export type SensorMeasureValueType = 'P1' | 'P2' | 'humidity' | 'temperature';
 export interface SensorMeasureItem {
   datetime: string;
   sensor_id: number;

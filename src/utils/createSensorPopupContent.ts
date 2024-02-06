@@ -1,6 +1,7 @@
-import { fetchSensorData } from './fetchSensorData';
+import { fetchSensorsData } from './fetchSensorsData';
 
-import type { SensorMeasureValueType } from '../interfaces';
+import type { SensorMeasureItem, SensorMeasureValueType } from '../interfaces';
+import type { ChartDataset } from 'chart.js';
 import type { Feature } from 'geojson';
 
 export interface CreateExportPopupContentProps {
@@ -10,72 +11,96 @@ export interface CreateExportPopupContentProps {
   signal?: AbortSignal;
 }
 
+type ChartType = Partial<
+  Record<SensorMeasureValueType, Partial<ChartDataset<'line'>>>
+>;
+
 export async function createSensorPopupContent({
   feature,
   signal,
 }: CreateExportPopupContentProps): Promise<HTMLElement> {
   const popupElement = document.createElement('div');
-  const sensorId = feature.properties?.SID_T;
-  if (sensorId !== undefined) {
-    const sensor = await fetchSensorData({
-      sensorId,
-      // end,
-      // start,
-      lastHours: 24,
-      // valueType: 'P1',
-      signal,
+  const { SID_T, PLACE } = feature.properties || {};
+
+  const sensorIds = [SID_T, PLACE].filter(Boolean);
+  if (sensorIds.length === 0) return popupElement;
+
+  const sensorsData = await fetchSensorsData({
+    sensorIds,
+    lastHours: 24,
+    signal,
+  });
+  if (sensorsData.length === 0) {
+    popupElement.innerHTML = `Данные для ${sensorIds.length > 1 ? 'приёмников' : 'приёмника'} #${sensorIds} за последние 24 часа не найдены`;
+    return popupElement;
+  }
+  sensorsData.reverse();
+
+  const types: ChartType[] = [
+    {
+      P1: {},
+      P2: {},
+    },
+    { humidity: {} },
+    { temperature: {} },
+  ];
+  let index = 0;
+  for (const t of types) {
+    const chartElement = await createChart({
+      types: t,
+      sensorsData,
+      showXAxis: index++ > types.length,
     });
-    if (sensor.length) {
-      const chartCanvas = document.createElement('canvas');
-      sensor.reverse();
-      // @ts-ignore
-      await import('chartjs-adapter-moment');
-      const { Chart } = await import('chart.js/auto');
+    popupElement.appendChild(chartElement);
+  }
 
-      const types: SensorMeasureValueType[] = ['P1', 'P2'];
+  return popupElement;
+}
 
-      new Chart(chartCanvas, {
-        data: {
-          datasets: types.map((t) => {
-            return {
-              type: 'line',
-              label: t,
-              pointRadius: 1,
+async function createChart({
+  types,
+  showXAxis,
+  sensorsData,
+}: {
+  types: ChartType;
+  showXAxis: boolean;
+  sensorsData: SensorMeasureItem[];
+}) {
+  // @ts-ignore
+  await import('chartjs-adapter-moment');
+  const { Chart } = await import('chart.js/auto');
 
-              data: sensor
-                .filter((s) => s.value_type === t)
-                .map((row) => {
-                  const x = new Date(row.datetime).getTime();
-                  return {
-                    x,
-                    y: row.value,
-                  };
-                }),
-            };
-          }),
-        },
-        options: {
-          responsive: true,
-          scales: {
-            x: {
-              type: 'time',
-              time: {
-                unit: 'hour',
-                displayFormats: {
-                  hour: 'HH:mm',
-                },
-              },
-            },
+  const chartCanvas = document.createElement('canvas');
+  new Chart(chartCanvas, {
+    data: {
+      datasets: Object.entries(types)
+        .filter(([t]) => sensorsData.some((s) => s.value_type === t))
+        .map(([type, params]) => ({
+          type: 'line',
+          label: type,
+          pointRadius: 1,
+          ...params,
+          data: sensorsData
+            .filter((s) => s.value_type === type)
+            .map((row) => ({
+              x: new Date(row.datetime).getTime(),
+              y: row.value,
+            })),
+        })),
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          display: showXAxis,
+          type: 'time',
+          time: {
+            unit: 'hour',
+            displayFormats: { hour: 'HH:mm' },
           },
         },
-      });
-
-      popupElement.appendChild(chartCanvas);
-    } else {
-      const notFoundDiv = document.createElement('div');
-      notFoundDiv.innerHTML = `Данные для приёмника #${sensorId} за последние '24 часа' не найдены`;
-      popupElement.appendChild(notFoundDiv);
-    }
-  }
-  return popupElement;
+      },
+    },
+  });
+  return chartCanvas;
 }
